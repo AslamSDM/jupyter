@@ -1,70 +1,243 @@
 "use client";
-import React, { useEffect } from 'react';
-import axios from 'axios';
-import {Card, CardHeader, CardBody, CardFooter} from "@nextui-org/card";
-import { BigNumber } from 'bignumber.js';
-import Link from 'next/link';
+import React, { useEffect, useCallback } from "react";
+import { dummyPools, columns } from "./dummyData";
+import axios from "axios";
+import { BigNumber } from "bignumber.js";
+import Link from "next/link";
+import Logo from "../assets/logo.svg";
+import Image from "next/image";
 
 export default function Pools() {
-    const [pools, setPools] = React.useState([]);
-    const [loading, setLoading] = React.useState(false);
+  const [pools, setPools] = React.useState(dummyPools);
+  const [loading, setLoading] = React.useState(false);
+  const [sortKey, setSortKey] = React.useState<string | null>(null);
+  const [sortOrder, setSortOrder] = React.useState<"asc" | "desc" | null>(null);
 
-    function decodeMantissa(mantissa: string, vdecimals: number,udecimals: number): number {
-        const value = Number(mantissa);
+  const handleSorting = (key: string) => {
+    setSortKey(key);
+    setSortOrder((prevSortOrder) =>
+      prevSortOrder ? (prevSortOrder === "asc" ? "desc" : "asc") : "asc"
+    );
+  };
 
-        const decimals = 18 + udecimals- vdecimals
-        const f = value / Math.pow(10, decimals);
-        return Number(f);
+  useEffect(() => {
+    if (!sortKey) return;
+    const sortedPools = [...pools].sort((a: any, b: any) => {
+      const aValue = a[sortKey];
+      const bValue = b[sortKey];
+
+      if (typeof aValue === "number" && typeof bValue === "number")
+        return aValue - bValue;
+      else if (typeof aValue === "string" && typeof bValue === "string")
+        return aValue.localeCompare(bValue);
+      else return 0;
+    });
+    setPools(sortedPools);
+  }, [sortKey]);
+
+  useEffect(() => {
+    const reversedPools = [...pools].reverse();
+    setPools(reversedPools);
+  }, [sortOrder]);
+
+  const renderHeaderCell = useCallback((columnKey: any) => {
+    switch (columnKey) {
+      case "asset":
+        return (
+          <div
+            className="p-4 flex items-center text-start pl-6"
+            onClick={() => handleSorting("name")}
+          >
+            <p className="">Asset</p>
+          </div>
+        );
+
+      case "totalSupply":
+        return (
+          // <div className="flex flex-col">
+          <p className="p-4" onClick={() => handleSorting("totalSupplyUsd")}>
+            Total Supply
+          </p>
+          // </div>
+        );
+
+      case "supplyApy":
+        return (
+          <div
+            className=" p-4 flex justify-end"
+            onClick={() => handleSorting("supplyApy")}
+          >
+            <p className="">Supply APY / LTV</p>
+          </div>
+        );
+
+      case "totalBorrow":
+        return (
+          <div
+            className="p-4 flex justify-end"
+            onClick={() => handleSorting("totalBorrowUsd")}
+          >
+            <p className="">Total Borrow</p>
+          </div>
+        );
+
+      case "borrowApy":
+        return (
+          <p className="p-4" onClick={() => handleSorting("borrowApy")}>
+            Borrow APY
+          </p>
+        );
+
+      case "liquidity":
+        return (
+          <div
+            className="p-4 flex flex-col justify-end"
+            onClick={() => handleSorting("liquidityUsd")}
+          >
+            <p className="">Liquidity</p>
+          </div>
+        );
+
+      case "price":
+        return (
+          <p className="p-4 pr-6" onClick={() => handleSorting("price")}>
+            Price
+          </p>
+        );
+
+      default:
+        return null;
     }
+  }, []);
 
+  const renderCell = useCallback((user: any, columnKey: any) => {
+    switch (columnKey) {
+      case "asset":
+        return (
+          <div className="flex items-center gap-1">
+            <Image src={Logo} alt="logo" width={24} height={24} />
+            {/* <img src={Logo} alt="logo" className="w-6 h-6 mr-2" /> */}
+            <p className="text-white">{user.name}</p>
+          </div>
+        );
 
-    useEffect(() => {
-        async function fetchPools() {
-            setLoading(true);
-            const response = await axios.get('https://testnetapi.venus.io/markets/core-pool?limit=60');
-            response.data.result.map((pool:any) => {
-                const totalsupply = decodeMantissa(pool.totalSupplyMantissa,8, 0)
-                const exchangeRate = decodeMantissa(pool.exchangeRateMantissa,8, 18)
-                pool.totalsupplyusd = totalsupply*exchangeRate*Number(pool.tokenPriceCents)
-                return pool;
-            })
-            response.data.result.sort((a:any, b:any) => Number(b.totalsupplyusd) - Number(a.totalsupplyusd));
-            setPools(response.data.result);
-            setLoading(false);
-        }
-        fetchPools();
-    }, []);
-    console.log(pools);
-    return (<>
-            <div className="flex justify-center">
-        <Card className="w-full">
-            <CardHeader>Pool</CardHeader>
-            <CardBody className='flex flex-col gap-4'>
-                <Card className="flex flex-row justify-between">
-                    <CardBody className="flex flex-row justify-between">
+      case "totalSupply":
+        return (
+          <div className="flex flex-col">
+            <p className="text-white">
+              {user.totalSupplyCoin} {user.name}
+            </p>
+            <p className="text-slate-400">{user.totalSupplyUsd}</p>
+          </div>
+        );
 
-                    <div className="w-1/4">Name</div>
-                    <div className="w-1/4">Total supply</div>
-                    <div className="w-1/4">Liquidity</div>
-                    <div className="w-1/4">Supply APY</div>
-                    <div className="w-1/4">Borrow APY</div>
-               </CardBody>
-                </Card>
-                {pools.map((pool:any) => (
-                    <Card >
-                        <Link href={`/pool/${pool.address}`}>
-                        <CardBody className="flex flex-row justify-between">
-                        <div className="w-1/4">{pool.name}</div>
-                        <div className="w-1/4">{(pool.totalsupplyusd / 1000000).toLocaleString("US-en")} million</div>
-                        <div className="w-1/4">{pool.liquidityCents}</div>
-                        <div className="w-1/4">{pool.supplyApy}</div>
-                        <div className="w-1/4">{pool.borrowApy}</div>
-                        </CardBody>
-                        </Link>
-                    </Card>))}
-            </CardBody>
-            </Card>
+      case "supplyApy":
+        return (
+          <div className="flex flex-col">
+            <p className="text-white">{user.supplyApy}%</p>
+            <p className="text-slate-400">{user.ltv}%</p>
+          </div>
+        );
 
-            </div>
-    </>);
+      case "totalBorrow":
+        return (
+          <div className="flex flex-col">
+            <p className="text-white">
+              {user.totalBorrowCoin} {user.name}
+            </p>
+            <p className="text-slate-400">${user.totalBorrowUsd}</p>
+          </div>
+        );
+      case "borrowApy":
+        return <p>{user.borrowApy}%</p>;
+
+      case "liquidity":
+        return (
+          <div className="flex flex-col">
+            <p className="text-white">
+              {user.liquidityCoin} {user.name}
+            </p>
+            <p className="text-slate-400">${user.liquidityUsd}</p>
+          </div>
+        );
+
+      case "price":
+        return <p>{user.price}</p>;
+
+      default:
+        return null;
+    }
+  }, []);
+
+  function decodeMantissa(
+    mantissa: string,
+    vdecimals: number,
+    udecimals: number
+  ): number {
+    const value = Number(mantissa);
+
+    const decimals = 18 + udecimals - vdecimals;
+    const f = value / Math.pow(10, decimals);
+    return Number(f);
+  }
+
+  // useEffect(() => {
+  //   async function fetchPools() {
+  //     setLoading(true);
+  //     const response = await axios.get(
+  //       "https://testnetapi.venus.io/markets/core-pool?limit=60"
+  //     );
+  //     response.data.result.map((pool: any) => {
+  //       const totalsupply = decodeMantissa(pool.totalSupplyMantissa, 8, 0);
+  //       const exchangeRate = decodeMantissa(pool.exchangeRateMantissa, 8, 18);
+  //       pool.totalsupplyusd =
+  //         totalsupply * exchangeRate * Number(pool.tokenPriceCents);
+  //       return pool;
+  //     });
+  //     response.data.result.sort(
+  //       (a: any, b: any) => Number(b.totalsupplyusd) - Number(a.totalsupplyusd)
+  //     );
+  //     setPools(response.data.result);
+  //     setLoading(false);
+  //   }
+  //   fetchPools();
+  // }, []);
+  // console.log(pools);
+
+  return (
+    <>
+      <div
+        className="flex flex-col items-center  justify-center bg-[#181d27]"
+        aria-label="Core Pool table"
+      >
+        <div className="w-4/5 py-6 text-white mt-20 bg-[#1E2431] rounded-3xl">
+          <table className=" w-full">
+            <thead>
+              <tr>
+                {columns.map((column) => (
+                  <th
+                    className="text-[#AAB3CA] text-sm font-normal text-end"
+                    key={column.key}
+                  >
+                    {renderHeaderCell(column.key)}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {pools.map((pool: any, index: number) => (
+                <tr key={index}>
+                  {columns.map((column) => (
+                    <td key={column.key} className="text-end px-4">
+                      {renderCell(pool, column.key)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </>
+  );
 }
