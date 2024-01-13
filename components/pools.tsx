@@ -207,7 +207,7 @@ export default function Pools() {
   return (
     <>
       <div
-        className="flex flex-col items-center  justify-center bg-[#181d27]"
+        className="w-full flex flex-col items-center  justify-center bg-[#181d27]"
         aria-label="Core Pool table"
       >
         <div className="w-4/5 py-6 text-white mt-20 bg-[#1E2431] rounded-3xl">

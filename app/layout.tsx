@@ -4,6 +4,7 @@ import { siteConfig } from "@/config/site";
 import { fontSans } from "@/config/fonts";
 import { Providers } from "./providers";
 import { Navbar } from "@/components/navbar";
+import Sidebar from "@/components/sidebar";
 import { Link } from "@nextui-org/link";
 import clsx from "clsx";
 
@@ -34,13 +35,15 @@ export default function RootLayout({
       <head />
       <body
         className={clsx(
-          "min-h-screen bg-background font-sans antialiased",
+          "min-h-screen bg-[#181D27] font-sans antialiased",
           fontSans.variable
         )}
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
-			<Navbar />
-          {children}
+          <div className="flex">
+            <Sidebar />
+            {children}
+          </div>
         </Providers>
       </body>
     </html>
