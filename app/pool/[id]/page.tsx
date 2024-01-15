@@ -9,12 +9,13 @@ import { vTokenabi } from "@/components/abi/vTokenabi";
 import { vBNBTokenabi } from "@/components/abi/vBNBTokenabi";
 import { ethers } from "ethers";
 import { Console } from "console";
+import AreaChartComponent from "@/components/charts/Areachart";
 const PoolComponent = () => {
   const { id } = useParams();
   const [pool, setpool] = useState<any>([]);
   const [loading, setLoading] = useState(false);
   const [amount, setAmount] = useState(0);
-
+  const [history, setHistory] = useState<any>([]);
   function decodeMantissa(mantissa: string, vdecimals: number,udecimals: number): number {
     const value = Number(mantissa);
 
@@ -24,6 +25,20 @@ const PoolComponent = () => {
 }
 useEffect(() => {
   // Fetch data from API
+  async function fetchhistory() {
+    setLoading(true);
+    const response = await axios.get(
+      "https://testnetapi.venus.io/markets/history",
+      {
+          params: {
+            asset: id,
+          },
+        }
+        );
+        setHistory(response.data.result);
+        console.log(response.data.result)
+        setLoading(false);
+      }
   async function fetchpool() {
     setLoading(true);
     const response = await axios.get(
@@ -41,6 +56,7 @@ useEffect(() => {
         setLoading(false);
       }
       fetchpool();
+      fetchhistory();
     }, []);
     const totalsupply = decodeMantissa(pool.totalSupplyMantissa,8, 0)
     const exchangeRate = decodeMantissa(pool.exchangeRateMantissa,8, 18)
@@ -125,6 +141,7 @@ const handlesupplysubmit = async (e: any) => {
     <div>
       <Chip>{pool.name}</Chip>
       <div className="flex flex-row justify-between">
+        <AreaChartComponent data={history} />
         {/* <Card>
           <CardHeader>Supply</CardHeader>
           <CardBody>

@@ -32,6 +32,7 @@ export default function Pools() {
         return aValue.localeCompare(bValue);
       else return 0;
     });
+    console
     setPools(sortedPools);
   }, [sortKey]);
 
@@ -181,28 +182,28 @@ export default function Pools() {
     return Number(f);
   }
 
-  // useEffect(() => {
-  //   async function fetchPools() {
-  //     setLoading(true);
-  //     const response = await axios.get(
-  //       "https://testnetapi.venus.io/markets/core-pool?limit=60"
-  //     );
-  //     response.data.result.map((pool: any) => {
-  //       const totalsupply = decodeMantissa(pool.totalSupplyMantissa, 8, 0);
-  //       const exchangeRate = decodeMantissa(pool.exchangeRateMantissa, 8, 18);
-  //       pool.totalsupplyusd =
-  //         totalsupply * exchangeRate * Number(pool.tokenPriceCents);
-  //       return pool;
-  //     });
-  //     response.data.result.sort(
-  //       (a: any, b: any) => Number(b.totalsupplyusd) - Number(a.totalsupplyusd)
-  //     );
-  //     setPools(response.data.result);
-  //     setLoading(false);
-  //   }
-  //   fetchPools();
-  // }, []);
-  // console.log(pools);
+  useEffect(() => {
+    async function fetchPools() {
+      setLoading(true);
+      const response = await axios.get(
+        "https://testnetapi.venus.io/markets/core-pool?limit=60"
+      );
+      response.data.result.map((pool: any) => {
+        const totalsupply = decodeMantissa(pool.totalSupplyMantissa, 8, 0);
+        const exchangeRate = decodeMantissa(pool.exchangeRateMantissa, 8, 18);
+        pool.totalsupplyusd =
+          totalsupply * exchangeRate * Number(pool.tokenPriceCents);
+        return pool;
+      });
+      response.data.result.sort(
+        (a: any, b: any) => Number(b.totalsupplyusd) - Number(a.totalsupplyusd)
+      );
+      setPools(response.data.result);
+      setLoading(false);
+    }
+    fetchPools();
+  }, []);
+  console.log(pools);
 
   return (
     <>
