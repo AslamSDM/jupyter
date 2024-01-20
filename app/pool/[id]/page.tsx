@@ -1,24 +1,32 @@
 "use client";
 import { useParams } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
+import Image from "next/image";
 import axios from "axios";
 import { Card, CardBody, CardHeader } from "@nextui-org/card";
-import { Button, Chip, Divider, Input, Tab, Tabs } from "@nextui-org/react";
 import {
+  Button,
+  Chip,
+  Divider,
+  Input,
+  Tab,
+  Tabs,
   Modal,
   ModalContent,
   ModalHeader,
   ModalBody,
   ModalFooter,
   useDisclosure,
+  Progress,
 } from "@nextui-org/react";
-
+import {} from "@nextui-org/react";
 import { useContractRead, useContractWrite, useSendTransaction } from "wagmi";
 import { vTokenabi } from "@/components/abi/vTokenabi";
 import { vBNBTokenabi } from "@/components/abi/vBNBTokenabi";
 import { ethers } from "ethers";
 import { Console } from "console";
 import AreaChartComponent from "@/components/charts/Areachart";
+import Logo from "@/assets/logo.svg";
 
 const PoolComponent = () => {
   const { id } = useParams();
@@ -259,7 +267,13 @@ const PoolComponent = () => {
                   <ModalHeader className="text-center">{pool.name}</ModalHeader>
                   <Divider />
                   <ModalBody className="w-full items-center">
-                    <Tabs selectedKey={selectedTab} onSelectionChange={setSelectedTab} variant="light" size="lg" color="primary">
+                    <Tabs
+                      selectedKey={selectedTab}
+                      onSelectionChange={setSelectedTab}
+                      variant="light"
+                      size="lg"
+                      color="primary"
+                    >
                       <Tab key="supply" className="w-full" title="Supply">
                         <Card>
                           <CardBody className="bg-[#1E2431]">
@@ -269,6 +283,7 @@ const PoolComponent = () => {
                             >
                               <Input
                                 placeholder="Amount"
+                                variant="bordered"
                                 type="number"
                                 onChange={(e) => {
                                   setAmount(Number(e.target.value));
@@ -302,17 +317,93 @@ const PoolComponent = () => {
                         <Card>
                           <CardBody className="bg-[#1E2431]">
                             <form
-                              className="flex flex-col gap-3 items-start"
+                              className="flex flex-col gap-3 items-center"
                               onSubmit={handlewithdrawsubmit}
                             >
                               <Input
-                                placeholder="Amount"
+                                placeholder="0.00"
+                                variant="bordered"
                                 type="number"
                                 onChange={(e) => {
                                   setAmount(Number(e.target.value));
                                 }}
+                                startContent={
+                                  <Image
+                                    src={Logo}
+                                    alt="logo"
+                                    width={20}
+                                    height={20}
+                                  />
+                                }
+                                endContent={
+                                  <Button size="sm" onClick={() => {}}>
+                                    Max
+                                  </Button>
+                                }
                               />
-                              <Button type="submit">Withdraw</Button>
+                              <div className="flex flex-col w-full gap-2">
+                                <div className="flex justify-between">
+                                  <p>Withdrawable amount</p>
+                                  <p>0 BTCB</p>
+                                </div>
+                                <Divider className="my-4" />
+                                <div className="flex justify-between">
+                                  <div className="flex justify-start gap-1">
+                                    <Image
+                                      src={Logo}
+                                      alt="logo"
+                                      width={20}
+                                      height={20}
+                                    />
+                                    <p>Supply APY</p>
+                                  </div>
+                                  <p>0.02%</p>
+                                </div>
+                                <div className="flex justify-between">
+                                  <div className="flex justify-start gap-1">
+                                    <Image
+                                      src={Logo}
+                                      alt="logo"
+                                      width={20}
+                                      height={20}
+                                    />
+                                    <p>Distribution APY</p>
+                                  </div>
+                                  <p>0.02%</p>
+                                </div>
+                                <div className="flex justify-between">
+                                  <p>Supply APY</p>
+                                  <p>0.02%</p>
+                                </div>
+                                <Divider className="my-4" />
+                                <Progress
+                                  label="Current"
+                                  value={50}
+                                  maxValue={200}
+                                  showValueLabel={true}
+                                  formatOptions={{
+                                    style: "currency",
+                                    currency: "USD",
+                                    currencyDisplay: "symbol",
+                                  }}
+                                  classNames={{
+                                    label: "text-gray-500",
+                                  }}
+                                />
+                                <div className="flex justify-between">
+                                  <p>Supply Balance</p>
+                                  <p>0.02%</p>
+                                </div>
+                                <div className="flex justify-between">
+                                  <p>Borrow limit</p>
+                                  <p>0.02%</p>
+                                </div>
+                                <div className="flex justify-between">
+                                  <p>Daily earnings</p>
+                                  <p>0.02%</p>
+                                </div>
+                              </div>
+                              <Button variant="bordered" type="submit">Withdraw</Button>
                             </form>
                           </CardBody>
                         </Card>
