@@ -2,7 +2,7 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Card, CardBody, CardHeader } from "@nextui-org/card";
+import { Card, CardBody } from "@nextui-org/card";
 import { Button, Chip, Input, Tab, Tabs } from "@nextui-org/react";
 import { useContractRead, useContractWrite, useSendTransaction } from "wagmi";
 import { vTokenabi } from "@/components/abi/vTokenabi";
@@ -141,7 +141,7 @@ const handlesupplysubmit = async (e: any) => {
     <div>
       <Chip>{pool.name}</Chip>
       <div className="flex flex-row justify-between">
-        <AreaChartComponent data={history} />
+        <AreaChartComponent />
         {/* <Card>
           <CardHeader>Supply</CardHeader>
           <CardBody>
