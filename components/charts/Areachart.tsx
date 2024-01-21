@@ -5,7 +5,7 @@ import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 
 type Props = {};
 
-const AreaChartComponent = (props: Props) => {
+const AreaChartComponent = (data:any) => {
   const timeArr = ['1M', '6M', '1Y', 'All'];
   const [time, setTime] = useState('1M');
   const chartData = Array.from({ length: 20 }, (_, index) => ({
