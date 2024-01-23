@@ -1,41 +1,41 @@
-"use client";
+"use client"
+import '@rainbow-me/rainbowkit/styles.css';
+import {
+  getDefaultWallets,
+  RainbowKitProvider,
+} from '@rainbow-me/rainbowkit';
+import { configureChains, createConfig, WagmiConfig } from 'wagmi';
+import {
 
-"use client";
-import * as React from "react";
-import { useRouter } from 'next/navigation'
-
-import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
-import { configureChains, createConfig, WagmiConfig } from "wagmi";
-import { bsc, bscTestnet } from "wagmi/chains";
-import { publicProvider } from "wagmi/providers/public";
-
-export interface ProvidersProps {
-  children: React.ReactNode;
-}
+  bscTestnet,
+} from 'wagmi/chains';
+import { publicProvider } from 'wagmi/providers/public';
+import { ReactNode } from 'react';
 const { chains, publicClient } = configureChains(
-  [bsc,bscTestnet],
-  [publicProvider()]
-);
-
-const { connectors } = getDefaultWallets({
-  appName: "aegis ai",
-  projectId: "d asd",
-  chains,
-});
-
-const wagmiConfig = createConfig({
-  autoConnect: true,
-  connectors,
-  publicClient,
-});
-export function Providers({ children }: ProvidersProps) {
-  const router = useRouter();
-
-	return (
-		<WagmiConfig config={wagmiConfig}>
-		<RainbowKitProvider chains={chains}>
-        {children}
-		</RainbowKitProvider>
-		</WagmiConfig>
-	);
-}
+    [bscTestnet],
+    [
+      publicProvider()
+    ]
+  );
+  
+  const { connectors } = getDefaultWallets({
+    appName: 'My RainbowKit App',
+    projectId: 'YOUR_PROJECT_ID',
+    chains
+  });
+  
+  const wagmiConfig = createConfig({
+    autoConnect: true,
+    connectors,
+    publicClient
+  })
+const Provider = ({children}:{children:React.ReactNode}) => {
+    return (
+      <WagmiConfig config={wagmiConfig}>
+        <RainbowKitProvider chains={chains}>
+            {children}
+        </RainbowKitProvider>
+      </WagmiConfig>
+    );
+  };
+  export default Provider;

@@ -15,6 +15,7 @@ const IsolatedPoolsPage = () => {
         args:[testnet.PoolRegistry]
     })
     console.log(isopools)
+    console.log(testnet.PoolRegistry)
 
 
 
@@ -22,6 +23,7 @@ const IsolatedPoolsPage = () => {
 return (
     <div>
         <h1>Isolated Pools</h1>
+        
     </div>
 )
 

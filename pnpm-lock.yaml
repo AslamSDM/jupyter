@@ -110,14 +110,17 @@ dependencies:
   tailwindcss:
     specifier: 3.3.5
     version: 3.3.5
+  tls:
+    specifier: ^0.0.1
+    version: 0.0.1
   typescript:
     specifier: 5.0.4
     version: 5.0.4
   viem:
-    specifier: ^1.19.8
+    specifier: ^1.20.3
     version: 1.20.3(typescript@5.0.4)
   wagmi:
-    specifier: ^1.4.7
+    specifier: ^1.4.12
     version: 1.4.12(@types/react@18.2.21)(react-dom@18.2.0)(react@18.2.0)(typescript@5.0.4)(viem@1.20.3)
 
 packages:
@@ -7929,6 +7932,10 @@ packages:
 
   /tiny-invariant@1.3.1:
     resolution: {integrity: sha512-AD5ih2NlSssTCwsMznbvwMZpJ1cbhkGd2uueNxzv2jDlEeZdU04JQfRnggJQ8DrcVBGjAsCKwFBbDlVNtEMlzw==}
+    dev: false
+
+  /tls@0.0.1:
+    resolution: {integrity: sha512-GzHpG+hwupY8VMR6rYsnAhTHqT/97zT45PG8WD5eTT1lq+dFE0nN+1PYpsoBcHJgSmTz5ceK2Cv88IkPmIPOtQ==}
     dev: false
 
   /to-regex-range@5.0.1:

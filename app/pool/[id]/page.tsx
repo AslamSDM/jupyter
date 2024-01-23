@@ -15,7 +15,6 @@ import {
   ModalContent,
   ModalHeader,
   ModalBody,
-  ModalFooter,
   useDisclosure,
   Progress,
 } from "@nextui-org/react";
@@ -24,9 +23,9 @@ import { useContractRead, useContractWrite, useSendTransaction } from "wagmi";
 import { vTokenabi } from "@/components/abi/vTokenabi";
 import { vBNBTokenabi } from "@/components/abi/vBNBTokenabi";
 import { ethers } from "ethers";
-import { Console } from "console";
 import AreaChartComponent from "@/components/charts/Areachart";
 import Logo from "@/assets/logo.svg";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 const PoolComponent = () => {
   const { id } = useParams();
@@ -236,6 +235,7 @@ const PoolComponent = () => {
 
   return (
     <div className=" w-full py-8 px-10">
+      <ConnectButton />
       <Chip>{pool.name}</Chip>
       <div className="flex flex-row justify-between">
         <div className="w-2/3">
