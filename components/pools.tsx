@@ -40,7 +40,7 @@ export default function Pools() {
     const reversedPools = [...pools].reverse();
     setPools(reversedPools);
   }, [sortOrder]);
-
+  console.log(pools);
   const renderHeaderCell = useCallback((columnKey: any) => {
     switch (columnKey) {
       case "asset":
