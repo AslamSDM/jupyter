@@ -3,10 +3,12 @@ import Link from "next/link";
 import React from "react";
 import Logo from "../assets/logo.svg";
 import Image from "next/image";
-import { DashboardIcon } from "./icons";
-// import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { DashboardIcon, SidebarIcons } from "./icons";
+import { usePathname } from "next/navigation";
 
 function Sidebar() {
+  const pathname = usePathname();
+
   const sidebarLinks = [
     { label: "Dashboard", link: "/" },
     { label: "Core Pool", link: "/core-pool" },
@@ -24,34 +26,28 @@ function Sidebar() {
     <div className="hidden bg-[#1E2431] pt-7 md:flex md:flex-col md:items-center xl:w-56">
       <Link
         href="/"
-        className="text-blue hover:underline mb-4 flex w-full gap-2 items-center justify-center py-2"
+        className="text-blue hover:underline flex w-full gap-2 items-center justify-center py-2 text-white"
       >
         <Image src={Logo} alt="Jupiter" className="w-12 h-12" />
         <span className="text-4xl font-bold">Jupiter</span>
       </Link>
-      <div className="flex-1 overflow-auto px-3 py-6 xl:w-full xl:px-0">
+      <div className="flex-1 overflow-auto px-3 py-6 xl:w-full xl:px-0 text-[#AAB3CA]">
         {sidebarLinks.map((link) => (
           <Link
             href={link.link}
             key={link.label}
-            className="flex items-center justify-center whitespace-nowrap px-6 py-4 hover:bg-lightGrey active:bg-lightGrey md:h-14 md:w-14 md:rounded-2xl md:p-0 xl:relative xl:h-auto xl:w-full xl:rounded-none xl:px-8 xl:py-4 xl:font-semibold text-blue md:bg-lightGrey md:text-offWhite xl:before:absolute xl:before:bottom-0 xl:before:left-0 xl:before:top-0 xl:before:w-1 xl:before:rounded-br-lg xl:before:rounded-tr-lg xl:before:bg-blue"
+            className={`flex items-center justify-center whitespace-nowrap px-6 py-4 ${
+              pathname === link.link
+                ? "text-white border-l-3 border-blue-600 bg-gray-700"
+                : "hover:bg-gray-700"
+            }  `}
           >
-            <DashboardIcon />
+            <SidebarIcons pathLink={link.link} />
             <div className="flex grow items-center md:hidden xl:flex">
-              <p className="overflow-hidden text-ellipsis text-offWhite xl:text-inherit">
-                {link.label}
-              </p>
+              <p className="overflow-hidden text-ellipsis">{link.label}</p>
             </div>
           </Link>
         ))}
-        {/* <div className="flex items-center justify-center whitespace-nowrap px-6 py-4 hover:bg-lightGrey active:bg-lightGrey md:h-14 md:w-14 md:rounded-2xl md:p-0 xl:relative xl:h-auto xl:w-full xl:rounded-none xl:px-8 xl:py-4 xl:font-semibold text-blue md:bg-lightGrey md:text-offWhite xl:before:absolute xl:before:bottom-0 xl:before:left-0 xl:before:top-0 xl:before:w-1 xl:before:rounded-br-lg xl:before:rounded-tr-lg xl:before:bg-blue">
-          <div className="flex grow items-center md:hidden xl:flex">
-            <ConnectButton />
-          </div>
-        </div> */}
-        <div className="flex items-center justify-center whitespace-nowrap px-6 py-4 hover:bg-lightGrey active:bg-lightGrey md:h-14 md:w-14 md:rounded-2xl md:p-0 xl:relative xl:h-auto xl:w-full xl:rounded-none xl:px-8 xl:py-4 xl:font-semibold text-blue md:bg-lightGrey md:text-offWhite xl:before:absolute xl:before:bottom-0 xl:before:left-0 xl:before:top-0 xl:before:w-1 xl:before:rounded-br-lg xl:before:rounded-tr-lg xl:before:bg-blue">
-          <div className="flex grow items-center md:hidden xl:flex"></div>
-        </div>
       </div>
     </div>
   );

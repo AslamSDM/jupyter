@@ -213,6 +213,182 @@ export const NextUILogo: React.FC<IconSvgProps> = (props) => {
   );
 };
 
+export function SidebarIcons({ pathLink }: any) {
+  switch (pathLink) {
+    case "/":
+      return (
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          color="#AAB3CA"
+          id="22"
+          className="mr-4 h-6 w-6 text-inherit md:mr-0 xl:mr-4"
+        >
+          <path
+            d="M12 14a4 4 0 0 1 4 4v5H8v-5a4 4 0 0 1 4-4Z"
+            stroke="currentColor"
+            strokeWidth="2"
+          ></path>
+          <path
+            d="M1 11.422a5 5 0 0 1 1.892-3.917l7.243-5.748a3 3 0 0 1 3.73 0l7.243 5.748A5 5 0 0 1 23 11.422V18a5 5 0 0 1-5 5H6a5 5 0 0 1-5-5v-6.578Z"
+            stroke="currentColor"
+            strokeWidth="2"
+          ></path>
+        </svg>
+      );
+    case "/account":
+      return (
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          color="#AAB3CA"
+          id="150"
+          className="mr-4 h-6 w-6 text-inherit md:mr-0 xl:mr-4"
+        >
+          <path
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M1 20C1 16.134 4.13401 13 8 13H16C19.866 13 23 16.134 23 20C23 21.6569 21.6569 23 20 23H4C2.34315 23 1 21.6569 1 20ZM8 15C5.23858 15 3 17.2386 3 20C3 20.5523 3.44772 21 4 21H20C20.5523 21 21 20.5523 21 20C21 17.2386 18.7614 15 16 15H8Z"
+            fill="currentColor"
+          ></path>
+          <path
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M12 3C10.3431 3 9 4.34315 9 6C9 7.65685 10.3431 9 12 9C13.6569 9 15 7.65685 15 6C15 4.34315 13.6569 3 12 3ZM7 6C7 3.23858 9.23858 1 12 1C14.7614 1 17 3.23858 17 6C17 8.76142 14.7614 11 12 11C9.23858 11 7 8.76142 7 6Z"
+            fill="currentColor"
+          ></path>
+        </svg>
+      );
+    case "/core-pool":
+      return (
+        <svg
+          viewBox="0 0 20 18"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          color="#AAB3CA"
+          id="24"
+          className="mr-4 h-6 w-6 text-inherit md:mr-0 xl:mr-4"
+        >
+          <path
+            d="m19.662 3.953-7.32 12.678a2.52 2.52 0 0 1-4.36 0L6.699 14.41a.026.026 0 0 1 .005-.037.026.026 0 0 1 .036.006 2.108 2.108 0 0 0 3.304-.44l6.128-10.623a2.108 2.108 0 0 0-1.286-3.09.026.026 0 0 1-.026-.027c0-.007.003-.013.007-.018a.026.026 0 0 1 .019-.008h2.597a2.52 2.52 0 0 1 2.18 3.78ZM10.998.173H8.46a.026.026 0 0 0 0 .05 1.273 1.273 0 0 1 .647 1.818l-3.7 6.397a1.275 1.275 0 0 1-1.945.307.026.026 0 0 0-.041.031l1.299 2.255a1.662 1.662 0 0 0 2.88 0l4.839-8.364A1.662 1.662 0 0 0 10.998.173Zm-8.808 0a2.19 2.19 0 1 0 0 4.38 2.19 2.19 0 0 0 0-4.38Z"
+            fill="currentColor"
+          ></path>
+        </svg>
+      );
+    case "/isolated-pools":
+      return (
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 25"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          color="#AAB3CA"
+          id="26"
+          className="mr-4 h-6 w-6 text-inherit md:mr-0 xl:mr-4"
+        >
+          <circle cx="6" cy="6.17331" r="3" fill="currentColor"></circle>
+          <circle cx="18" cy="18.1733" r="3" fill="currentColor"></circle>
+          <circle cx="18" cy="6.17331" r="3" fill="currentColor"></circle>
+          <circle cx="6" cy="18.1733" r="3" fill="currentColor"></circle>
+        </svg>
+      );
+    case "/vaults":
+      return (
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          color="#AAB3CA"
+          id="28"
+          className="mr-4 h-6 w-6 text-inherit md:mr-0 xl:mr-4"
+        >
+          <rect
+            x="7"
+            y="20"
+            width="2"
+            height="4"
+            rx="1"
+            fill="currentColor"
+          ></rect>
+          <rect
+            x="15"
+            y="20"
+            width="2"
+            height="4"
+            rx="1"
+            fill="currentColor"
+          ></rect>
+          <circle
+            cx="12"
+            cy="11"
+            r="4"
+            stroke="currentColor"
+            stroke-width="2"
+          ></circle>
+          <circle cx="12" cy="11" r="1" fill="currentColor"></circle>
+          <rect
+            x="6.343"
+            y="15.243"
+            width="3"
+            height="2"
+            rx="1"
+            transform="rotate(-45 6.343 15.243)"
+            fill="currentColor"
+          ></rect>
+          <rect
+            x="7.757"
+            y="5.343"
+            width="3"
+            height="2"
+            rx="1"
+            transform="rotate(45 7.757 5.343)"
+            fill="currentColor"
+          ></rect>
+          <rect
+            x="14.121"
+            y="7.464"
+            width="3"
+            height="2"
+            rx="1"
+            transform="rotate(-45 14.121 7.464)"
+            fill="currentColor"
+          ></rect>
+          <rect
+            x="15.536"
+            y="13.121"
+            width="3"
+            height="2"
+            rx="1"
+            transform="rotate(45 15.536 13.121)"
+            fill="currentColor"
+          ></rect>
+          <rect
+            x="2"
+            y="1"
+            width="20"
+            height="20"
+            rx="5"
+            stroke="currentColor"
+            stroke-width="2"
+          ></rect>
+        </svg>
+      );
+    default:
+      return <DashboardIcon />;
+  }
+}
+
 export const DashboardIcon: React.FC<IconSvgProps> = (props) => {
   return (
     <svg
