@@ -3,9 +3,12 @@ import { useState } from "react";
 import Logo from "../assets/logo.svg";
 import { Input, Button, Divider } from "@nextui-org/react";
 import { ethers } from "ethers";
+import CoinSearch from "./coinSearch";
 
 function RepayTab({ pool, id, repay, approve }: any) {
   const [amount, setAmount] = useState(0);
+  const [openSeach, setOpenSearch] = useState(false);
+  const [coin, setCoin] = useState({ name: "BNB", symbol: "BNB" });
 
   const handleRepay = async (e: any) => {
     e.preventDefault();
@@ -34,15 +37,14 @@ function RepayTab({ pool, id, repay, approve }: any) {
         }}
         startContent={<Image src={Logo} alt="logo" width={20} height={20} />}
         endContent={
-          // <div className="flex items-center">
           <div className="flex gap-2">
             <Button
               size="sm"
-              onClick={() => {}}
+              onClick={() => setOpenSearch(!openSeach)}
               className="bg-[#2D3549] text-white"
             >
               <Image src={Logo} alt="logo" width={20} height={20} />
-              {pool.name}
+              {coin.symbol}
               <svg
                 fill="#FFFF"
                 height="200px"
@@ -70,6 +72,9 @@ function RepayTab({ pool, id, repay, approve }: any) {
                 </g>
               </svg>
             </Button>
+            {openSeach && (
+              <CoinSearch setCoin={setCoin} setOpenSearch={setOpenSearch} />
+            )}
             <Button
               size="sm"
               onClick={() => {}}

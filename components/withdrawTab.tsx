@@ -27,7 +27,11 @@ function WithdrawTab({ pool, approveVtoken, id, redeem }: any) {
         }}
         startContent={<Image src={Logo} alt="logo" width={20} height={20} />}
         endContent={
-          <Button size="sm" onClick={() => {}}>
+          <Button
+            size="sm"
+            onClick={() => {}}
+            className="bg-[#2D3549] text-white"
+          >
             Max
           </Button>
         }

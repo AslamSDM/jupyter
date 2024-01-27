@@ -4,9 +4,13 @@ import Image from "next/image";
 import Logo from "../assets/logo.svg";
 import { Switch, Input, Button, Divider } from "@nextui-org/react";
 import { ethers } from "ethers";
+import CoinSearch from "./coinSearch";
 
 function SupplyTab({ pool, id, mint, approve, mintBNB }: any) {
   const [amount, setAmount] = useState(0);
+  const [openSeach, setOpenSearch] = useState(false);
+  const [coin, setCoin] = useState({ name: "BNB", symbol: "BNB" });
+
   const handlesupplysubmit = async (e: any) => {
     e.preventDefault();
     if (pool.underlyingSymbol === "BNB") {
@@ -41,9 +45,52 @@ function SupplyTab({ pool, id, mint, approve, mintBNB }: any) {
         }}
         startContent={<Image src={Logo} alt="logo" width={20} height={20} />}
         endContent={
-          <Button size="sm" onClick={() => {}}>
-            Max
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              onClick={() => setOpenSearch(!openSeach)}
+              className="bg-[#2D3549] text-white"
+            >
+              <Image src={Logo} alt="logo" width={20} height={20} />
+              {coin.symbol}
+              <svg
+                fill="#FFFF"
+                height="200px"
+                width="200px"
+                version="1.1"
+                id="Layer_1"
+                xmlns="http://www.w3.org/2000/svg"
+                xmlnsXlink="http://www.w3.org/1999/xlink"
+                viewBox="0 0 330 330"
+                xmlSpace="preserve"
+                stroke="#FFFF"
+              >
+                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                <g
+                  id="SVGRepo_tracerCarrier"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                ></g>
+                <g id="SVGRepo_iconCarrier">
+                  {" "}
+                  <path
+                    id="XMLID_225_"
+                    d="M325.607,79.393c-5.857-5.857-15.355-5.858-21.213,0.001l-139.39,139.393L25.607,79.393 c-5.857-5.857-15.355-5.858-21.213,0.001c-5.858,5.858-5.858,15.355,0,21.213l150.004,150c2.813,2.813,6.628,4.393,10.606,4.393 s7.794-1.581,10.606-4.394l149.996-150C331.465,94.749,331.465,85.251,325.607,79.393z"
+                  ></path>{" "}
+                </g>
+              </svg>
+            </Button>
+            {openSeach && (
+              <CoinSearch setCoin={setCoin} setOpenSearch={setOpenSearch} />
+            )}
+            <Button
+              size="sm"
+              onClick={() => {}}
+              className="bg-[#2D3549] text-white"
+            >
+              Max
+            </Button>
+          </div>
         }
       />
       <div className="flex flex-col w-full gap-2">
