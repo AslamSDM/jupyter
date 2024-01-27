@@ -1,16 +1,10 @@
-"use client";
 import React, { useState, useEffect, useCallback } from "react";
-import { columns } from "./dummyData";
-import axios from "axios";
-import { BigNumber } from "bignumber.js";
-import Link from "next/link";
 import Logo from "../assets/logo.svg";
 import Image from "next/image";
-import { CircularProgress } from "@nextui-org/react";
+import Link from "next/link";
 
-export default function Pools() {
-  const [pools, setPools] = useState([]);
-  const [loading, setLoading] = useState(true);
+function PoolTable({ tableData, columns }: any) {
+  const [pools, setPools] = useState(tableData);
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | null>(null);
 
@@ -64,11 +58,10 @@ export default function Pools() {
 
       case "supplyApy":
         return (
-          <div
-            className=" p-4 flex justify-end"
-            onClick={() => handleSorting("supplyApy")}
-          >
-            <p className="">Supply APY / LTV</p>
+          <div className="p-4 flex justify-end">
+            <button onClick={() => handleSorting("supplyApy")}>
+              <p className="">Supply APY / LTV</p>
+            </button>
           </div>
         );
 
@@ -115,9 +108,8 @@ export default function Pools() {
     switch (columnKey) {
       case "asset":
         return (
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 pl-2">
             <Image src={Logo} alt="logo" width={24} height={24} />
-            {/* <img src={Logo} alt="logo" className="w-6 h-6 mr-2" /> */}
             <p className="text-white">{user.name}</p>
           </div>
         );
@@ -163,88 +155,44 @@ export default function Pools() {
         );
 
       case "price":
-        return <p>{user.price}</p>;
+        return <p className="pr-2">{user.price}</p>;
 
       default:
         return null;
     }
   }, []);
 
-  function decodeMantissa(
-    mantissa: string,
-    vdecimals: number,
-    udecimals: number
-  ): number {
-    const value = Number(mantissa);
-
-    const decimals = 18 + udecimals - vdecimals;
-    const f = value / Math.pow(10, decimals);
-    return Number(f);
-  }
-
-  useEffect(() => {
-    async function fetchPools() {
-      setLoading(true);
-      const response = await axios.get(
-        "https://testnetapi.venus.io/markets/core-pool?limit=60"
-      );
-      response.data.result.map((pool: any) => {
-        const totalsupply = decodeMantissa(pool.totalSupplyMantissa, 8, 0);
-        const exchangeRate = decodeMantissa(pool.exchangeRateMantissa, 8, 18);
-        pool.totalsupplyusd =
-          totalsupply * exchangeRate * Number(pool.tokenPriceCents);
-        return pool;
-      });
-      response.data.result.sort(
-        (a: any, b: any) => Number(b.totalsupplyusd) - Number(a.totalsupplyusd)
-      );
-      setPools(response.data.result);
-      setLoading(false);
-    }
-    fetchPools();
-  }, []);
-
   return (
-    <div
-      className="w-full flex flex-col items-center  justify-center bg-[#181d27]"
-      aria-label="Core Pool table"
-    >
-      {loading ? (
-        <CircularProgress />
-      ) : (
-        <div className="w-4/5 py-6 text-white mt-20 bg-[#1E2431] rounded-3xl">
-          <table className=" w-full">
-            <thead className="w-full grid col-6">
-              <tr>
-                {columns.map((column) => (
-                  <th
-                    className="text-[#AAB3CA] text-sm font-normal text-end"
-                    key={column.key}
+    <div className="py-6 text-white bg-[#1E2431] rounded-3xl">
+      <table className="w-full text-md">
+        <thead className="text-[#AAB3CA] text-md text-end">
+          <tr>
+            {columns.map((column: any) => (
+              <th scope="col" className="font-medium" key={column.key}>
+                {renderHeaderCell(column.key)}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {pools.map((pool: any, index: number) => (
+            <tr key={index}>
+              {columns.map((column: any) => (
+                <td key={column.key} className="text-end px-4">
+                  <Link
+                    className="w-full grid col-6"
+                    href={`/pool/${pool.address}`}
                   >
-                    {renderHeaderCell(column.key)}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {pools.map((pool: any, index: number) => (
-                <Link
-                  className="w-full grid col-6"
-                  href={`/pool/${pool.address}`}
-                >
-                  <tr key={index}>
-                    {columns.map((column) => (
-                      <td key={column.key} className="text-end px-4">
-                        {renderCell(pool, column.key)}
-                      </td>
-                    ))}
-                  </tr>
-                </Link>
+                    {renderCell(pool, column.key)}
+                  </Link>
+                </td>
               ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
+
+export default PoolTable;

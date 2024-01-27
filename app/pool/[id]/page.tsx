@@ -110,9 +110,11 @@ const PoolComponent = () => {
   }
 
   return (
-    <div className=" w-full py-8 px-10">
-      <ConnectButton />
-      <Chip>{pool.name}</Chip>
+    <div className="w-full py-8 px-10">
+      <div className="flex justify-between mb-4">
+        <Chip>{pool.name}</Chip>
+        <ConnectButton />
+      </div>
       <div className="flex flex-row justify-between">
         <div className="w-2/3">
           <AreaChartComponent data={history} />

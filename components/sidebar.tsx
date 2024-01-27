@@ -4,7 +4,7 @@ import React from "react";
 import Logo from "../assets/logo.svg";
 import Image from "next/image";
 import { DashboardIcon } from "./icons";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+// import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 function Sidebar() {
   const sidebarLinks = [
@@ -44,14 +44,11 @@ function Sidebar() {
             </div>
           </Link>
         ))}
-          <div
-            
-            className="flex items-center justify-center whitespace-nowrap px-6 py-4 hover:bg-lightGrey active:bg-lightGrey md:h-14 md:w-14 md:rounded-2xl md:p-0 xl:relative xl:h-auto xl:w-full xl:rounded-none xl:px-8 xl:py-4 xl:font-semibold text-blue md:bg-lightGrey md:text-offWhite xl:before:absolute xl:before:bottom-0 xl:before:left-0 xl:before:top-0 xl:before:w-1 xl:before:rounded-br-lg xl:before:rounded-tr-lg xl:before:bg-blue"
-          >
-            <div className="flex grow items-center md:hidden xl:flex">
-       <ConnectButton />
-            </div>
-            </div>
+        {/* <div className="flex items-center justify-center whitespace-nowrap px-6 py-4 hover:bg-lightGrey active:bg-lightGrey md:h-14 md:w-14 md:rounded-2xl md:p-0 xl:relative xl:h-auto xl:w-full xl:rounded-none xl:px-8 xl:py-4 xl:font-semibold text-blue md:bg-lightGrey md:text-offWhite xl:before:absolute xl:before:bottom-0 xl:before:left-0 xl:before:top-0 xl:before:w-1 xl:before:rounded-br-lg xl:before:rounded-tr-lg xl:before:bg-blue">
+          <div className="flex grow items-center md:hidden xl:flex">
+            <ConnectButton />
+          </div>
+        </div> */}
       </div>
     </div>
   );

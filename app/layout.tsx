@@ -37,7 +37,7 @@ export default function RootLayout({
           fontSans.variable
         )}
       >
-        <Providers >
+        <Providers>
           <div className="flex">
             <Sidebar />
             {children}
