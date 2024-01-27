@@ -214,10 +214,8 @@ export default function Pools() {
         <div className="w-4/5 py-6 text-white mt-20 bg-[#1E2431] rounded-3xl">
           <table className=" w-full">
             <thead  className="w-full grid col-6">
-
               <tr >
                 {columns.map((column) => (
-
                   <th
                     className="text-[#AAB3CA] text-sm font-normal text-end"
                     key={column.key}
