@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -6,7 +7,7 @@ import { useEffect, useState } from "react";
 
 const Page = () => {
    
-    const { id } = useParams<{ id: string }>();
+    const { section } = useParams<{ section: string }>();
     const [loading, setLoading] = useState(false);
     const [pool, setPool] = useState([]);
     useEffect(() => {
@@ -15,13 +16,12 @@ const Page = () => {
           const res = await fetch("/api/isolatedpools?chain=bsctestnet");
           const data = await res.json();
           const pools_json = JSON.parse(data);
-          const pool = pools_json.filter((pool: any) => pool.name === id);
+          const pool = pools_json.filter((pool: any) => pool.name === section);
           setPool(pool);
           setLoading(false);
         }
         fetchData();
       }, []);
-      console.log(pool);
 
     
 
@@ -30,8 +30,15 @@ const Page = () => {
         <h1>Isolated Pool</h1>
         <div className="w-full flex flex-col items-center  justify-center bg-[#181d27]">
             {
-                Array.isArray(pool) && pool.map((pool: any, index: number) => (
+                Array.isArray(pool[0]?.vTokens) && pool[0]?.vTokens.map((token: any, index: number) => (
                     <>
+                    <div className="w-full flex flex-col items-center  justify-center bg-[#181d27]">
+                        <Link href={`/isolated-pools/${pool[0]?.name}/${token.vToken}`}>
+                            <h1>
+                                {token.vToken}
+                            </h1>
+                        </Link>
+                        </div>
                     </>
                 ))
             }
