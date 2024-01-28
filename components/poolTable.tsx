@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import Logo from "../assets/logo.svg";
 import Image from "next/image";
 import Link from "next/link";
+import getImage from "./abi/tokenImage";
+import { get } from "http";
 
 function PoolTable({ tableData, columns }: any) {
   const [pools, setPools] = useState(tableData);
@@ -109,7 +111,12 @@ function PoolTable({ tableData, columns }: any) {
       case "asset":
         return (
           <div className="flex items-center gap-1 pl-2">
-            <Image src={Logo} alt="logo" width={24} height={24} />
+            <Image
+              src={getImage(user.name)}
+              alt="logo"
+              width={24}
+              height={24}
+            />
             <p className="text-white">{user.name}</p>
           </div>
         );
@@ -127,8 +134,8 @@ function PoolTable({ tableData, columns }: any) {
       case "supplyApy":
         return (
           <div className="flex flex-col">
-            <p className="text-white">{user.supplyApy}%</p>
-            <p className="text-slate-400">{user.ltv}%</p>
+            <p className="text-white">{user.supplyApy}</p>
+            <p className="text-slate-400">{user.ltv}</p>
           </div>
         );
 
@@ -142,7 +149,7 @@ function PoolTable({ tableData, columns }: any) {
           </div>
         );
       case "borrowApy":
-        return <p>{user.borrowApy}%</p>;
+        return <p>{user.borrowApy}</p>;
 
       case "liquidity":
         return (
@@ -150,7 +157,7 @@ function PoolTable({ tableData, columns }: any) {
             <p className="text-white">
               {user.liquidityCoin} {user.name}
             </p>
-            <p className="text-slate-400">${user.liquidityUsd}</p>
+            <p className="text-slate-400">{user.liquidityUsd}</p>
           </div>
         );
 
