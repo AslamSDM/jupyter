@@ -1,8 +1,8 @@
 import { Input } from "@nextui-org/input";
 import React, { useState } from "react";
-import Logo from "../assets/logo.svg";
 import Image from "next/image";
 import { Button } from "@nextui-org/button";
+import getImage from "./abi/tokenImage";
 
 function CoinSearch({ setOpenSearch, setCoin }: any) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -92,7 +92,12 @@ function CoinSearch({ setOpenSearch, setCoin }: any) {
             className="flex items-center"
             onClick={() => handleCoinSelect(coin)}
           >
-            <Image src={Logo} alt="logo" width={20} height={20} />
+            <Image
+              src={getImage("Venus " + coin.symbol)}
+              alt="logo"
+              width={20}
+              height={20}
+            />
             <p className="text-gray-400">{coin.symbol}</p>
           </Button>
         ))}
@@ -106,7 +111,12 @@ function CoinSearch({ setOpenSearch, setCoin }: any) {
             onClick={() => handleCoinSelect(coin)}
           >
             <div className="flex justify-start gap-2">
-              <Image src={Logo} alt="logo" width={20} height={20} />
+              <Image
+                src={getImage("Venus " + coin.symbol)}
+                alt="logo"
+                width={20}
+                height={20}
+              />
               <p className="text-gray-400">{coin.symbol}</p>
             </div>
             <p className="text-gray-400 ">0.00</p>

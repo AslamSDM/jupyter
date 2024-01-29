@@ -7,10 +7,11 @@ import { Chip, Divider, useDisclosure } from "@nextui-org/react";
 import AreaChartComponent from "@/components/charts/Areachart";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import SupplyModal from "@/components/supplyModal";
+import getImage from "@/components/abi/tokenImage";
 
 const PoolComponent = () => {
   const { id } = useParams();
-  const [pool, setpool] = useState<any>([]);
+  const [pool, setPool] = useState<any>([]);
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState<any>([]);
   const [selectedTab, setSelectedTab] = useState<any>("supply");
@@ -99,7 +100,17 @@ const PoolComponent = () => {
       response.data.result.sort(
         (a: any, b: any) => Number(b.liquidityCents) - Number(a.liquidityCents)
       );
-      setpool(response.data.result[0]);
+      response.data.result.forEach((item: any) => {
+        item.logo = getImage(item.name);
+      });
+      setPool(response.data.result[0]);
+      // setPool((pool: any) => {
+      //   console.log(pool);
+      //   // pool.forEach((item: any) => {
+      //   //   console.log(item);
+      //   // });
+      //   // return pool;
+      // });
       setLoading(false);
     }
     fetchpool();

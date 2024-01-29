@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { useState } from "react";
-import Logo from "../assets/logo.svg";
 import { Input, Button, Divider } from "@nextui-org/react";
 import { ethers } from "ethers";
 
@@ -25,7 +24,9 @@ function WithdrawTab({ pool, approveVtoken, id, redeem }: any) {
         onChange={(e) => {
           setAmount(Number(e.target.value));
         }}
-        startContent={<Image src={Logo} alt="logo" width={20} height={20} />}
+        startContent={
+          <Image src={pool.logo} alt="logo" width={20} height={20} />
+        }
         endContent={
           <Button
             size="sm"
@@ -44,14 +45,14 @@ function WithdrawTab({ pool, approveVtoken, id, redeem }: any) {
         <Divider className="my-4" />
         <div className="flex justify-between">
           <div className="flex justify-start gap-1">
-            <Image src={Logo} alt="logo" width={20} height={20} />
+            <Image src={pool.logo} alt="logo" width={20} height={20} />
             <p className="text-gray-400">Supply APY</p>
           </div>
           <p>0.02%</p>
         </div>
         <div className="flex justify-between">
           <div className="flex justify-start gap-1">
-            <Image src={Logo} alt="logo" width={20} height={20} />
+            <Image src={pool.logo} alt="logo" width={20} height={20} />
             <p className="text-gray-400">Distribution APY</p>
           </div>
           <p>0.02%</p>

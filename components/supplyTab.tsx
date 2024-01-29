@@ -1,15 +1,15 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
-import Logo from "../assets/logo.svg";
 import { Switch, Input, Button, Divider } from "@nextui-org/react";
 import { ethers } from "ethers";
 import CoinSearch from "./coinSearch";
+import getImage from "./abi/tokenImage";
 
 function SupplyTab({ pool, id, mint, approve, mintBNB }: any) {
   const [amount, setAmount] = useState(0);
   const [openSeach, setOpenSearch] = useState(false);
-  const [coin, setCoin] = useState({ name: "BNB", symbol: "BNB" });
+  const [coin, setCoin] = useState({ name: pool.name, symbol: pool.name });
 
   const handlesupplysubmit = async (e: any) => {
     e.preventDefault();
@@ -43,7 +43,9 @@ function SupplyTab({ pool, id, mint, approve, mintBNB }: any) {
         onChange={(e) => {
           setAmount(Number(e.target.value));
         }}
-        startContent={<Image src={Logo} alt="logo" width={20} height={20} />}
+        startContent={
+          <Image src={pool.logo} alt="logo" width={20} height={20} />
+        }
         endContent={
           <div className="flex gap-2">
             <Button
@@ -51,7 +53,12 @@ function SupplyTab({ pool, id, mint, approve, mintBNB }: any) {
               onClick={() => setOpenSearch(!openSeach)}
               className="bg-[#2D3549] text-white"
             >
-              <Image src={Logo} alt="logo" width={20} height={20} />
+              <Image
+                src={getImage("Venus " + coin.symbol)}
+                alt="logo"
+                width={20}
+                height={20}
+              />
               {coin.symbol}
               <svg
                 fill="#FFFF"
@@ -101,14 +108,14 @@ function SupplyTab({ pool, id, mint, approve, mintBNB }: any) {
         <Divider className="my-4 bg-gray-600" />
         <div className="flex justify-between">
           <div className="flex justify-start gap-1">
-            <Image src={Logo} alt="logo" width={20} height={20} />
+            <Image src={pool.logo} alt="logo" width={20} height={20} />
             <p className="text-gray-400">Supply APY</p>
           </div>
           <p>0.02%</p>
         </div>
         <div className="flex justify-between">
           <div className="flex justify-start gap-1">
-            <Image src={Logo} alt="logo" width={20} height={20} />
+            <Image src={pool.logo} alt="logo" width={20} height={20} />
             <p className="text-gray-400">Distribution APY (XVS)</p>
           </div>
           <p>0.02%</p>

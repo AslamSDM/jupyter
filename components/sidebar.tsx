@@ -14,12 +14,12 @@ function Sidebar() {
     { label: "Core Pool", link: "/core-pool" },
     { label: "Isolated Pools", link: "/isolated-pools" },
     { label: "Vaults", link: "/vaults" },
-    { label: "Swap", link: "/swap" },
-    { label: "History", link: "/history" },
-    { label: "Governance", link: "/governance" },
-    { label: "XVS", link: "/xvs" },
-    { label: "Convert VRT", link: "/convert-vrt" },
-    { label: "VAI", link: "/vai" },
+    // { label: "Swap", link: "/swap" },
+    // { label: "History", link: "/history" },
+    // { label: "Governance", link: "/governance" },
+    // { label: "XVS", link: "/xvs" },
+    // { label: "Convert VRT", link: "/convert-vrt" },
+    // { label: "VAI", link: "/vai" },
   ];
 
   return (

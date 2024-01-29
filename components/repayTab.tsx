@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { useState } from "react";
-import Logo from "../assets/logo.svg";
+import getImage from "./abi/tokenImage";
 import { Input, Button, Divider } from "@nextui-org/react";
 import { ethers } from "ethers";
 import CoinSearch from "./coinSearch";
@@ -35,7 +35,9 @@ function RepayTab({ pool, id, repay, approve }: any) {
         onChange={(e) => {
           setAmount(Number(e.target.value));
         }}
-        startContent={<Image src={Logo} alt="logo" width={20} height={20} />}
+        startContent={
+          <Image src={pool.logo} alt="logo" width={20} height={20} />
+        }
         endContent={
           <div className="flex gap-2">
             <Button
@@ -43,7 +45,12 @@ function RepayTab({ pool, id, repay, approve }: any) {
               onClick={() => setOpenSearch(!openSeach)}
               className="bg-[#2D3549] text-white"
             >
-              <Image src={Logo} alt="logo" width={20} height={20} />
+              <Image
+                src={getImage("Venus " + coin.symbol)}
+                alt="logo"
+                width={20}
+                height={20}
+              />
               {coin.symbol}
               <svg
                 fill="#FFFF"
@@ -128,14 +135,14 @@ function RepayTab({ pool, id, repay, approve }: any) {
         <Divider className="my-4 bg-gray-600" />
         <div className="flex justify-between">
           <div className="flex justify-start gap-1">
-            <Image src={Logo} alt="logo" width={20} height={20} />
+            <Image src={pool.logo} alt="logo" width={20} height={20} />
             <p className="text-gray-400">Supply APY</p>
           </div>
           <p>0.02%</p>
         </div>
         <div className="flex justify-between">
           <div className="flex justify-start gap-1">
-            <Image src={Logo} alt="logo" width={20} height={20} />
+            <Image src={pool.logo} alt="logo" width={20} height={20} />
             <p className="text-gray-400">Distribution APY (XVS)</p>
           </div>
           <p>0.02%</p>
