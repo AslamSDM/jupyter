@@ -5,37 +5,29 @@ import { useEffect, useState } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { CircularProgress } from "@nextui-org/react";
 import PoolTable from "@/components/poolTable";
-import { dummyPools, columns } from "@/components/dummyData";
+import {  columns } from "@/components/dummyData";
 
 const Page = () => {
   const { section } = useParams<{ section: string }>();
   const [loading, setLoading] = useState(false);
-  const [pool, setPool] = useState(dummyPools);
-  //   useEffect(() => {
-  //     async function fetchData() {
-  //       setLoading(true);
-  //       const res = await fetch("/api/isolatedpools?chain=bsctestnet");
-  //       const data = await res.json();
-  //       const pools_json = JSON.parse(data);
-  //       const pool = pools_json.filter((pool: any) => pool.name === section);
-  //       console.log(pool);
-  //       setPool(pool);
-  //       setLoading(false);
-  //     }
-  //     fetchData();
-  //   }, []);
+  const [pool, setPool] = useState<any>([]);
+
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
       const res = await fetch("/api/isolatedpools?chain=bsctestnet");
       const data = await res.json();
       const pools_json = JSON.parse(data);
-      setPool(pools_json);
+      const pool_ = pools_json.filter((pool: any) => pool.name === section);
+      setPool(pool_);
       setLoading(false);
     }
     fetchData();
   }, []);
-  console.log(pool);
+  
+  //Data to be implemented !!!!
+
+  console.log(pool[0]?.vTokens);
   return (
     <div className="w-full flex flex-col gap-10 px-10 py-8">
       <div className="flex justify-between">
@@ -67,24 +59,10 @@ const Page = () => {
           <CircularProgress />
         </div>
       ) : (
-        <PoolTable columns={columns} tableData={pool} />
+        <PoolTable columns={columns} tableData={pool[0]?.vTokens || []} poolType="isolated" />
       )}
     </div>
-    // <div>
-    //   <h1>Isolated Pool</h1>
-    //   <div className="w-full flex flex-col items-center  justify-center bg-[#181d27]">
-    //     {/* {Array.isArray(pool[0]?.vTokens) &&
-    //       pool[0]?.vTokens.map((token: any, index: number) => (
-    //         <>
-    //           <div className="w-full flex flex-col items-center  justify-center bg-[#181d27]">
-    //             <Link href={`/isolated-pools/${pool[0]?.name}/${token.vToken}`}>
-    //               <h1>{token.vToken}</h1>
-    //             </Link>
-    //           </div>
-    //         </>
-    //       ))} */}
-    //   </div>
-    // </div>
+
   );
 };
 

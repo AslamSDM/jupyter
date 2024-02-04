@@ -112,7 +112,7 @@ function IsolatedPoolsTable({ columns, pools }: any) {
             <tr>
               {columns.map((column: any) => (
                 <td key={column.key} className="text-end px-4">
-                  <Link className="" href={`/isolated-pools/${pool.creator}`}>
+                  <Link className="" href={`/isolated-pools/${pool.name}`}>
                     {renderCell(pool, column.key)}
                   </Link>
                 </td>
