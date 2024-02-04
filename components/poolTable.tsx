@@ -30,12 +30,12 @@ function PoolTable({ tableData, columns }: any) {
       else return 0;
     });
     setPools(sortedPools);
-  }, [sortKey]);
+  }, [sortKey,tableData]);
 
   useEffect(() => {
     const reversedPools = [...pools].reverse();
     setPools(reversedPools);
-  }, [sortOrder]);
+  }, [sortOrder,tableData]);
 
   const renderHeaderCell = useCallback((columnKey: any) => {
     switch (columnKey) {

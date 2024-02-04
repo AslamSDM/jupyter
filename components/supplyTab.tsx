@@ -6,7 +6,7 @@ import { ethers } from "ethers";
 import CoinSearch from "./coinSearch";
 import getImage from "./abi/tokenImage";
 
-function SupplyTab({ pool, id, mint, approve, mintBNB }: any) {
+function SupplyTab({ pool, id, mint, approve, mintBNB ,marketHandler,Membership}: any) {
   const [amount, setAmount] = useState(0);
   const [openSeach, setOpenSearch] = useState(false);
   const [coin, setCoin] = useState({ name: pool.name, symbol: pool.name });
@@ -34,7 +34,7 @@ function SupplyTab({ pool, id, mint, approve, mintBNB }: any) {
     >
       <div className="w-full flex justify-between">
         <p className="text-gray-400">Collateral</p>
-        <Switch></Switch>
+        <Switch isSelected={Membership} onClick={()=>marketHandler()}></Switch>
       </div>
       <Input
         placeholder="0.00"

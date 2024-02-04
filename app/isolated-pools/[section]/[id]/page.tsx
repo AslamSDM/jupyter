@@ -119,6 +119,7 @@ const PoolComponent = () => {
                 onOpenChange={onOpenChange}
                 selectedTab={selectedTab}
                 setSelectedTab={setSelectedTab}
+                poolType="isolated"
               />
             </CardBody>
           </Card>

@@ -70,7 +70,6 @@ const PoolComponent = () => {
     { label: "Xvs Borrow Index", data: pool.xvsBorrowIndex },
     { label: "Xvs Supply Index", data: pool.xvsSupplyIndex },
   ];
-
   useEffect(() => {
     // Fetch data from API
     async function fetchhistory() {
@@ -157,6 +156,7 @@ const PoolComponent = () => {
                 onOpenChange={onOpenChange}
                 selectedTab={selectedTab}
                 setSelectedTab={setSelectedTab}
+                poolType="core"
               />
             </CardBody>
           </Card>
