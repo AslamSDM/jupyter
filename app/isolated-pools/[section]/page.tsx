@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { CircularProgress } from "@nextui-org/react";
 import PoolTable from "@/components/poolTable";
-import {  columns } from "@/components/dummyData";
+import { columns } from "@/components/dummyData";
 
 const Page = () => {
   const { section } = useParams<{ section: string }>();
@@ -20,11 +20,12 @@ const Page = () => {
       const pools_json = JSON.parse(data);
       const pool_ = pools_json.filter((pool: any) => pool.name === section);
       setPool(pool_);
+      console.log(pool_);
       setLoading(false);
     }
     fetchData();
   }, []);
-  
+
   //Data to be implemented !!!!
 
   console.log(pool[0]?.vTokens);
@@ -59,10 +60,13 @@ const Page = () => {
           <CircularProgress />
         </div>
       ) : (
-        <PoolTable columns={columns} tableData={pool[0]?.vTokens || []} poolType="isolated" />
+        <PoolTable
+          columns={columns}
+          tableData={pool[0]?.vTokens || []}
+          poolType="isolated"
+        />
       )}
     </div>
-
   );
 };
 

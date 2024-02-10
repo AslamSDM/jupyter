@@ -5,7 +5,7 @@ import Link from "next/link";
 import getImage from "./abi/tokenImage";
 import { get } from "http";
 
-function PoolTable({ tableData, columns ,poolType}: any) {
+function PoolTable({ tableData, columns, poolType }: any) {
   const [pools, setPools] = useState(tableData);
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | null>(null);
@@ -30,12 +30,12 @@ function PoolTable({ tableData, columns ,poolType}: any) {
       else return 0;
     });
     setPools(sortedPools);
-  }, [sortKey,tableData]);
+  }, [sortKey, tableData]);
 
   useEffect(() => {
     const reversedPools = [...pools].reverse();
     setPools(reversedPools);
-  }, [sortOrder,tableData]);
+  }, [sortOrder, tableData]);
 
   const renderHeaderCell = useCallback((columnKey: any) => {
     switch (columnKey) {
@@ -168,7 +168,6 @@ function PoolTable({ tableData, columns ,poolType}: any) {
         return null;
     }
   }, []);
-console.log(columns)
   return (
     <div className="py-6 text-white bg-[#1E2431] rounded-3xl">
       <table className="w-full text-md">
@@ -188,7 +187,11 @@ console.log(columns)
                 <td key={column.key} className="text-end px-4">
                   <Link
                     className="w-full grid col-6"
-                    href={poolType =="isolated"? `/isolated-pool/` :`/pool/${pool.address}`}
+                    href={
+                      poolType == "isolated"
+                        ? `/isolated-pool/`
+                        : `/pool/${pool.address}`
+                    }
                   >
                     {renderCell(pool, column.key)}
                   </Link>
