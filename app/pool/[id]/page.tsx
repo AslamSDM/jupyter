@@ -82,8 +82,15 @@ const PoolComponent = () => {
           },
         }
       );
-      setHistory(response.data.result);
-      console.log(response.data.result);
+      const { data } = response.data.result;
+      let chartData: any = [];
+      data.forEach((item: any, index: number) => {
+        chartData.push({
+          name: index + 1,
+          val: item.totalSupplyCents,
+        });
+      });
+      setHistory(chartData);
       setLoading(false);
     }
     async function fetchpool() {
@@ -103,7 +110,6 @@ const PoolComponent = () => {
         item.logo = getImage(item.name);
       });
       setPool(response.data.result[0]);
-
       setLoading(false);
     }
     fetchpool();

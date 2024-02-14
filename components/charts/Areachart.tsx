@@ -1,17 +1,40 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer } from 'recharts';
+import { type } from "os";
+import React, { useEffect, useState } from "react";
+import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer } from "recharts";
 
 type Props = {};
 
-const AreaChartComponent = (data:any) => {
-  const timeArr = ['1M', '6M', '1Y', 'All'];
-  const [time, setTime] = useState('1M');
-  const chartData = Array.from({ length: 20 }, (_, index) => ({
-    name: `${index + 1}`,
-    val: Math.random() * 100,
-  }));
+const AreaChartComponent = ({ data }: any) => {
+  const timeArr = ["1M", "6M", "1Y", "All"];
+  const [time, setTime] = useState("All");
+  const [filteredChartData, setFilteredChartData] = useState<any[]>(data);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!filteredChartData) return;
+    setLoading(true);
+  }, [filteredChartData]);
+
+  useEffect(() => {
+    console.log(time);
+    if (time === "All") {
+      console.log(filteredChartData);
+      console.log(data);
+      setFilteredChartData(data);
+    } else if (time === "1M") {
+      setFilteredChartData(data.slice(0, 30));
+    } else if (time === "6M") {
+      setFilteredChartData(data.slice(0, 180));
+    } else if (time === "1Y") {
+      setFilteredChartData(data.slice(0, 365));
+    } else {
+      setFilteredChartData(data);
+    }
+    // setLoading(false);
+  }, [time]);
+
   return (
     <div className="w-full flex flex-col gap-8">
       <div className="flex max-md:flex-col max-md:gap-3 md:items-center justify-between">
@@ -20,13 +43,13 @@ const AreaChartComponent = (data:any) => {
           <p className="text-neutral-600 text-[16px]">V3 Uniswap (Ethereum)</p>
         </div>
         <div className="flex items-center gap-2">
-          {timeArr?.map(item => (
+          {timeArr?.map((item) => (
             <button
               key={item}
               type="button"
               onClick={() => setTime(item)}
               className={`${
-                item === time ? 'bg-zinc-700' : ''
+                item === time ? "bg-zinc-700" : ""
               } text-neutral-200 w-[40px] rounded-md py-[3px] px-2 text-sm font-medium text-[16px]`}
             >
               {item}
@@ -39,7 +62,7 @@ const AreaChartComponent = (data:any) => {
           <AreaChart
             width={790}
             height={400}
-            data={chartData}
+            data={filteredChartData}
             margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
           >
             <defs>
@@ -53,14 +76,14 @@ const AreaChartComponent = (data:any) => {
               </linearGradient>
             </defs>
             <XAxis
-              axisLine={{ display: 'none' }}
-              tickLine={{ display: 'none' }}
+              axisLine={{ display: "none" }}
+              tickLine={{ display: "none" }}
               dataKey="name"
             />
             <YAxis
-              axisLine={{ display: 'none' }}
-              tickLine={{ display: 'none' }}
-              domain={['auto', 'auto']}
+              axisLine={{ display: "none" }}
+              tickLine={{ display: "none" }}
+              domain={["auto", "auto"]}
             />
             {/* <Tooltip /> */}
             <Area
