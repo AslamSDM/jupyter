@@ -103,18 +103,13 @@ const PoolComponent = () => {
         item.logo = getImage(item.name);
       });
       setPool(response.data.result[0]);
-      // setPool((pool: any) => {
-      //   console.log(pool);
-      //   // pool.forEach((item: any) => {
-      //   //   console.log(item);
-      //   // });
-      //   // return pool;
-      // });
+
       setLoading(false);
     }
     fetchpool();
     fetchhistory();
   }, []);
+  console.log(pool);
   if (loading) {
     return <div>Loading...</div>;
   }
