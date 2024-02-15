@@ -4,11 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import getImage from "./abi/tokenImage";
 import { get } from "http";
+import { decodeMantissa, formatNumber } from "@/app/utils/formatNumber";
 
 function PoolTable({ tableData, columns, poolType }: any) {
   const [pools, setPools] = useState(tableData);
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | null>(null);
+
 
   const handleSorting = (key: string) => {
     setSortKey(key);
@@ -36,6 +38,7 @@ function PoolTable({ tableData, columns, poolType }: any) {
     const reversedPools = [...pools].reverse();
     setPools(reversedPools);
   }, [sortOrder, tableData]);
+
 
   const renderHeaderCell = useCallback((columnKey: any) => {
     switch (columnKey) {
@@ -74,6 +77,7 @@ function PoolTable({ tableData, columns, poolType }: any) {
             onClick={() => handleSorting("totalBorrowUsd")}
           >
             <p className="">Total Borrow</p>
+
           </div>
         );
 
@@ -117,7 +121,7 @@ function PoolTable({ tableData, columns, poolType }: any) {
               width={24}
               height={24}
             />
-            <p className="text-white">{user.name}</p>
+            <p className="text-white">{user.symbol}</p>
           </div>
         );
 
@@ -125,44 +129,48 @@ function PoolTable({ tableData, columns, poolType }: any) {
         return (
           <div className="flex flex-col">
             <p className="text-white">
-              {user.totalSupplyCoin} {user.name}
+              {formatNumber((Number(user.totalsupplyusd)/(Number(user.tokenPriceCents)/100)).toString())} {user.symbol}
+            <p className="text-slate-400">${formatNumber((Number(user.totalsupplyusd)/100).toString())}</p>
             </p>
-            <p className="text-slate-400">{user.totalSupplyUsd}</p>
           </div>
         );
 
       case "supplyApy":
         return (
           <div className="flex flex-col">
-            <p className="text-white">{user.supplyApy}</p>
-            <p className="text-slate-400">{user.ltv}</p>
+            <p className="text-white">{(Number(user.supplyApy)+Number(user.supplyXvsApy)).toFixed(3)}%</p>
+            {/* <p className="text-slate-400">{(Number(user.supplyXvsApy)).toFixed(3)} XVS</p> */}
           </div>
         );
-
       case "totalBorrow":
         return (
           <div className="flex flex-col">
-            <p className="text-white">
-              {user.totalBorrowCoin} {user.name}
+
+            <p className="text-white">{formatNumber((decodeMantissa(user.totalBorrowsMantissa,0,0)).toString()) }   {user.symbol}
+            <p className="text-slate-400">${formatNumber((decodeMantissa(user.totalBorrowsMantissa,0,0)*Number(user.tokenPriceCents/100)).toString())}  </p>
             </p>
-            <p className="text-slate-400">${user.totalBorrowUsd}</p>
           </div>
         );
       case "borrowApy":
-        return <p>{user.borrowApy}</p>;
+        return (
+          <div className="flex flex-col">
+          <p className="text-white">{(Number(user.borrowApy)-Number(user.borrowXvsApy)).toFixed(3)}%</p>
+          {/* <p className="text-slate-400">{(Number(user.borrowApy)-Number(user.borrowXvsApy)).toFixed(3)} XVS</p> */}
+        </div>
+        );
 
       case "liquidity":
         return (
           <div className="flex flex-col">
-            <p className="text-white">
-              {user.liquidityCoin} {user.name}
+
+            <p className="text-white">{formatNumber((Number(user.liquidityCents)*100/Number(user.tokenPriceCents)).toString()) }   {user.symbol}
+            <p className="text-slate-400">{formatNumber(user.liquidityCents)}</p>
             </p>
-            <p className="text-slate-400">{user.liquidityUsd}</p>
           </div>
         );
 
       case "price":
-        return <p className="pr-2">{user.price}</p>;
+        return <p className="pr-2"> $ {Number((user.tokenPriceCents)/100).toFixed(2)} </p>;
 
       default:
         return null;
