@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { bsc,bscTestnet } from "viem/chains";
 import { createPublicClient, http } from "viem";
-import { testnet } from "@/components/contracts";
+import { mainnet, testnet } from "@/components/contracts";
 import { PoolLensabi } from "@/components/abi/Poolabi";
 
 const bscClient = createPublicClient({
@@ -21,10 +21,10 @@ const replacer = (key: string, value: any) =>
 typeof value === 'bigint' ? value.toString() : value;
 if(chain === "bsc"){
     const pools = await bscClient.readContract({
-        address: testnet.PoolLens as `0x${string}`,
+        address: mainnet.PoolLens as `0x${string}`,
         abi :PoolLensabi,
         functionName:"getAllPools",
-        args:[testnet.PoolRegistry]
+        args:[mainnet.PoolRegistry]
     });
     
     return NextResponse.json(JSON.stringify(pools, replacer));}

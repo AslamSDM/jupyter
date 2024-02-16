@@ -69,3 +69,70 @@ export const testnet = {
         }
     }
 };
+
+export const mainnet = {
+    PoolRegistry: "0x9F7b01A536aFA00EF10310A162877fd792cD0666",
+    PoolLens: "0x25E215CcE40bD849B7c286912B85212F984Ff1e0",
+    DefaultProxyAdmin: "0x6beb6D2695B67FEb73ad4f172E8E2975497187e4",
+    "Comptroller Beacon": "0x38B4Efab9ea1bAcD19dC81f19c4D1C2F9DeAe1B2",
+    "VToken Beacon": "0x2b8A1C539ABaC89CbF7E2Bc6987A0A38A5e660D4",
+    RiskFund: "0xdF31a28D68A2AB381D42b380649Ead7ae2A76E42",
+    Shortfall: "0xf37530A8a810Fcb501AA0Ecd0B0699388F0F2209",
+    ProtocolShareReserve: "0xCa01D5A9A248a830E9D93231e791B1afFed7c446",
+    "Pool Stablecoin": {
+        Comptroller: "0x94c1495cD4c557f1560Cbd68EAB0d197e6291571",
+        SwapRouter: "0xBBd8E2b5d69fcE9Aaa599c50F0f0960AA58B32aA",
+        Tokens: {
+            vHAY_Stablecoins: "0xCa2D81AA7C09A1a025De797600A7081146dceEd9",
+            vUSDD_Stablecoins: "0xc3a45ad8812189cAb659aD99E64B1376f6aCD035",
+            vUSDT_Stablecoins: "0x5e3072305F9caE1c7A82F6Fe9E38811c74922c3B",
+            vagEUR_Stablecoins: "0x795DE779Be00Ea46eA97a28BDD38d9ED570BCF0F"
+        }
+    },
+    "Pool DeFi": {
+        Comptroller: "0x3344417c9360b963ca93A4e8305361AEde340Ab9",
+        "Swap router": "0x47bEe99BD8Cf5D8d7e815e2D2a3E2985CBCcC04b",
+        Markets: {
+            vBSW_DeFi: "0x8f657dFD3a1354DEB4545765fE6840cc54AFd379",
+            vALPACA_DeFi: "0x02c5Fb0F26761093D297165e902e96D08576D344",
+            vUSDT_DeFi: "0x1D8bBDE12B6b34140604E18e9f9c6e14deC16854",
+            vUSDD_DeFi: "0xA615467caE6B9E0bb98BC04B4411d9296fd1dFa0",
+            vANKR_DeFi: "0x19CE11C8817a1828D1d357DFBF62dCf5b0B2A362",
+            vankrBNB_DeFi: "0x53728FD51060a85ac41974C6C3Eb1DaE42776723",
+            vTWT_DeFi: "0x736bf1D21A28b5DC19A1aC8cA71Fc2856C23c03F",
+            vPLANET_DeFi: "0xFf1112ba7f88a53D4D23ED4e14A117A2aE17C6be"
+        }
+    },
+    "Pool GameFi": {
+        Comptroller: "0x1b43ea8622e76627B81665B1eCeBB4867566B963",
+        "Swap router": "0x9B15462a79D0948BdDF679E0E5a9841C44aAFB7A",
+        Markets: {
+            vRACA_GameFi: "0xE5FE5527A5b76C75eedE77FdFA6B80D52444A465",
+            vFLOKI_GameFi: "0xc353B7a1E13dDba393B5E120D4169Da7185aA2cb",
+            vUSDD_GameFi: "0x9f2FD23bd0A5E08C5f2b9DD6CF9C96Bfb5fA515C",
+            vUSDT_GameFi: "0x4978591f17670A846137d9d613e333C38dc68A37"
+        }
+    },
+    "Pool Liquid Staked BNB": {
+        Comptroller: "0xd933909A4a2b7A4638903028f44D1d38ce27c352",
+        "Swap router": "0x5f0ce69Aa564468492e860e8083BB001e4eb8d56",
+        Markets: {
+            vankrBNB_LiquidStakedBNB: "0xBfe25459BA784e70E2D7a718Be99a1f3521cA17f",
+            vBNBx_LiquidStakedBNB: "0x5E21bF67a6af41c74C1773E4b473ca5ce8fd3791",
+            vstkBNB_LiquidStakedBNB: "0xcc5D9e502574cda17215E70bC0B4546663785227",
+            vSnBNB_LiquidStakedBNB: "0xd3CC9d8f3689B83c91b7B59cAB4946B063EB894A",
+            vWBNB_LiquidStakedBNB: "0xe10E80B7FD3a29fE46E16C30CC8F4dd938B742e2"
+        }
+    },
+    "Pool Tron": {
+        Comptroller: "0x23b4404E4E5eC5FF5a6FFb70B7d14E3FabF237B0",
+        "Swap router": "0xacD270Ed7DFd4466Bd931d84fe5B904080E28Bfc",
+        Markets: {
+            vBTT_Tron: "0x49c26e12959345472E2Fd95E5f79F8381058d3Ee",
+            vTRX_Tron: "0x836beb2cB723C498136e1119248436A645845F4E",
+            vWIN_Tron: "0xb114cfA615c828D88021a41bFc524B800E64a9D5",
+            vUSDD_Tron: "0xf1da185CCe5BeD1BeBbb3007Ef738Ea4224025F7",
+            vUSDT_Tron: "0x281E5378f99A4bc55b295ABc0A3E7eD32Deba059"
+        }
+    }
+};

@@ -11,13 +11,44 @@ import IsolatedPoolsTable from "@/components/isolatedPoolsTable";
 const IsolatedPoolsPage = () => {
   const [pools, setPools] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const [totalSupply, setTotalSupply] = useState({
+    Stablecoins: 0,
+    GameFi: 0,
+    DeFi: 0,
+    "Liquid Staked BNB": 0,
+    Tron: 0,
+    Total: 0,
+  });
+  const [totalBorrow, setTotalBorrow] = useState({
+    Stablecoins: 0,
+    GameFi: 0,
+    DeFi: 0,
+    "Liquid Staked BNB": 0,
+    Tron: 0,
+    Total: 0,
+  });
+  const [liquidity, setLiquidity] = useState({
+    Stablecoins: 0,
+    GameFi: 0,
+    DeFi: 0,
+    "Liquid Staked BNB": 0,
+    Tron: 0,
+    Total: 0,
+  });
+  const [totalTreasury, setTotalTreasury] = useState(0);
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
-      const res = await fetch("/api/isolatedpools?chain=bsctestnet");
+      const res = await fetch("/api/isolatedpools?chain=bsc");
       const data = await res.json();
       const pools_json = JSON.parse(data);
+      let temp:any = {}
+      pools_json.forEach((pool: any) => {
+        temp["totalsupply"][pool.name] += Number(pool.vTokens.forEach((vToken: any) => vToken.totalSupply));
+        temp["totalborrow"][pool.name] += Number(pool.vTokens.forEach((vToken: any) => vToken.totalBorrow));
+
+
+      });
       setPools(pools_json);
       setLoading(false);
     }
