@@ -35,7 +35,7 @@ export default function Home() {
     async function fetchPools() {
       setLoading(true);
       const response = await axios.get(
-        "https://testnetapi.venus.io/markets/core-pool?limit=60"
+        "https://api.venus.io/markets/core-pool?limit=60"
       );
       response.data.result.map((pool: any) => {
         const totalsupply = decodeMantissa(pool.totalSupplyMantissa, 8, 0);

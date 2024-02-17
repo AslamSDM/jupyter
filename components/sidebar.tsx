@@ -11,6 +11,7 @@ function Sidebar() {
 
   const sidebarLinks = [
     { label: "Dashboard", link: "/" },
+    { label: "Account", link: "/account" },
     { label: "Core Pool", link: "/core-pool" },
     { label: "Isolated Pools", link: "/isolated-pools" },
     { label: "Vaults", link: "/vaults" },

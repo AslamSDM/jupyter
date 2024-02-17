@@ -2,7 +2,14 @@
 
 import { type } from "os";
 import React, { useEffect, useState } from "react";
-import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer } from "recharts";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts";
 
 type Props = {};
 
@@ -85,7 +92,7 @@ const AreaChartComponent = ({ data }: any) => {
               tickLine={{ display: "none" }}
               domain={["auto", "auto"]}
             />
-            {/* <Tooltip /> */}
+            <Tooltip />
             <Area
               type="monotone"
               dataKey="val"
