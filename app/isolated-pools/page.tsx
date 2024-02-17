@@ -50,16 +50,15 @@ const IsolatedPoolsPage = () => {
     }
     fetchData();
   }, []);
-  const contracts = pools.flatMap((p: any) =>
+  const oracles = useContractReads({
+    contracts: pools.flatMap((p: any) =>
     p.vTokens.map((vToken: any) => ({
       address: p.priceOracle,
       abi: oracleabi,
       functionName: "getUnderlyingPrice",
       args: [vToken.vToken],
     }))
-  );
-  const oracles = useContractReads({
-    contracts: contracts,
+  ),
     enabled: true,
   });
   useEffect(() => {
@@ -101,7 +100,7 @@ const IsolatedPoolsPage = () => {
       } else {
         priceData_temp[vToken?.vToken] = null;
       }
-      setPriceData(priceData);
+      setPriceData(priceData_temp);
     });
         pools.forEach((pool: any) => {
           pool.vTokens.forEach((vToken: any) => {
@@ -151,7 +150,7 @@ const IsolatedPoolsPage = () => {
         </div>
         <div className="flex flex-col">
           <p className="text-gray-400">Available Liquidity</p>
-          <p className="text-white">$1.45B</p>
+          <p className="text-white">${formatNumber(String((totalSupply.supply-totalSupply.borrow) *100))}</p>
         </div>
         <div className="flex flex-col">
           <p className="text-gray-400">Total Treasury</p>
@@ -163,7 +162,7 @@ const IsolatedPoolsPage = () => {
           <CircularProgress />
         </div>
       ) : (
-        <IsolatedPoolsTable columns={columns} pools={pools} priceData={priceData} total={totalSupply} />
+        <IsolatedPoolsTable columns={columns} pools={pools} total={totalSupply} />
       )}
     </div>
   );

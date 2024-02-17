@@ -7,12 +7,14 @@ import { get } from "http";
 import { decodeMantissa, formatNumber } from "@/app/utils/formatNumber";
 import { formatUnits } from "viem";
 import { useContractRead, useContractReads } from "wagmi";
+import { isolatedtokens } from "@/config/isolatedtokens";
 
-function PoolTable({ tableData, columns, poolType }: any) {
+function PoolTable({ tableData, columns, poolType,priceData }: any) {
   const [pools, setPools] = useState(tableData);
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | null>(null);
-
+  console.log(pools);
+  console.log(priceData);
 
   const handleSorting = (key: string) => {
     setSortKey(key);
@@ -114,17 +116,18 @@ function PoolTable({ tableData, columns, poolType }: any) {
 
 
   const renderCell = useCallback((user: any, columnKey: any) => {
+    const symbol =  (isolatedtokens.find((token:any)=> (token.id).toLocaleLowerCase() ===(user.vToken).toLocaleLowerCase()))?.underlyingSymbol
     switch (columnKey) {
       case "asset":
         return (
           <div className="flex items-center gap-1 pl-2">
             <Image
-              src={getImage(user.name)}
+              src={getImage("Venus "+symbol)}
               alt="logo"
               width={24}
               height={24}
             />
-            <p className="text-white">{user.symbol}</p>
+            <p className="text-white">{symbol}</p>
           </div>
         );
 
@@ -132,8 +135,9 @@ function PoolTable({ tableData, columns, poolType }: any) {
         return (
           <div className="flex flex-col">
             <p className="text-white">
-              {(Number(formatUnits(user.totalSupply,user.underlyingDecimals)))} {user.symbol}
-            {/* <p className="text-slate-400">${formatNumber((Number(user.totalsupplyusd)/100).toString())}</p> */}
+              {(formatNumber(formatUnits(user.totalSupply,6)))} {symbol}
+
+            <p className="text-slate-400">${priceData[user.vToken]? formatNumber((Number(priceData[user.vToken]["totalSupply"])*100).toString()):0}</p>
             </p>
           </div>
         );
@@ -148,11 +152,11 @@ function PoolTable({ tableData, columns, poolType }: any) {
       case "totalBorrow":
         return (
           <div className="flex flex-col">
-
-            <p className="text-white">{formatNumber((decodeMantissa(user.totalBorrowsMantissa,0,0)).toString()) }   {user.symbol}
-            <p className="text-slate-400">${formatNumber((decodeMantissa(user.totalBorrowsMantissa,0,0)*Number(user.tokenPriceCents/100)).toString())}  </p>
-            </p>
-          </div>
+          <p className="text-white">
+            {(formatNumber(String(Number(formatUnits(user.totalBorrows,18))*100)))} {symbol}
+            <p className="text-slate-400">${priceData[user.vToken]? formatNumber((Number(priceData[user.vToken]["totalBorrow"])*100).toString()):0}</p>
+          </p>
+        </div>
         );
       case "borrowApy":
         return (
@@ -166,14 +170,14 @@ function PoolTable({ tableData, columns, poolType }: any) {
         return (
           <div className="flex flex-col">
 
-            <p className="text-white">{formatNumber((Number(user.liquidityCents)*100/Number(user.tokenPriceCents)).toString()) }   {user.symbol}
-            <p className="text-slate-400">{formatNumber(user.liquidityCents)}</p>
+            <p className="text-white">{formatNumber(((Number(formatUnits(user.totalSupply,8))-Number(formatUnits(user.totalBorrows,18)))*100).toString()) }   {user.symbol}
+            <p className="text-slate-400">${priceData[user.vToken]? formatNumber(((Number(priceData[user.vToken]["totalSupply"])-Number(priceData[user.vToken]["totalBorrow"]))*100).toString()):0}</p>
             </p>
           </div>
         );
 
       case "price":
-        return <p className="pr-2"> $ {Number((user.tokenPriceCents)/100).toFixed(2)} </p>;
+        return <p className="pr-2"> ${priceData[user.vToken]? formatNumber((Number(priceData[user.vToken]["price"])).toString()):0}</p>;
 
       default:
         return null;

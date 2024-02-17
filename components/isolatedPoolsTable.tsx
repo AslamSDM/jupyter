@@ -5,8 +5,7 @@ import getImage from "./abi/tokenImage";
 import { isolatedtokens } from "@/config/isolatedtokens";
 import { formatNumber } from "@/app/utils/formatNumber";
 
-function IsolatedPoolsTable({ columns, pools,priceData,total }: any) {
-  console.log(pools);
+function IsolatedPoolsTable({ columns, pools,total }: any) {
   const renderHeaderCell = useCallback((columnKey: any) => {
     switch (columnKey) {
       case "assets":
@@ -42,8 +41,7 @@ function IsolatedPoolsTable({ columns, pools,priceData,total }: any) {
           </div>
         );
 
-      case "price":
-        return <p className="p-4 pr-6">Price</p>;
+
 
       default:
         return null;
@@ -81,12 +79,11 @@ function IsolatedPoolsTable({ columns, pools,priceData,total }: any) {
       case "liquidity":
         return (
           <div className="py-4 flex flex-col justify-end">
-            <p className="">311344</p>
+            <p className="">${formatNumber(String((total[pool.name]["supply"]-total[pool.name]["borrow"])*100))}</p>
           </div>
         );
 
-      case "price":
-        return <p className="py-4 pr-6">Price</p>;
+
 
       default:
         return null;
