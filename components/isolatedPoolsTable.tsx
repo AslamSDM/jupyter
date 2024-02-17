@@ -2,8 +2,10 @@ import React, { useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import getImage from "./abi/tokenImage";
+import { isolatedtokens } from "@/config/isolatedtokens";
+import { formatNumber } from "@/app/utils/formatNumber";
 
-function IsolatedPoolsTable({ columns, pools }: any) {
+function IsolatedPoolsTable({ columns, pools,priceData,total }: any) {
   console.log(pools);
   const renderHeaderCell = useCallback((columnKey: any) => {
     switch (columnKey) {
@@ -51,13 +53,8 @@ function IsolatedPoolsTable({ columns, pools }: any) {
   const renderCell = useCallback((pool: any, columnKey: any) => {
     switch (columnKey) {
       case "assets":
-        const poolAssets = [
-          "Venus BNB",
-          "Venus BUSD",
-          "Venus DAI",
-          "Venus ETH",
-          "Venus LINK",
-        ];
+        const poolAssets = pool.vTokens.map((vToken: any) => "Venus "+(isolatedtokens.find((token: any) => String(token.id).toLocaleLowerCase() === String(vToken.vToken).toLocaleLowerCase()))?.underlyingSymbol);
+
         return (
           <div className="p-4 flex items-center gap-2 justify-start pl-2">
             {poolAssets.map((asset: any) => (
@@ -70,14 +67,14 @@ function IsolatedPoolsTable({ columns, pools }: any) {
       case "totalSupply":
         return (
           <div className="flex flex-col">
-            <p className="py-4">23281731</p>
+            <p className="py-4">$ {formatNumber(String(total[pool.name]["supply"]*100))}</p>
           </div>
         );
 
       case "totalBorrow":
         return (
           <div className="py-4 flex justify-end">
-            <p className="">31435</p>
+            <p className="">$ {formatNumber(String(total[pool.name]["borrow"]*100))}</p>
           </div>
         );
 
@@ -95,6 +92,7 @@ function IsolatedPoolsTable({ columns, pools }: any) {
         return null;
     }
   }, []);
+
   return (
     <div className="py-6 text-white bg-[#1E2431] rounded-3xl">
       <table className="w-full text-md">

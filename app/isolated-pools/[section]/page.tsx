@@ -4,8 +4,10 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { CircularProgress } from "@nextui-org/react";
-import PoolTable from "@/components/poolTable";
+import PoolTable from "@/components/sectionTable";
 import { columns } from "@/components/dummyData";
+import { useContractReads } from "wagmi";
+import { oracleabi } from "@/components/abi/oracleabi";
 
 const Page = () => {
   const { section } = useParams<{ section: string }>();
@@ -26,14 +28,12 @@ const Page = () => {
     fetchData();
   }, []);
 
-  //Data to be implemented !!!!
 
-  console.log(pool[0]?.vTokens);
   return (
     <div className="w-full flex flex-col gap-10 px-10 py-8">
       <div className="flex justify-between">
         <h2 className="text-xl text-gray-400 font-bold">
-          Isolated pools / <span className="text-white">Defi</span>
+          Isolated pools / <span className="text-white">{section}</span>
         </h2>
         <ConnectButton />
       </div>

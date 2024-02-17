@@ -2,38 +2,29 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { testnet } from "@/components/contracts";
-import { useContractRead } from "wagmi";
+import { useContractRead, useContractReads } from "wagmi";
 import { PoolLensabi } from "@/components/abi/Poolabi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { CircularProgress } from "@nextui-org/react";
 import IsolatedPoolsTable from "@/components/isolatedPoolsTable";
+import { formatUnits } from "viem";
+import { oracleabi } from "@/components/abi/oracleabi";
+import { formatNumber } from "../utils/formatNumber";
 
 const IsolatedPoolsPage = () => {
   const [pools, setPools] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [priceData, setPriceData] = useState({
+    "0x0": { price: 1, decimal: 18 },
+  });
   const [totalSupply, setTotalSupply] = useState({
-    Stablecoins: 0,
-    GameFi: 0,
-    DeFi: 0,
-    "Liquid Staked BNB": 0,
-    Tron: 0,
-    Total: 0,
-  });
-  const [totalBorrow, setTotalBorrow] = useState({
-    Stablecoins: 0,
-    GameFi: 0,
-    DeFi: 0,
-    "Liquid Staked BNB": 0,
-    Tron: 0,
-    Total: 0,
-  });
-  const [liquidity, setLiquidity] = useState({
-    Stablecoins: 0,
-    GameFi: 0,
-    DeFi: 0,
-    "Liquid Staked BNB": 0,
-    Tron: 0,
-    Total: 0,
+    Stablecoins: { supply: 0, borrow: 0 },
+    GameFi: { supply: 0, borrow: 0 },
+    DeFi: { supply: 0, borrow: 0 },
+    "Liquid Staked BNB": { supply: 0, borrow: 0 },
+    Tron: { supply: 0, borrow: 0 },
+    borrow: 0,
+    supply: 0,
   });
   const [totalTreasury, setTotalTreasury] = useState(0);
   useEffect(() => {
@@ -41,20 +32,86 @@ const IsolatedPoolsPage = () => {
       setLoading(true);
       const res = await fetch("/api/isolatedpools?chain=bsc");
       const data = await res.json();
+      // const graph = await fetch("/api/isolatedpools/graph");
+      // const graphData = await graph.json();
+
       const pools_json = JSON.parse(data);
-      let temp:any = {}
-      pools_json.forEach((pool: any) => {
-        temp["totalsupply"][pool.name] += Number(pool.vTokens.forEach((vToken: any) => vToken.totalSupply));
-        temp["totalborrow"][pool.name] += Number(pool.vTokens.forEach((vToken: any) => vToken.totalBorrow));
-
-
-      });
       setPools(pools_json);
       setLoading(false);
+      let totals = {
+        Stablecoins: { total_supply: 0, total_borrow: 0 },
+        GameFi: { total_supply: 0, total_borrow: 0 },
+        DeFi: { total_supply: 0, total_borrow: 0 },
+        "Liquid Staked BNB": { total_supply: 0, total_borrow: 0 },
+        Tron: { total_supply: 0, total_borrow: 0 },
+      };
+
+
     }
     fetchData();
   }, []);
-  console.log(pools);
+  const contracts = pools.flatMap((p: any) =>
+    p.vTokens.map((vToken: any) => ({
+      address: p.priceOracle,
+      abi: oracleabi,
+      functionName: "getUnderlyingPrice",
+      args: [vToken.vToken],
+    }))
+  );
+  const oracles = useContractReads({
+    contracts: contracts,
+    enabled: true,
+  });
+  useEffect(() => {
+    if (oracles.data === undefined) {
+      oracles.refetch();
+      console.log("refresh");
+      return;
+    }
+    if (priceData["0x0"] === undefined) {
+      return
+    }
+    if (Array.isArray(oracles.data) && oracles.data.length === 0) return;
+    if (oracles.data.length === 0 || !oracles.data) return;
+    let priceData_temp: any = {};
+    let total: any = {};
+    let vTokens = pools.flatMap((pool: any) => pool.vTokens);
+
+    vTokens.forEach((vToken: any, i: number) => {
+
+      if (
+        vToken &&
+        vToken.vToken &&
+        oracles &&
+        oracles.data &&
+        i < oracles.data.length
+        && oracles.data[i]?.result
+      ) {
+        priceData_temp[vToken.vToken] = {
+          price: formatUnits(oracles.data[i]?.result as bigint,vToken.underlyingDecimals==18?18:(vToken.underlyingDecimals==9?27:30)),
+          decimal: vToken.underlyingDecimals,
+          totalSupply: Number(formatUnits(vToken.totalSupply,8)) * Number(formatUnits(oracles.data[i]?.result as bigint,vToken.underlyingDecimals==18?18:(vToken.underlyingDecimals==9?27:30))),
+          totalBorrow: Number(formatUnits(vToken.totalBorrows,18)) * Number(formatUnits(oracles.data[i]?.result as bigint,vToken.underlyingDecimals==18?18:(vToken.underlyingDecimals==9?27:30))),
+          rawtotalBorrow: vToken.totalBorrows,
+        };
+        total["supply"] = total["supply"] || 0;
+        total["borrow"] = total["borrow"] || 0;
+        total["supply"] += priceData_temp[vToken.vToken]?.totalSupply;
+        total["borrow"] += priceData_temp[vToken.vToken]?.totalBorrow;    
+      } else {
+        priceData_temp[vToken?.vToken] = null;
+      }
+      setPriceData(priceData);
+    });
+        pools.forEach((pool: any) => {
+          pool.vTokens.forEach((vToken: any) => {
+            total[pool.name] = total[pool.name] || { supply: 0, borrow: 0 };
+            total[pool.name]["supply"] += priceData_temp[vToken.vToken]?.totalSupply;
+            total[pool.name]["borrow"] += priceData_temp[vToken.vToken]?.totalBorrow;
+      });});
+      setTotalSupply(total);
+  }, [oracles]);
+
   const columns = [
     {
       key: "assets",
@@ -86,11 +143,11 @@ const IsolatedPoolsPage = () => {
       <div className="w-full rounded-xl bg-[#1E2431] flex justify-start gap-10 p-6 font-semibold text-xl">
         <div className="flex flex-col">
           <p className="text-gray-400">Total Supply</p>
-          <p className="text-white">$1.45B</p>
+          <p className="text-white">${formatNumber(String(totalSupply.supply *100))}</p>
         </div>
         <div className="flex flex-col">
           <p className="text-gray-400">Total Borrow</p>
-          <p className="text-white">$1.45B</p>
+          <p className="text-white">${formatNumber(String(totalSupply.borrow *100))}</p>
         </div>
         <div className="flex flex-col">
           <p className="text-gray-400">Available Liquidity</p>
@@ -106,11 +163,9 @@ const IsolatedPoolsPage = () => {
           <CircularProgress />
         </div>
       ) : (
-        <IsolatedPoolsTable columns={columns} pools={pools} />
+        <IsolatedPoolsTable columns={columns} pools={pools} priceData={priceData} total={totalSupply} />
       )}
     </div>
-  
   );
-
 };
 export default IsolatedPoolsPage;

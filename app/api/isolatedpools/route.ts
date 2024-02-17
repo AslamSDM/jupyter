@@ -19,6 +19,7 @@ const chain = url.searchParams.get("chain");
 console.log(chain);
 const replacer = (key: string, value: any) => 
 typeof value === 'bigint' ? value.toString() : value;
+
 if(chain === "bsc"){
     const pools = await bscClient.readContract({
         address: mainnet.PoolLens as `0x${string}`,
@@ -26,6 +27,7 @@ if(chain === "bsc"){
         functionName:"getAllPools",
         args:[mainnet.PoolRegistry]
     });
+    console.log(pools);
     
     return NextResponse.json(JSON.stringify(pools, replacer));}
     else {
@@ -37,8 +39,5 @@ if(chain === "bsc"){
             args:[testnet.PoolRegistry]
         });
     return NextResponse.json(JSON.stringify(pools, replacer));}
-
-
-
 
 }
