@@ -11,7 +11,6 @@ function PoolTable({ tableData, columns, poolType }: any) {
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | null>(null);
 
-
   const handleSorting = (key: string) => {
     setSortKey(key);
     setSortOrder((prevSortOrder) =>
@@ -38,7 +37,6 @@ function PoolTable({ tableData, columns, poolType }: any) {
     const reversedPools = [...pools].reverse();
     setPools(reversedPools);
   }, [sortOrder, tableData]);
-
 
   const renderHeaderCell = useCallback((columnKey: any) => {
     switch (columnKey) {
@@ -77,7 +75,6 @@ function PoolTable({ tableData, columns, poolType }: any) {
             onClick={() => handleSorting("totalBorrowUsd")}
           >
             <p className="">Total Borrow</p>
-
           </div>
         );
 
@@ -129,8 +126,16 @@ function PoolTable({ tableData, columns, poolType }: any) {
         return (
           <div className="flex flex-col">
             <p className="text-white">
-              {formatNumber((Number(user.totalsupplyusd)/(Number(user.tokenPriceCents)/100)).toString())} {user.symbol}
-            <p className="text-slate-400">${formatNumber((Number(user.totalsupplyusd)/100).toString())}</p>
+              {formatNumber(
+                (
+                  Number(user.totalsupplyusd) /
+                  (Number(user.tokenPriceCents) / 100)
+                ).toString()
+              )}{" "}
+              {user.symbol}
+              <p className="text-slate-400">
+                ${formatNumber((Number(user.totalsupplyusd) / 100).toString())}
+              </p>
             </p>
           </div>
         );
@@ -138,39 +143,67 @@ function PoolTable({ tableData, columns, poolType }: any) {
       case "supplyApy":
         return (
           <div className="flex flex-col">
-            <p className="text-white">{(Number(user.supplyApy)+Number(user.supplyXvsApy)).toFixed(3)}%</p>
+            <p className="text-white">
+              {(Number(user.supplyApy) + Number(user.supplyXvsApy)).toFixed(3)}%
+            </p>
             {/* <p className="text-slate-400">{(Number(user.supplyXvsApy)).toFixed(3)} XVS</p> */}
           </div>
         );
       case "totalBorrow":
         return (
           <div className="flex flex-col">
-
-            <p className="text-white">{formatNumber((decodeMantissa(user.totalBorrowsMantissa,0,0)).toString()) }   {user.symbol}
-            <p className="text-slate-400">${formatNumber((decodeMantissa(user.totalBorrowsMantissa,0,0)*Number(user.tokenPriceCents/100)).toString())}  </p>
+            <p className="text-white">
+              {formatNumber(
+                decodeMantissa(user.totalBorrowsMantissa, 0, 0).toString()
+              )}{" "}
+              {user.symbol}
+              <p className="text-slate-400">
+                $
+                {formatNumber(
+                  (
+                    decodeMantissa(user.totalBorrowsMantissa, 0, 0) *
+                    Number(user.tokenPriceCents / 100)
+                  ).toString()
+                )}{" "}
+              </p>
             </p>
           </div>
         );
       case "borrowApy":
         return (
           <div className="flex flex-col">
-          <p className="text-white">{(Number(user.borrowApy)-Number(user.borrowXvsApy)).toFixed(3)}%</p>
-          {/* <p className="text-slate-400">{(Number(user.borrowApy)-Number(user.borrowXvsApy)).toFixed(3)} XVS</p> */}
-        </div>
+            <p className="text-white">
+              {(Number(user.borrowApy) - Number(user.borrowXvsApy)).toFixed(3)}%
+            </p>
+            {/* <p className="text-slate-400">{(Number(user.borrowApy)-Number(user.borrowXvsApy)).toFixed(3)} XVS</p> */}
+          </div>
         );
 
       case "liquidity":
         return (
           <div className="flex flex-col">
-
-            <p className="text-white">{formatNumber((Number(user.liquidityCents)*100/Number(user.tokenPriceCents)).toString()) }   {user.symbol}
-            <p className="text-slate-400">{formatNumber(user.liquidityCents)}</p>
+            <p className="text-white">
+              {formatNumber(
+                (
+                  (Number(user.liquidityCents) * 100) /
+                  Number(user.tokenPriceCents)
+                ).toString()
+              )}{" "}
+              {user.symbol}
+              <p className="text-slate-400">
+                {formatNumber(user.liquidityCents)}
+              </p>
             </p>
           </div>
         );
 
       case "price":
-        return <p className="pr-2"> $ {Number((user.tokenPriceCents)/100).toFixed(2)} </p>;
+        return (
+          <p className="pr-2">
+            {" "}
+            $ {Number(user.tokenPriceCents / 100).toFixed(2)}{" "}
+          </p>
+        );
 
       default:
         return null;
