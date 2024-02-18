@@ -22,3 +22,16 @@ export function decodeMantissa(
     const f = value / Math.pow(10, decimals);
     return Number(f);
   }
+export function getRate(rate: string, vdecimals: number) {
+    const value = Number(rate);
+    const decimals =  vdecimals;
+    const blocksPerDay = 20 * 60 * 24;
+
+    // const daysPerYear = 365;
+    // const apy = ((Math.pow(1,value/(Math.pow(10,decimals)* blocksPerDay)) + 1))
+    const apy = (Math.pow(value/Math.pow(10,decimals)* blocksPerDay+1,365)-1)*100;
+    // console.log(value/(decimals* blocksPerDay));
+    return apy;
+
+  }
+  

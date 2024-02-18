@@ -4,10 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import getImage from "./abi/tokenImage";
 import { get } from "http";
-import { decodeMantissa, formatNumber } from "@/app/utils/formatNumber";
+import { decodeMantissa, formatNumber, getRate } from "@/app/utils/formatNumber";
 import { formatUnits } from "viem";
 import { useContractRead, useContractReads } from "wagmi";
 import { isolatedtokens } from "@/config/isolatedtokens";
+import { useParams } from "next/navigation";
 
 function PoolTable({ tableData, columns, poolType,priceData }: any) {
   const [pools, setPools] = useState(tableData);
@@ -15,14 +16,14 @@ function PoolTable({ tableData, columns, poolType,priceData }: any) {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | null>(null);
   console.log(pools);
   console.log(priceData);
-
+  const {section} = useParams<{section:string}>();
   const handleSorting = (key: string) => {
     setSortKey(key);
     setSortOrder((prevSortOrder) =>
       prevSortOrder ? (prevSortOrder === "asc" ? "desc" : "asc") : "asc"
     );
   };
-
+  console.log(pools);
   useEffect(() => {
     if (!sortKey) return;
     const sortedPools = [...pools].sort((a: any, b: any) => {
@@ -145,23 +146,23 @@ function PoolTable({ tableData, columns, poolType,priceData }: any) {
       case "supplyApy":
         return (
           <div className="flex flex-col">
-            <p className="text-white">{(Number(user.supplyApy)+Number(user.supplyXvsApy)).toFixed(3)}%</p>
+            <p className="text-white">{(Number(getRate(user.supplyRatePerBlock,user.underlyingDecimals))).toFixed(3)}%</p>
             {/* <p className="text-slate-400">{(Number(user.supplyXvsApy)).toFixed(3)} XVS</p> */}
           </div>
         );
-      case "totalBorrow":
-        return (
-          <div className="flex flex-col">
+        case "totalBorrow":
+          return (
+            <div className="flex flex-col">
           <p className="text-white">
             {(formatNumber(String(Number(formatUnits(user.totalBorrows,18))*100)))} {symbol}
             <p className="text-slate-400">${priceData[user.vToken]? formatNumber((Number(priceData[user.vToken]["totalBorrow"])*100).toString()):0}</p>
           </p>
         </div>
         );
-      case "borrowApy":
-        return (
-          <div className="flex flex-col">
-          <p className="text-white">{(Number(user.borrowApy)-Number(user.borrowXvsApy)).toFixed(3)}%</p>
+        case "borrowApy":
+          return (
+            <div className="flex flex-col">
+            <p className="text-white">{(Number(getRate(user.borrowRatePerBlock,user.underlyingDecimals))).toFixed(3)}%</p>
           {/* <p className="text-slate-400">{(Number(user.borrowApy)-Number(user.borrowXvsApy)).toFixed(3)} XVS</p> */}
         </div>
         );
@@ -202,10 +203,7 @@ function PoolTable({ tableData, columns, poolType,priceData }: any) {
                 <td key={column.key} className="text-end px-4">
                   <Link
                     className="w-full grid col-6"
-                    href={
-                      poolType == "isolated"
-                        ? `/isolated-pool/`
-                        : `/pool/${pool.address}`
+                    href={`/isolated-pools/${section}/${pool.vToken}`
                     }
                   >
                     {renderCell(pool, column.key)}
