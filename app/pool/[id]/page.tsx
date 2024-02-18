@@ -17,9 +17,10 @@ const PoolComponent = () => {
   const [selectedTab, setSelectedTab] = useState<any>("supply");
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-
+  console.log(pool);
   const poolInfo = [
-    { label: "Token Price", data: pool.tokenPriceCents },
+    { label: "Token Price", data: pool.tokenPriceCents/100 },
+    { label: "Market Liquidity", data: pool.supplyApr },
     { label: "APY", data: Number(pool.supplyApy) + Number(pool.supplyXvsApy) },
     { label: "APR", data: pool.supplyApr },
     { label: "TVL", data: pool.supplyBalance },
@@ -75,7 +76,7 @@ const PoolComponent = () => {
     async function fetchhistory() {
       setLoading(true);
       const response = await axios.get(
-        "https://testnetapi.venus.io/markets/history",
+        "https:// api.venus.io/markets/history",
         {
           params: {
             asset: id,
@@ -96,7 +97,7 @@ const PoolComponent = () => {
     async function fetchpool() {
       setLoading(true);
       const response = await axios.get(
-        "https://testnetapi.venus.io/markets/core-pool",
+        "https://api.venus.io/markets/core-pool",
         {
           params: {
             address: id,

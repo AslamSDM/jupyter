@@ -263,6 +263,7 @@ function PoolTable({ tableData, columns, poolType }: any) {
                       poolType == "isolated"
                         ? `/isolated-pool/`
                         : `/pool/${pool.address}`
+                        
                     }
                   >
                     {renderCell(pool, column.key)}

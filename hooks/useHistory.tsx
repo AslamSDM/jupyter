@@ -10,7 +10,7 @@ function useHistory(id: string) {
             setLoading(true);
             try {
                 const response = await axios.get(
-                    "https://testnetapi.venus.io/markets/history",
+                    "https://api.venus.io/markets/history",
                     {
                         params: {
                             asset: id,
