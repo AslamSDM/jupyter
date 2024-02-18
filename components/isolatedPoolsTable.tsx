@@ -5,7 +5,7 @@ import getImage from "./abi/tokenImage";
 import { isolatedtokens } from "@/config/isolatedtokens";
 import { formatNumber } from "@/app/utils/formatNumber";
 
-function IsolatedPoolsTable({ columns, pools,total }: any) {
+function IsolatedPoolsTable({ columns, pools, total }: any) {
   const renderHeaderCell = useCallback((columnKey: any) => {
     switch (columnKey) {
       case "assets":
@@ -41,54 +41,79 @@ function IsolatedPoolsTable({ columns, pools,total }: any) {
           </div>
         );
 
-
-
       default:
         return null;
     }
   }, []);
 
-  const renderCell = useCallback((pool: any, columnKey: any) => {
-    switch (columnKey) {
-      case "assets":
-        const poolAssets = pool.vTokens.map((vToken: any) => "Venus "+(isolatedtokens.find((token: any) => String(token.id).toLocaleLowerCase() === String(vToken.vToken).toLocaleLowerCase()))?.underlyingSymbol);
+  const renderCell = useCallback(
+    (pool: any, columnKey: any) => {
+      switch (columnKey) {
+        case "assets":
+          const poolAssets = pool.vTokens.map(
+            (vToken: any) =>
+              "Venus " +
+              isolatedtokens.find(
+                (token: any) =>
+                  String(token.id).toLocaleLowerCase() ===
+                  String(vToken.vToken).toLocaleLowerCase()
+              )?.underlyingSymbol
+          );
+          console.log(poolAssets);
+          return (
+            <div className="p-4 flex items-center gap-2 justify-start pl-2">
+              {poolAssets.map((asset: any, i: number) => (
+                <Image
+                  src={getImage(asset)}
+                  alt="coin"
+                  width={20}
+                  height={20}
+                  key={i}
+                />
+              ))}
+            </div>
+          );
+        case "pool":
+          return <p className="py-4 text-end">{pool.name}</p>;
+        case "totalSupply":
+          return (
+            <div className="flex flex-col">
+              <p className="py-4">
+                $ {formatNumber(String(total[pool.name]["supply"] * 100))}
+              </p>
+            </div>
+          );
 
-        return (
-          <div className="p-4 flex items-center gap-2 justify-start pl-2">
-            {poolAssets.map((asset: any,i:number) => (
-              <Image src={getImage(asset)} alt="coin" width={20} height={20} key={i}/>
-            ))}
-          </div>
-        );
-      case "pool":
-        return <p className="py-4 text-end">{pool.name}</p>;
-      case "totalSupply":
-        return (
-          <div className="flex flex-col">
-            <p className="py-4">$ {formatNumber(String(total[pool.name]["supply"]*100))}</p>
-          </div>
-        );
+        case "totalBorrow":
+          return (
+            <div className="py-4 flex justify-end">
+              <p className="">
+                $ {formatNumber(String(total[pool.name]["borrow"] * 100))}
+              </p>
+            </div>
+          );
 
-      case "totalBorrow":
-        return (
-          <div className="py-4 flex justify-end">
-            <p className="">$ {formatNumber(String(total[pool.name]["borrow"]*100))}</p>
-          </div>
-        );
+        case "liquidity":
+          return (
+            <div className="py-4 flex flex-col justify-end">
+              <p className="">
+                $
+                {formatNumber(
+                  String(
+                    (total[pool.name]["supply"] - total[pool.name]["borrow"]) *
+                      100
+                  )
+                )}
+              </p>
+            </div>
+          );
 
-      case "liquidity":
-        return (
-          <div className="py-4 flex flex-col justify-end">
-            <p className="">${formatNumber(String((total[pool.name]["supply"]-total[pool.name]["borrow"])*100))}</p>
-          </div>
-        );
-
-
-
-      default:
-        return null;
-    }
-  }, [total]);
+        default:
+          return null;
+      }
+    },
+    [total]
+  );
 
   return (
     <div className="py-6 text-white bg-[#1E2431] rounded-3xl">

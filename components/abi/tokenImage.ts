@@ -50,12 +50,24 @@ export default function getImage(name: string) {
     { name: "Venus BTT", link: "https://app.venus.io/assets/btt-5c3484d7.svg" },
     { name: "Venus WIN", link: "https://app.venus.io/assets/win-3f169c62.svg" },
     {
+      name: "Venus HAY",
+      link: "	https://app.venus.io/assets/lisUSD-50a8bbe1.png",
+    },
+    {
+      name: "Venus SnBNB",
+      link: "https://app.venus.io/assets/slisBNB-96761da9.png",
+    },
+    {
       name: "Venus WBNB",
       link: "https://app.venus.io/assets/wbnb-e73b2dde.svg",
     },
     {
       name: "Venus stkBNB",
       link: "https://app.venus.io/assets/stkBNB-14b66c9a.svg",
+    },
+    {
+      name: "Venus PLANET",
+      link: "https://app.venus.io/assets/planet-0a528d79.svg",
     },
     {
       name: "Venus FLOKI",
