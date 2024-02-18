@@ -109,7 +109,7 @@ const IsolatedPoolsPage = () => {
             total[pool.name]["borrow"] += priceData_temp[vToken.vToken]?.totalBorrow;
       });});
       setTotalSupply(total);
-  }, [oracles]);
+  }, [oracles,pools,priceData]);
 
   const columns = [
     {

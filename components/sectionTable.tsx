@@ -36,12 +36,12 @@ function PoolTable({ tableData, columns, poolType,priceData }: any) {
       else return 0;
     });
     setPools(sortedPools);
-  }, [sortKey, tableData]);
+  }, [sortKey, tableData,pools]);
 
   useEffect(() => {
     const reversedPools = [...pools].reverse();
     setPools(reversedPools);
-  }, [sortOrder, tableData]);
+  }, [sortOrder, tableData,pools]);
   
 
   const renderHeaderCell = useCallback((columnKey: any) => {
@@ -182,7 +182,7 @@ function PoolTable({ tableData, columns, poolType,priceData }: any) {
       default:
         return null;
     }
-  }, []);
+  }, [priceData]);
   return (
     <div className="py-6 text-white bg-[#1E2431] rounded-3xl">
       <table className="w-full text-md">

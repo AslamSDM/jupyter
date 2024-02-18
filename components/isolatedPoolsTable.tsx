@@ -55,8 +55,8 @@ function IsolatedPoolsTable({ columns, pools,total }: any) {
 
         return (
           <div className="p-4 flex items-center gap-2 justify-start pl-2">
-            {poolAssets.map((asset: any) => (
-              <Image src={getImage(asset)} alt="coin" width={20} height={20} />
+            {poolAssets.map((asset: any,i:number) => (
+              <Image src={getImage(asset)} alt="coin" width={20} height={20} key={i}/>
             ))}
           </div>
         );
@@ -88,7 +88,7 @@ function IsolatedPoolsTable({ columns, pools,total }: any) {
       default:
         return null;
     }
-  }, []);
+  }, [total]);
 
   return (
     <div className="py-6 text-white bg-[#1E2431] rounded-3xl">
@@ -104,7 +104,7 @@ function IsolatedPoolsTable({ columns, pools,total }: any) {
         </thead>
         <tbody>
           {pools.map((pool: any, index: number) => (
-            <tr>
+            <tr key={index}>
               {columns.map((column: any) => (
                 <td key={column.key} className="text-end px-4">
                   <Link className="" href={`/isolated-pools/${pool.name}`}>

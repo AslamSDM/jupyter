@@ -34,12 +34,12 @@ export default function Pools() {
       else return 0;
     });
     setPools(sortedPools);
-  }, [sortKey]);
+  }, [sortKey,pools]);
 
   useEffect(() => {
     const reversedPools = [...pools].reverse();
     setPools(reversedPools);
-  }, [sortOrder]);
+  }, [sortOrder,pools]);
   console.log(pools);
   const renderHeaderCell = useCallback((columnKey: any) => {
     switch (columnKey) {
@@ -231,6 +231,7 @@ export default function Pools() {
                 <Link
                   className="w-full grid col-6"
                   href={`/pool/${pool.address}`}
+                  key={index}
                 >
                   <tr key={index}>
                     {columns.map((column) => (

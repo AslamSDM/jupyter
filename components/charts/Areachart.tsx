@@ -40,7 +40,7 @@ const AreaChartComponent = ({ data }: any) => {
       setFilteredChartData(data);
     }
     // setLoading(false);
-  }, [time]);
+  }, [time,data,filteredChartData]);
 
   return (
     <div className="w-full flex flex-col gap-8">

@@ -6,7 +6,7 @@ import { Input, Button } from "@nextui-org/react";
 import CoinSearch from "@/components/coinSearch";
 import getImage from "@/components/abi/tokenImage";
 
-function page() {
+function Page() {
   const [amount, setAmount] = useState(0);
   const [openFromCoinSearch, setOpenFromCoinSearch] = useState(false);
   const [openToCoinSearch, setOpenToCoinSearch] = useState(false);
@@ -167,4 +167,4 @@ function page() {
   );
 }
 
-export default page;
+export default Page;

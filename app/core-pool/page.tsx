@@ -7,7 +7,7 @@ import axios from "axios";
 import { CircularProgress } from "@nextui-org/react";
 import { decodeMantissa, formatNumber } from "../utils/formatNumber";
 
-function page() {
+function Page() {
   const [pools, setPools] = useState([]);
   const [totalData, setTotalData] = useState({
     totalSupply: 0,
@@ -92,4 +92,4 @@ function page() {
   );
 }
 
-export default page;
+export default Page;

@@ -114,7 +114,7 @@ const PoolComponent = () => {
     }
     fetchpool();
     fetchhistory();
-  }, []);
+  }, [id]);
   console.log(pool);
   if (loading) {
     return <div>Loading...</div>;

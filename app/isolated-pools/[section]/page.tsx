@@ -34,7 +34,7 @@ const Page = () => {
       setLoading(false);
     }
     fetchData();
-  }, []);
+  }, [section]);
 
   const oracles = useContractReads({
     contracts: pool.flatMap((p: any) =>
@@ -96,7 +96,7 @@ const Page = () => {
       });});
     setTotalSupply(total);
 
-  }, [oracles]);
+  }, [oracles,pool,priceData]);
   return (
     <div className="w-full flex flex-col gap-10 px-10 py-8">
       <div className="flex justify-between">

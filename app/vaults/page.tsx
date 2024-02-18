@@ -6,7 +6,7 @@ import { useDisclosure } from "@nextui-org/react";
 import getImage from "@/components/abi/tokenImage";
 import VaultModal from "@/components/vaultModal";
 
-function page() {
+function Page() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [modalTitle, setModalTitle] = useState("");
   const [modalCoin, setModalCoin] = useState({});
@@ -176,4 +176,4 @@ function page() {
   );
 }
 
-export default page;
+export default Page;
