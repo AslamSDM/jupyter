@@ -80,7 +80,7 @@ export const isolatedtokens = [
       "id": "0xc718c51958d3fd44f5f9580c9ffac2f89815c909"
     },
     {
-      "underlyingSymbol": "HAY",
+      "underlyingSymbol": "lisUSD",
       "id": "0xca2d81aa7c09a1a025de797600a7081146dceed9"
     },
     {
@@ -88,7 +88,7 @@ export const isolatedtokens = [
       "id": "0xcc5d9e502574cda17215e70bc0b4546663785227"
     },
     {
-      "underlyingSymbol": "SnBNB",
+      "underlyingSymbol": "slisBNB",
       "id": "0xd3cc9d8f3689b83c91b7b59cab4946b063eb894a"
     },
     {
