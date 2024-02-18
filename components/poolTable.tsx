@@ -5,6 +5,7 @@ import Link from "next/link";
 import getImage from "./abi/tokenImage";
 import { get } from "http";
 import { decodeMantissa, formatNumber } from "@/app/utils/formatNumber";
+import { Chip } from "@nextui-org/react";
 
 function PoolTable({ tableData, columns, poolType }: any) {
   const [pools, setPools] = useState(tableData);
@@ -142,10 +143,25 @@ function PoolTable({ tableData, columns, poolType }: any) {
 
       case "supplyApy":
         return (
-          <div className="flex flex-col">
+          <div className="flex flex-col items-end">
             <p className="text-white">
               {(Number(user.supplyApy) + Number(user.supplyXvsApy)).toFixed(3)}%
             </p>
+            <button
+              className="inline-flex items-center justify-center border font-semibold border-slate-400 h-6 rounded-full p-1 my-1"
+              type="button"
+            >
+              <span className="inline-flex items-center text-[10px]">
+                <Image
+                  src="https://app.venus.io/assets/primeLogo-ca7f7e64.svg"
+                  className="mr-1"
+                  alt="Prime logo"
+                  width={12}
+                  height={12}
+                />
+                <span className="text-green-400">1.42%</span>
+              </span>
+            </button>
             {/* <p className="text-slate-400">{(Number(user.supplyXvsApy)).toFixed(3)} XVS</p> */}
           </div>
         );
@@ -171,10 +187,25 @@ function PoolTable({ tableData, columns, poolType }: any) {
         );
       case "borrowApy":
         return (
-          <div className="flex flex-col">
+          <div className="flex flex-col items-end">
             <p className="text-white">
               {(Number(user.borrowApy) - Number(user.borrowXvsApy)).toFixed(3)}%
             </p>
+            <button
+              className="inline-flex items-center justify-center border font-semibold border-slate-400 h-6 rounded-full p-1 my-1"
+              type="button"
+            >
+              <span className="inline-flex items-center text-[10px]">
+                <Image
+                  src="https://app.venus.io/assets/primeLogo-ca7f7e64.svg"
+                  className="mr-1"
+                  alt="Prime logo"
+                  width={12}
+                  height={12}
+                />
+                <span className="text-green-400">1.42%</span>
+              </span>
+            </button>
             {/* <p className="text-slate-400">{(Number(user.borrowApy)-Number(user.borrowXvsApy)).toFixed(3)} XVS</p> */}
           </div>
         );
