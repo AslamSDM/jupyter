@@ -59,7 +59,6 @@ function IsolatedPoolsTable({ columns, pools, total }: any) {
                   String(vToken.vToken).toLocaleLowerCase()
               )?.underlyingSymbol
           );
-          console.log(poolAssets);
           return (
             <div className="p-4 flex items-center gap-2 justify-start pl-2">
               {poolAssets.map((asset: any, i: number) => (

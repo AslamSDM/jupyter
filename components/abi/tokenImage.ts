@@ -75,6 +75,7 @@ export default function getImage(name: string) {
     },
     { name: "Venus TWT", link: "https://app.venus.io/assets/twt-5a3293b4.svg" },
     { name: "vXVS", link: "https://app.venus.io/assets/xvs-e7b82352.svg" },
+    { name: "Venus XVS", link: "https://app.venus.io/assets/xvs-e7b82352.svg" },
     {
       name: "Venus USDC",
       link: "https://app.venus.io/assets/usdc-ae6ed32b.svg",
@@ -102,7 +103,7 @@ export default function getImage(name: string) {
     { name: "Venus SXP", link: "https://app.venus.io/assets/sxp-2fad29e2.svg" },
     {
       name: "Venus FIL",
-      link: "https://app.venus.io/assets/fil-0a 1 b2be4.svg",
+      link: "https://app.venus.io/assets/fil-0a1b2be4.svg",
     },
     {
       name: "Venus BUSD",
