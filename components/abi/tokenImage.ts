@@ -4,7 +4,14 @@ export default function getImage(name: string) {
       name: "Venus BTC",
       link: "https://app.venus.io/assets/btcb-88ed0fde.svg",
     },
-    { name: "Venus BNB", link: "https://app.venus.io/assets/bnb-8cd7030f.svg" },
+    {
+      name: "Venus USDD",
+      link: "https://app.venus.io/assets/usdd-2f108c20.svg",
+    },
+    {
+      name: "Venus ankrBNB",
+      link: "https://app.venus.io/assets/bnb-8cd7030f.svg",
+    },
     {
       name: "Venus USDT",
       link: "https://app.venus.io/assets/usdt-68774da1.svg",
@@ -18,6 +25,42 @@ export default function getImage(name: string) {
       name: "Venus CAKE",
       link: "https://app.venus.io/assets/cake-c9e02a24.svg",
     },
+    { name: "Venus BSW", link: "	https://app.venus.io/assets/bsw-378a0dd1.svg" },
+    {
+      name: "Venus ALPACA",
+      link: "https://app.venus.io/assets/alpaca-3d1836fb.png",
+    },
+    {
+      name: "Venus ANKR",
+      link: "	https://app.venus.io/assets/ankr-d8ff80fc.svg",
+    },
+    {
+      name: "Venus agEUR",
+      link: "	https://app.venus.io/assets/agEUR-923b87e8.svg",
+    },
+    {
+      name: "Venus RACA",
+      link: "https://app.venus.io/assets/raca-e6ba6596.png",
+    },
+    {
+      name: "Venus BNBx",
+      link: "https://app.venus.io/assets/bnbx-a02cf002.png",
+    },
+    { name: "Venus BTT", link: "https://app.venus.io/assets/btt-5c3484d7.svg" },
+    { name: "Venus WIN", link: "https://app.venus.io/assets/win-3f169c62.svg" },
+    {
+      name: "Venus WBNB",
+      link: "https://app.venus.io/assets/wbnb-e73b2dde.svg",
+    },
+    {
+      name: "Venus stkBNB",
+      link: "https://app.venus.io/assets/stkBNB-14b66c9a.svg",
+    },
+    {
+      name: "Venus FLOKI",
+      link: "https://app.venus.io/assets/floki-1bb0894a.svg",
+    },
+    { name: "Venus TWT", link: "https://app.venus.io/assets/twt-5a3293b4.svg" },
     { name: "vXVS", link: "https://app.venus.io/assets/xvs-e7b82352.svg" },
     {
       name: "Venus USDC",
