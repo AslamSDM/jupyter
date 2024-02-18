@@ -4,6 +4,7 @@ export default function getImage(name: string) {
       name: "Venus BTC",
       link: "https://app.venus.io/assets/btcb-88ed0fde.svg",
     },
+    { name: "Venus BNB", link: "https://app.venus.io/assets/bnb-8cd7030f.svg" },
     {
       name: "Venus USDD",
       link: "https://app.venus.io/assets/usdd-2f108c20.svg",

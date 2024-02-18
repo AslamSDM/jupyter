@@ -25,7 +25,7 @@ function Sidebar() {
   ];
 
   return (
-    <div className="hidden h-screen bg-[#1E2431] pt-7 md:flex md:flex-col md:items-center xl:w-56">
+    <div className="hidden h-screen sticky top-0 bg-[#1E2431] pt-7 md:flex md:flex-col md:items-center xl:w-56">
       <Link
         href="/"
         className="text-blue hover:underline flex w-full gap-2 items-center justify-center py-2 text-white"
