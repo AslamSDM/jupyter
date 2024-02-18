@@ -53,7 +53,7 @@ const Page = () => {
       console.log("refresh");
       return;
     }
-    if (priceData["0x0"] == undefined) {
+    if (priceData["0x0"] === undefined) {
       return
     }
     if (Array.isArray(oracles.data) && oracles.data.length === 0) return;
@@ -97,6 +97,7 @@ const Page = () => {
     setTotalSupply(total);
 
   }, [oracles,pool,priceData]);
+  console.log(pool);
   return (
     <div className="w-full flex flex-col gap-10 px-10 py-8">
       <div className="flex justify-between">
@@ -119,8 +120,8 @@ const Page = () => {
           <p className="text-white">${formatNumber(String((totalSupply.supply-totalSupply.borrow) *100))}</p>
         </div>
         <div className="flex flex-col">
-          <p className="text-gray-400">Total Treasury</p>
-          <p className="text-white">30</p>
+          <p className="text-gray-400">Assets</p>
+          <p className="text-white">{pool.length}</p>
         </div>
       </div>
       {loading ? (

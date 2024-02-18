@@ -41,7 +41,7 @@ function PoolTable({ tableData, columns, poolType,priceData }: any) {
   useEffect(() => {
     const reversedPools = [...pools].reverse();
     setPools(reversedPools);
-  }, [sortOrder, tableData,pools]);
+  }, [sortOrder, tableData]);
   
 
   const renderHeaderCell = useCallback((columnKey: any) => {
