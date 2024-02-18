@@ -147,7 +147,7 @@ function PoolTable({ tableData, columns, poolType }: any) {
             <p className="text-white">
               {(Number(user.supplyApy) + Number(user.supplyXvsApy)).toFixed(3)}%
             </p>
-            <button
+            {/* <button
               className="inline-flex items-center justify-center border font-semibold border-slate-400 h-6 rounded-full p-1 my-1"
               type="button"
             >
@@ -161,7 +161,7 @@ function PoolTable({ tableData, columns, poolType }: any) {
                 />
                 <span className="text-green-400">1.42%</span>
               </span>
-            </button>
+            </button> */}
             {/* <p className="text-slate-400">{(Number(user.supplyXvsApy)).toFixed(3)} XVS</p> */}
           </div>
         );
@@ -191,7 +191,7 @@ function PoolTable({ tableData, columns, poolType }: any) {
             <p className="text-white">
               {(Number(user.borrowApy) - Number(user.borrowXvsApy)).toFixed(3)}%
             </p>
-            <button
+            {/* <button
               className="inline-flex items-center justify-center border font-semibold border-slate-400 h-6 rounded-full p-1 my-1"
               type="button"
             >
@@ -205,7 +205,7 @@ function PoolTable({ tableData, columns, poolType }: any) {
                 />
                 <span className="text-green-400">1.42%</span>
               </span>
-            </button>
+            </button> */}
             {/* <p className="text-slate-400">{(Number(user.borrowApy)-Number(user.borrowXvsApy)).toFixed(3)} XVS</p> */}
           </div>
         );
