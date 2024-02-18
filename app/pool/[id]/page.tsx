@@ -20,7 +20,7 @@ const PoolComponent = () => {
   console.log(pool);
   const poolInfo = [
     { label: "Token Price", data: pool.tokenPriceCents/100 },
-    { label: "Market Liquidity", data: pool.supplyApr },
+    { label: "Market Liquidity", data: "" },
     { label: "APY", data: Number(pool.supplyApy) + Number(pool.supplyXvsApy) },
     { label: "APR", data: pool.supplyApr },
     { label: "TVL", data: pool.supplyBalance },
@@ -76,7 +76,7 @@ const PoolComponent = () => {
     async function fetchhistory() {
       setLoading(true);
       const response = await axios.get(
-        "https:// api.venus.io/markets/history",
+        "https://api.venus.io/markets/history",
         {
           params: {
             asset: id,
