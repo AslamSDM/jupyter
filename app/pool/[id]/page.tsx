@@ -8,18 +8,21 @@ import AreaChartComponent from "@/components/charts/Areachart";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import SupplyModal from "@/components/supplyModal";
 import getImage from "@/components/abi/tokenImage";
+import { formatNumber } from "@/app/utils/formatNumber";
+import LineChartComponent from "@/components/charts/Linechart";
 
 const PoolComponent = () => {
   const { id } = useParams();
   const [pool, setPool] = useState<any>([]);
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState<any>([]);
+  const [supplyHistory, setSupplyHistory] = useState<any>([]);
+  const [borrowHistory, setBorrowHistory] = useState<any>([]);
   const [selectedTab, setSelectedTab] = useState<any>("supply");
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  console.log(pool);
   const poolInfo = [
-    { label: "Token Price", data: pool.tokenPriceCents/100 },
+    { label: "Token Price", data: pool.tokenPriceCents / 100 },
     { label: "Market Liquidity", data: "" },
     { label: "APY", data: Number(pool.supplyApy) + Number(pool.supplyXvsApy) },
     { label: "APR", data: pool.supplyApr },
@@ -75,23 +78,36 @@ const PoolComponent = () => {
     // Fetch data from API
     async function fetchhistory() {
       setLoading(true);
-      const response = await axios.get(
-        "https://api.venus.io/markets/history",
-        {
-          params: {
-            asset: id,
-          },
-        }
-      );
+      const response = await axios.get("https://api.venus.io/markets/history", {
+        params: {
+          asset: id,
+        },
+      });
       const { data } = response.data.result;
-      let chartData: any = [];
-      data.forEach((item: any, index: number) => {
-        chartData.push({
-          name: index + 1,
-          val: item.totalSupplyCents,
+      console.log(response);
+      let supplyChartData: any = [];
+      let borrowChartData: any = [];
+      data.forEach((item: any) => {
+        const date = new Date(item.blockTimestamp * 1000).toLocaleDateString(
+          "en-GB"
+        );
+        const supplyApy = item.supplyApy;
+        const totalSupply = formatNumber(item.totalSupplyCents);
+        const borrowApy = item.borrowApy;
+        const totalBorrow = formatNumber(item.totalBorrowCents);
+        supplyChartData.push({
+          date: date,
+          supplyApy: supplyApy,
+          totalSupply: totalSupply,
+        });
+        borrowChartData.push({
+          date: date,
+          borrowApy: borrowApy,
+          totalBorrow: totalBorrow,
         });
       });
-      setHistory(chartData);
+      setSupplyHistory(supplyChartData);
+      setBorrowHistory(borrowChartData);
       setLoading(false);
     }
     async function fetchpool() {
@@ -127,9 +143,36 @@ const PoolComponent = () => {
         <Chip>{pool.name}</Chip>
         <ConnectButton />
       </div>
-      <div className="flex flex-row justify-between">
-        <div className="w-2/3">
-          <AreaChartComponent data={history} />
+      <div className="flex flex-row justify-between items-start">
+        <div className="w-2/3 space-y-8">
+          <div className="w-full bg-[#1E2431] rounded-xl p-8 space-y-8">
+            <h2 className="text-3xl font-semibold text-white">Supply Info</h2>
+            <AreaChartComponent
+              data={supplyHistory}
+              yFieldLabel="Supply APY"
+              yFieldName="supplyApy"
+              color="#4ADE80"
+              tooltipFieldName="totalSupply"
+              tooltipFieldLabel="Total Supply"
+            />
+          </div>
+          <div className="w-full bg-[#1E2431] rounded-xl p-8 space-y-8">
+            <h2 className="text-3xl font-semibold text-white">Borrow Info</h2>
+            <AreaChartComponent
+              data={borrowHistory}
+              yFieldLabel="Borrow APY"
+              yFieldName="borrowApy"
+              color="#E93D66"
+              tooltipFieldName="totalBorrow"
+              tooltipFieldLabel="Total Borrow"
+            />
+          </div>
+          <div className="w-full bg-[#1E2431] rounded-xl p-8 space-y-8">
+            <h2 className="text-3xl font-semibold text-white">
+              Interest Rate Model
+            </h2>
+            <LineChartComponent />
+          </div>
         </div>
         <div className="w-1/4 flex flex-col gap-6">
           <Card className="bg-[#1E2431] p-3">

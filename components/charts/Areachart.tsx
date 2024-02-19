@@ -1,7 +1,6 @@
 "use client";
 
-import { type } from "os";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   AreaChart,
   Area,
@@ -9,104 +8,102 @@ import {
   YAxis,
   ResponsiveContainer,
   Tooltip,
+  ReferenceLine,
 } from "recharts";
 
-type Props = {};
-
-const AreaChartComponent = ({ data }: any) => {
-  const timeArr = ["1M", "6M", "1Y", "All"];
-  const [time, setTime] = useState("All");
-  const [filteredChartData, setFilteredChartData] = useState<any[]>(data);
+const AreaChartComponent = ({
+  data,
+  yFieldLabel,
+  yFieldName,
+  color,
+  tooltipFieldName,
+  tooltipFieldLabel,
+}: any) => {
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (!filteredChartData) return;
-    setLoading(true);
-  }, [filteredChartData]);
-
-  useEffect(() => {
-    console.log(time);
-    if (time === "All") {
-      console.log(filteredChartData);
-      console.log(data);
-      setFilteredChartData(data);
-    } else if (time === "1M") {
-      setFilteredChartData(data.slice(0, 30));
-    } else if (time === "6M") {
-      setFilteredChartData(data.slice(0, 180));
-    } else if (time === "1Y") {
-      setFilteredChartData(data.slice(0, 365));
-    } else {
-      setFilteredChartData(data);
+  const CustomTooltip = useCallback(({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-gray-400 p-4 rounded-md shadow-md text-neutral-800 text-sm font-medium">
+          <p>{`Date : ${payload[0].payload.date}`}</p>
+          <p>
+            {`${yFieldLabel} : ${payload[0]?.payload[yFieldName].slice(0, 4)}%`}
+          </p>
+          <p>{`${tooltipFieldLabel} : ${payload[0]?.payload[tooltipFieldName]}`}</p>
+        </div>
+      );
     }
-    // setLoading(false);
-  }, [time,data,filteredChartData]);
+    return null;
+  }, []);
+
+  const maxVal = Math.max(...data.map((item: any) => item[yFieldName]));
+  const interval = maxVal / 5;
+  const ticks = [
+    0,
+    interval,
+    interval * 2,
+    interval * 3,
+    interval * 4,
+    interval * 5,
+  ];
 
   return (
     <div className="w-full flex flex-col gap-8">
       <div className="flex max-md:flex-col max-md:gap-3 md:items-center justify-between">
-        <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
           <h3 className="text-neutral-200 text-[16px]">AAVE/USD</h3>
           <p className="text-neutral-600 text-[16px]">V3 Uniswap (Ethereum)</p>
-        </div>
-        <div className="flex items-center gap-2">
-          {timeArr?.map((item) => (
-            <button
-              key={item}
-              type="button"
-              onClick={() => setTime(item)}
-              className={`${
-                item === time ? "bg-zinc-700" : ""
-              } text-neutral-200 w-[40px] rounded-md py-[3px] px-2 text-sm font-medium text-[16px]`}
-            >
-              {item}
-            </button>
-          ))}
-        </div>
+        </div> */}
       </div>
       <div className="max-md:w-[110%] md:w-full -translate-x-[32px] md:-translate-x-[24px]">
-        <ResponsiveContainer width="105%" height={300}>
+        <ResponsiveContainer width="105%" height={400}>
           <AreaChart
             width={790}
-            height={400}
-            data={filteredChartData}
-            margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+            height={300}
+            data={data}
+            margin={{ top: 10, right: 30, left: 0, bottom: 20 }}
           >
             <defs>
-              <linearGradient id="colorVal" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#4ADE80" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="#4ADE80" stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="colorPv" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#edcd8f" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="#edcd8f" stopOpacity={0} />
+              <linearGradient
+                id={`${color}colorVal`}
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
+                <stop offset="5%" stopColor={color} stopOpacity={0.8} />
+                <stop offset="95%" stopColor={color} stopOpacity={0} />
               </linearGradient>
             </defs>
             <XAxis
               axisLine={{ display: "none" }}
-              tickLine={{ display: "none" }}
-              dataKey="name"
+              // tickLine={{ display: "none" }}
+              dataKey="date"
+              tickMargin={20}
+              tick={{ fontSize: 12 }}
+              ticks={[data[5]?.date, data[180]?.date, data[360]?.date]}
             />
             <YAxis
               axisLine={{ display: "none" }}
               tickLine={{ display: "none" }}
+              dataKey={yFieldName}
+              tickFormatter={(val) => `${val.toFixed(2)}%`}
+              ticks={ticks}
               domain={["auto", "auto"]}
             />
-            <Tooltip />
-            <Area
-              type="monotone"
-              dataKey="val"
-              stroke="#4ADE80"
-              fillOpacity={1}
-              fill="url(#colorVal)"
-              strokeWidth={3}
+            {ticks.map((tick, index) => (
+              <ReferenceLine key={index} y={tick} stroke="#808080" />
+            ))}
+            <Tooltip
+              content={<CustomTooltip />}
+              wrapperStyle={{ backgroundColor: "blue", borderRadius: "12px" }}
             />
             <Area
               type="monotone"
-              dataKey="pv"
-              stroke="#4ADE80"
+              dataKey={yFieldName}
+              stroke={color}
               fillOpacity={1}
-              fill="url(#colorPv)"
+              fill={`url(#${color}colorVal)`}
+              strokeWidth={3}
             />
           </AreaChart>
         </ResponsiveContainer>
