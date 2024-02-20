@@ -8,7 +8,19 @@ import { formatUnits } from "viem";
 // import CoinSearch from "./coinSearch";
 // import getImage from "./abi/tokenImage";
 
-function SupplyTab({ pool, id, mint, approve, mintBNB ,marketHandler,Membership ,vtokenbalance,underlyingbalance ,accountLiquidity,borrowBalance}: any) {
+function SupplyTab({
+  pool,
+  id,
+  mint,
+  approve,
+  mintBNB,
+  marketHandler,
+  Membership,
+  vtokenbalance,
+  underlyingbalance,
+  accountLiquidity,
+  borrowBalance,
+}: any) {
   const [amount, setAmount] = useState(0);
   // const [openSeach, setOpenSearch] = useState(false);
   // const [coin, setCoin] = useState({ name: pool.name, symbol: pool.name });
@@ -29,7 +41,13 @@ function SupplyTab({ pool, id, mint, approve, mintBNB ,marketHandler,Membership 
       });
     }
   };
-  console.log(borrowBalance)
+  const max = Number(
+    formatUnits(accountLiquidity ? accountLiquidity[1] : "", 18)
+  ).toFixed(3);
+  console.log(borrowBalance);
+  // const progress = (Number(borrowBalance) / Number(max)) * 100;
+  const progress = 70;
+  console.log(progress);
   return (
     <form
       className="flex flex-col gap-3 items-center text-white"
@@ -37,7 +55,10 @@ function SupplyTab({ pool, id, mint, approve, mintBNB ,marketHandler,Membership 
     >
       <div className="w-full flex justify-between">
         <p className="text-gray-400">Collateral</p>
-        <Switch isSelected={Membership} onClick={()=>marketHandler()}></Switch>
+        <Switch
+          isSelected={Membership}
+          onClick={() => marketHandler()}
+        ></Switch>
       </div>
       <Input
         placeholder="0.00"
@@ -45,10 +66,9 @@ function SupplyTab({ pool, id, mint, approve, mintBNB ,marketHandler,Membership 
         type="number"
         value={String(amount)}
         onChange={(e) => {
-          if(Number(e.target.value)>0){
-
+          if (Number(e.target.value) > 0) {
             setAmount(Number(e.target.value));
-          }else{
+          } else {
             setAmount(0);
           }
         }}
@@ -101,7 +121,9 @@ function SupplyTab({ pool, id, mint, approve, mintBNB ,marketHandler,Membership 
             )} */}
             <Button
               size="sm"
-              onClick={() => {setAmount(Number(underlyingbalance?.formatted))}}
+              onClick={() => {
+                setAmount(Number(underlyingbalance?.formatted));
+              }}
               className="bg-[#2D3549] text-white"
             >
               Max
@@ -131,14 +153,23 @@ function SupplyTab({ pool, id, mint, approve, mintBNB ,marketHandler,Membership 
         </div>
         <div className="flex justify-between">
           <p className="text-gray-400">Total APY</p>
-          <p>{(Number(pool.supplyXvsApy)+ Number(pool.supplyApy)).toFixed(3)}%</p>
+          <p>
+            {(Number(pool.supplyXvsApy) + Number(pool.supplyApy)).toFixed(3)}%
+          </p>
         </div>
         <Divider className="my-4 bg-gray-600" />
         <div className="flex justify-between">
           <p className="text-gray-400">{`Current : $${borrowBalance}`}</p>
-          <p>Max {Number(formatUnits(accountLiquidity?accountLiquidity[1]:"",18)).toFixed(3)}</p>
+          <p>Max {max}</p>
         </div>
+        {/* Progress Bar */}
         <div className="relative w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
+          <div
+            className={`${
+              progress > 85 ? "bg-red-600" : "bg-green-600"
+            } h-2.5 absolute rounded-full`}
+            style={{ width: `${progress}%` }}
+          ></div>
           <div
             className="bg-red-600 h-2.5 dark:bg-blue-500 absolute w-1"
             style={{ left: "85%" }}
@@ -146,14 +177,40 @@ function SupplyTab({ pool, id, mint, approve, mintBNB ,marketHandler,Membership 
         </div>
         <div className="flex justify-between">
           <p className="text-gray-400">{`Supply Balance (${pool.underlyingSymbol})`}</p>
-          {amount===0? <p>{(Number(vtokenbalance?.formatted)/Number(getExchangeRate(pool.exchangeRateMantissa,8,pool.underlyingDecimal))).toFixed(6)}</p> : <>
-           <p>{(Number(vtokenbalance?.formatted)/Number(getExchangeRate(pool.exchangeRateMantissa,8,pool.underlyingDecimal))+Number(amount)).toFixed(6)}</p>
-          </>
-          }
+          {amount === 0 ? (
+            <p>
+              {(
+                Number(vtokenbalance?.formatted) /
+                Number(
+                  getExchangeRate(
+                    pool.exchangeRateMantissa,
+                    8,
+                    pool.underlyingDecimal
+                  )
+                )
+              ).toFixed(6)}
+            </p>
+          ) : (
+            <>
+              <p>
+                {(
+                  Number(vtokenbalance?.formatted) /
+                    Number(
+                      getExchangeRate(
+                        pool.exchangeRateMantissa,
+                        8,
+                        pool.underlyingDecimal
+                      )
+                    ) +
+                  Number(amount)
+                ).toFixed(6)}
+              </p>
+            </>
+          )}
         </div>
         <div className="flex justify-between">
           <p className="text-gray-400">Borrow limit</p>
-          <p>{Number(formatUnits(accountLiquidity[1],18)).toFixed(3)}</p>
+          <p>{Number(formatUnits(accountLiquidity[1], 18)).toFixed(3)}</p>
         </div>
         {/* <div className="flex justify-between">
           <p className="text-gray-400">Daily earnings</p>
