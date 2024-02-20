@@ -21,7 +21,7 @@ function RepayTab({   pool,
   isConnected,
   allowance,
   repay,
-  refetchbalance }: any) {
+  refetchbalance,isolated }: any) {
   const [amount, setAmount] = useState(0);
   const [openSeach, setOpenSearch] = useState(false);
   const [coin, setCoin] = useState({ name: "BNB", symbol: "BNB" });
@@ -182,8 +182,12 @@ const handleApprove = async (e: any) => {
             <p className="text-gray-400">Supply APY</p>
           </div>
 
-          <p>{Number(pool.supplyApy).toFixed(3)}%</p>
+          <p>{Number(pool.supplyApy)<0.01?"<0.01":Number(pool.supplyApy).toFixed(3)}%</p>
         </div>
+        {
+          isolated?<></>:
+          (
+<>
         <div className="flex justify-between">
           <div className="flex justify-start gap-1">
             <Image src={pool.logo} alt="logo" width={20} height={20} />
@@ -197,6 +201,9 @@ const handleApprove = async (e: any) => {
             {(Number(pool.supplyXvsApy) + Number(pool.supplyApy)).toFixed(3)}%
           </p>
         </div>
+</>
+          )
+        }
         <Divider className="my-4 bg-gray-600" />
         <div className="flex justify-between">
           <p className="text-gray-400">{`Current : $${(

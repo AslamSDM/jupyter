@@ -84,9 +84,8 @@ function SupplyModal({
   })
   //Vtoken fn
 
-const {data:underlyingbalance,refetch:underlyingbalancerefresh} = useBalance({ address:address,token: pool.underlyingAddress }  );
+const {data:underlyingbalance,refetch:underlyingbalancerefresh} = useBalance({ address:address,token: pool.underlyingAssetAddress }  );
 const {data:vtokenbalance,refetch:vtokenbalancerefetch} = useBalance({address:address, token: id as `0x${string}` }  );
-
   const { write: mint } = useContractWrite({
     address: id as `0x${string}`,
     abi: vTokenabi,
@@ -131,7 +130,7 @@ const {data:vtokenbalance,refetch:vtokenbalancerefetch} = useBalance({address:ad
     functionName: "approve",
   });
   const allowanceVtoken  = useContractRead({
-    address: pool.underlyingAddress as `0x${string}`,
+    address: pool.underlyingAssetAddress as `0x${string}`,
     abi: vTokenabi,
     functionName: "allowance",
     args:[address as `0x${string}`,id as `0x${string}`]
@@ -173,6 +172,7 @@ const {data:vtokenbalance,refetch:vtokenbalancerefetch} = useBalance({address:ad
       await exitMarket();
     }
   }
+  console.log(allowance);
 
   return (
     <Modal isOpen={isOpen} onClose={onOpenChange}>
@@ -206,6 +206,7 @@ const {data:vtokenbalance,refetch:vtokenbalancerefetch} = useBalance({address:ad
                 borrowBalance={borrowBalance}
                 allowance={allowance}
                 refetchbalance= {refetchbalance}
+                isolated={true}
                 />
             </Tab>
             <Tab key="withdraw" className="w-full" title="Withdraw">
@@ -226,6 +227,7 @@ const {data:vtokenbalance,refetch:vtokenbalancerefetch} = useBalance({address:ad
                 refetchbalance= {refetchbalance}
                 approve={approveVtoken}
                 redeem={redeem}
+                isolated={true}
                 />
             </Tab>
             <Tab key="borrow" className="w-full" title="Borrow">
@@ -243,6 +245,7 @@ const {data:vtokenbalance,refetch:vtokenbalancerefetch} = useBalance({address:ad
                 borrowBalance={borrowBalance}
                 allowance={allowance}
                 refetchbalance= {refetchbalance}
+                isolated={true}
                 />
             </Tab>
             <Tab key="repay" className="w-full" title="Repay">
@@ -259,6 +262,7 @@ const {data:vtokenbalance,refetch:vtokenbalancerefetch} = useBalance({address:ad
               borrowBalance={borrowBalance}
               allowance={allowance}
               refetchbalance= {refetchbalance}
+              isolated={true}
               
               />
             </Tab>

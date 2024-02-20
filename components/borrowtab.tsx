@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Input, Button, Divider } from "@nextui-org/react";
 import { formatUnits, parseUnits } from "viem";
 import { getExchangeRate } from "@/app/utils/formatNumber";
+import getImage from "./abi/tokenImage";
 
 function Borrowtab({   pool,
   id,
@@ -14,9 +15,9 @@ function Borrowtab({   pool,
   accountLiquidity,
   borrowBalance,
   isConnected,
-  refetchbalance, borrow }: any) {
+  refetchbalance, borrow,isolated }: any) {
   const [amount, setAmount] = useState(0);
-
+console.log(pool.underlyingSymbol);
   const handleborrowsubmit = async (e: any) => {
     e.preventDefault();
     if (pool.underlyingSymbol === "BNB") {
@@ -79,22 +80,31 @@ function Borrowtab({   pool,
         <Divider className="my-4 bg-gray-600" />
         <div className="flex justify-between">
           <div className="flex justify-start gap-1">
-            <Image src={pool.logo} alt="logo" width={20} height={20} />
+            <Image src={pool.logo??getImage("Venus "+pool.underlyingSymbol)} alt="logo" width={20} height={20} />
             <p className="text-gray-400">Supply APY</p>
           </div>
-          <p>{Number(pool.supplyApy).toFixed(3)}%</p>
+          <p>{Number(pool.supplyApy)<0.01?"<0.01":Number(pool.supplyApy).toFixed(3)}%</p>
         </div>
+        {
+          isolated?<></>:
+          (
+<>
         <div className="flex justify-between">
           <div className="flex justify-start gap-1">
-            <Image src={pool.logo} alt="logo" width={20} height={20} />
-            <p className="text-gray-400">Distribution APY</p>
+            <Image src={getImage("Venus XVS")} alt="logo" width={20} height={20} />
+            <p className="text-gray-400">Distribution APY (XVS)</p>
           </div>
           <p>{Number(pool.supplyXvsApy).toFixed(3)}%</p>
         </div>
         <div className="flex justify-between">
           <p className="text-gray-400">Total APY</p>
-          {(Number(pool.supplyXvsApy) + Number(pool.supplyApy)).toFixed(3)}%
+          <p>
+            {(Number(pool.supplyXvsApy) + Number(pool.supplyApy)).toFixed(3)}%
+          </p>
         </div>
+</>
+          )
+        }
         <Divider className="my-4 bg-gray-600" />
         <div className="flex justify-between">
           <p className="text-gray-400">{`Current :  $${(Number(formatUnits(borrowBalance??"",pool.underlyingDecimal))*Number(pool.tokenPriceCents)/100).toFixed(3)}`}</p>
@@ -186,8 +196,10 @@ function Borrowtab({   pool,
               className="w-full"
               type="submit"
               onClick={(e:any)=> handleborrowsubmit(e)}
+              disabled={amount === 0}
+
             >
-              Withdraw
+              Borrow
             </Button>
           )
         ) : (

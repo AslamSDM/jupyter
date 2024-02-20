@@ -23,6 +23,7 @@ function SupplyTab({
   isConnected,
   allowance,
   refetchbalance,
+  isolated,
 }: any) {
   const [amount, setAmount] = useState(0);
   // const [openSeach, setOpenSearch] = useState(false);
@@ -158,8 +159,12 @@ function SupplyTab({
             <p className="text-gray-400">Supply APY</p>
           </div>
 
-          <p>{Number(pool.supplyApy).toFixed(3)}%</p>
+          <p>{Number(pool.supplyApy)<0.01?"<0.01":Number(pool.supplyApy).toFixed(3)}%</p>
         </div>
+        {
+          isolated?<></>:
+          (
+<>
         <div className="flex justify-between">
           <div className="flex justify-start gap-1">
             <Image src={pool.logo} alt="logo" width={20} height={20} />
@@ -173,6 +178,9 @@ function SupplyTab({
             {(Number(pool.supplyXvsApy) + Number(pool.supplyApy)).toFixed(3)}%
           </p>
         </div>
+</>
+          )
+        }
         <Divider className="my-4 bg-gray-600" />
         <div className="flex justify-between">
           <p className="text-gray-400">{`Current : $${(
@@ -254,6 +262,7 @@ function SupplyTab({
       {isConnected ? (
         Number(allowance.data) <
           Number(parseUnits(String(amount), pool.underlyingDecimal)) ||
+
         pool.underlyingSymbol == "BNB" ? (
           <Button
             variant="bordered"
@@ -261,6 +270,7 @@ function SupplyTab({
             className="w-full"
             type="submit"
             onClick={(e: any) => handleApprove(e)}
+
           >
             Approve
           </Button>
@@ -271,6 +281,7 @@ function SupplyTab({
             className="w-full"
             type="submit"
             onClick={(e: any) => handlesupplysubmit(e)}
+            disabled={amount === 0}
           >
             Supply
           </Button>

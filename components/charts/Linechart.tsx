@@ -10,7 +10,9 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-function LineChartComponent() {
+function LineChartComponent(
+  {data}:any
+) {
   const CustomTooltip = useCallback(({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
@@ -23,16 +25,18 @@ function LineChartComponent() {
     }
     return null;
   }, []);
-  const data = [];
-
-  for (let i = 0; i < 100; i++) {
-    data.push({
-      borrowApy: parseFloat((Math.random() * 100).toFixed(2)), // random number between 0 and 100 with max 2 decimal points
-      supplyApy: parseFloat((Math.random() * 100).toFixed(2)), // random number between 0 and 100 with max 2 decimal points
-      utilizationRate: parseFloat((Math.random() * 100).toFixed(2)), // random number between 0 and 100 with max 2 decimal points
-    });
-  }
-  data.sort((a, b) => a.utilizationRate - b.utilizationRate);
+  console.log(data);
+  // const data = [];
+// const data = data_temp.map((item:any)=>{
+//   return{
+//     borrowApy: parseFloat((Math.random() * 100).toFixed(2)), 
+//     supplyApy: parseFloat((Math.random() * 100).toFixed(2)), 
+//     utilizationRate: parseFloat((Math.random() * 100).toFixed(2)), 
+//   }
+// })
+//     data.push({
+//     });
+//   data.sort((a, b) => a.utilizationRate - b.utilizationRate);
 
   const ticks = [25, 50, 75, 100];
   return (

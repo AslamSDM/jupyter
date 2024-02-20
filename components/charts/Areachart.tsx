@@ -34,8 +34,7 @@ const AreaChartComponent = ({
     }
     return null;
   }, []);
-
-  const maxVal = Math.max(...data.map((item: any) => item[yFieldName]));
+  const maxVal = Math.max(...data?.map((item: any) => item[yFieldName])) 
   const interval = maxVal / 5;
   const ticks = [
     0,

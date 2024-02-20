@@ -17,7 +17,7 @@ function useHistory(id: string) {
                         },
                     }
                 );
-                setHistory(response.data.result);
+                setHistory(response.data.result.data);
                 console.log(response.data.result);
             } catch (error) {
                 console.error("Error fetching history:", error);

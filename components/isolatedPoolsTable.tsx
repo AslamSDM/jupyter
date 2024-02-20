@@ -119,15 +119,15 @@ function IsolatedPoolsTable({ columns, pools, total }: any) {
       <table className="w-full text-md">
         <thead className="text-[#AAB3CA] text-md text-end">
           <tr>
-            {columns.map((column: any) => (
+            {Array.isArray(columns)?(columns?.map((column: any) => (
               <th scope="col" className="font-medium" key={column.key}>
                 {renderHeaderCell(column.key)}
               </th>
-            ))}
+            ))):<></>}
           </tr>
         </thead>
         <tbody>
-          {pools.map((pool: any, index: number) => (
+          {Array.isArray(pools)? pools.map((pool: any, index: number) => (
             <tr key={index}>
               {columns.map((column: any) => (
                 <td key={column.key} className="text-end px-4">
@@ -137,7 +137,7 @@ function IsolatedPoolsTable({ columns, pools, total }: any) {
                 </td>
               ))}
             </tr>
-          ))}
+          )):<></>}
         </tbody>
       </table>
     </div>

@@ -20,10 +20,11 @@ import LineChartComponent from "@/components/charts/Linechart";
 const PoolComponent = () => {
   const { id } = useParams();
   const [pool, setPool] = useState<any>([]);
-  const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState<any>([]);
+  const [loading, setLoading] = useState(false);
   const [supplyHistory, setSupplyHistory] = useState<any>([]);
   const [borrowHistory, setBorrowHistory] = useState<any>([]);
+  const [lineChartData, setLineChartData] = useState<any>([]);
   const [selectedTab, setSelectedTab] = useState<any>("supply");
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -156,7 +157,9 @@ const PoolComponent = () => {
       console.log(response);
       let supplyChartData: any = [];
       let borrowChartData: any = [];
-      data.forEach((item: any) => {
+      let lineChartData: any = [];
+      const data_len = data.length;
+      data.forEach((item: any,index:number) => {
         const date = new Date(item.blockTimestamp * 1000).toLocaleDateString(
           "en-GB"
         );
@@ -164,6 +167,12 @@ const PoolComponent = () => {
         const totalSupply = formatNumber(item.totalSupplyCents);
         const borrowApy = item.borrowApy;
         const totalBorrow = formatNumber(item.totalBorrowCents);
+        lineChartData.push({
+          supplyApy: supplyApy,
+          borrowApy: borrowApy,
+          utilizationRate: (index/360)*100,
+          
+        });
         supplyChartData.push({
           date: date,
           supplyApy: supplyApy,
@@ -177,6 +186,7 @@ const PoolComponent = () => {
       });
       setSupplyHistory(supplyChartData);
       setBorrowHistory(borrowChartData);
+      setLineChartData(lineChartData);
       setLoading(false);
     }
     async function fetchpool() {
@@ -243,12 +253,14 @@ const PoolComponent = () => {
               tooltipFieldLabel="Total Borrow"
             />
           </div>
-          <div className="w-full bg-[#1E2431] rounded-xl p-8 space-y-8">
+          {/* <div className="w-full bg-[#1E2431] rounded-xl p-8 space-y-8">
             <h2 className="text-3xl font-semibold text-white">
               Interest Rate Model
             </h2>
-            <LineChartComponent />
-          </div>
+            <LineChartComponent 
+            data={lineChartData}
+            />
+          </div> */}
         </div>
         <div className="w-1/4 flex flex-col gap-6">
           <Card className="bg-[#1E2431] p-3">
@@ -292,7 +304,7 @@ const PoolComponent = () => {
                       <Divider />
                       <div className="py-3 flex justify-between">
                         <p className="text-gray-500">{info.label}</p>
-                        <p className="text-white">
+                        <p className="text-white ">
                           {info.data ? info.data : ""}
                         </p>
                       </div>

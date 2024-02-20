@@ -47,7 +47,7 @@ export function getRate(rate: string, vdecimals: number) {
 
 export function getExchangeRate(rate: string, vdecimals: number, udecimals: number) {
     const value = Number(rate);
-    const decimals = 18 - vdecimals + udecimals;
+    const decimals = 18 - Number(vdecimals) + Number(udecimals);
     const f = value / Math.pow(10, decimals);
     return (1/f).toFixed(6);
   }

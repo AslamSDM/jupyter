@@ -5,7 +5,7 @@ import { formatUnits, parseUnits } from "viem";
 import { getExchangeRate } from "@/app/utils/formatNumber";
 
 function WithdrawTab({ pool, approve, id, redeem,
-  isConnected,underlyingbalance, vtokenbalance, allowance, refetchbalance,accountLiquidity,borrowBalance
+  isConnected,underlyingbalance, vtokenbalance, allowance, refetchbalance,accountLiquidity,borrowBalance,isolated
  }: any) {
   const [amount, setAmount] = useState(0);
   const handlewithdrawsubmit = async (e: any) => {
@@ -90,19 +90,28 @@ function WithdrawTab({ pool, approve, id, redeem,
             <Image src={pool.logo} alt="logo" width={20} height={20} />
             <p className="text-gray-400">Supply APY</p>
           </div>
-          <p>{Number(pool.supplyApy).toFixed(3)}%</p>
+          <p>{Number(pool.supplyApy)<0.01?"<0.01":Number(pool.supplyApy).toFixed(3)}%</p>
         </div>
+        {
+          isolated?<></>:
+          (
+<>
         <div className="flex justify-between">
           <div className="flex justify-start gap-1">
             <Image src={pool.logo} alt="logo" width={20} height={20} />
-            <p className="text-gray-400">Distribution APY</p>
+            <p className="text-gray-400">Distribution APY (XVS)</p>
           </div>
           <p>{Number(pool.supplyXvsApy).toFixed(3)}%</p>
         </div>
         <div className="flex justify-between">
           <p className="text-gray-400">Total APY</p>
-          {(Number(pool.supplyXvsApy) + Number(pool.supplyApy)).toFixed(3)}%
+          <p>
+            {(Number(pool.supplyXvsApy) + Number(pool.supplyApy)).toFixed(3)}%
+          </p>
         </div>
+</>
+          )
+        }
         <Divider className="my-4" />
         <div className="flex justify-between">
           <p className="text-gray-400">{`Current :  $${(Number(formatUnits(borrowBalance??"",pool.underlyingDecimal))*Number(pool.tokenPriceCents)/100).toFixed(3)}`}</p>
