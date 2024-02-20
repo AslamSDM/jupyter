@@ -91,7 +91,7 @@ const PoolComponent = () => {
     fetchData();
   }, [section]);
   console.log({pool});
-  console.log({comptroller});
+  console.log("Venus ")
 
   useEffect(() => {
   
@@ -208,11 +208,7 @@ const PoolComponent = () => {
         pool.underlyingSymbol,
     },
   ];
-  console.log(  getExchangeRate(
-    pool.exchangeRateCurrent ?? "",
-    8,
-    pool.underlyingDecimals
-  ));
+
   if (loading) {
     return (
       <>

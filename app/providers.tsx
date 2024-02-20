@@ -18,7 +18,7 @@ const { chains, publicClient } = configureChains(
   );
   
   const { connectors } = getDefaultWallets({
-    appName: 'My RainbowKit App',
+    appName: 'Jupyter app',
     projectId: 'YOUR_PROJECT_ID',
     chains
   });

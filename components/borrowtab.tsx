@@ -17,7 +17,6 @@ function Borrowtab({   pool,
   isConnected,
   refetchbalance, borrow,isolated }: any) {
   const [amount, setAmount] = useState(0);
-console.log(pool.underlyingSymbol);
   const handleborrowsubmit = async (e: any) => {
     e.preventDefault();
     if (pool.underlyingSymbol === "BNB") {
@@ -31,11 +30,11 @@ console.log(pool.underlyingSymbol);
     }
   };
   const progress =
-    ((Number(formatUnits(borrowBalance ?? "", pool.underlyingDecimal)) *
-      Number(pool.tokenPriceCents)) /
-      100 /
-      Number(formatUnits(accountLiquidity ? accountLiquidity[1] : "", 18))) *
-    100;
+  ((Number(formatUnits(borrowBalance ?? "", pool.underlyingDecimal)) *
+  Number(pool.tokenPriceCents)) /
+  100 /
+  Number(formatUnits(accountLiquidity ? accountLiquidity[1] : "", 18))) *
+  100;
   return (
     <form
       className="flex flex-col gap-3 items-center text-white"

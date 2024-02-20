@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { columns } from "./dummyData";
 import axios from "axios";
-import { BigNumber } from "bignumber.js";
 import Link from "next/link";
 import Logo from "../assets/logo.svg";
 import Image from "next/image";
