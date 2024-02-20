@@ -1,6 +1,6 @@
 "use client";
 import { useParams } from "next/navigation";
-import { useAccount, useContractRead, useContractWrite, useSendTransaction } from "wagmi";
+import { useAccount, useBalance, useContractRead, useContractWrite, useSendTransaction } from "wagmi";
 import { vTokenabi } from "@/components/abi/vTokenabi";
 import { vBNBTokenabi } from "@/components/abi/vBNBTokenabi";
 
@@ -31,7 +31,6 @@ function SupplyModal({
     udecimals: number
     ): number {
       const value = Number(mantissa);
-      
       const decimals = 18 + udecimals - vdecimals;
       const f = value / Math.pow(10, decimals);
       return Number(f);
@@ -71,8 +70,24 @@ const {data:MembershipFacet}  = useContractRead({
     functionName:"checkMembership",
     args:[address as `0x${string}`,id as `0x${string}`]
   })
-
+  const {data:accountLiquidity} = useContractRead({
+    address:  comptroller as `0x${string}`,
+    abi:newcomptrollerabi,
+    functionName:"getAccountLiquidity",
+    args:[address as `0x${string}`]
+  })
+  const borrowPower = useContractRead({
+    address:  comptroller as `0x${string}`,
+    abi:newcomptrollerabi,
+    functionName:"getBorrowingPower",
+    args:[address as `0x${string}`]
+  })
   //Vtoken fn
+
+const {data:underlyingbalance} = useBalance({ address:address,token: pool.underlyingAddress }  );
+const {data:vtokenbalance} = useBalance({address:address, token: id as `0x${string}` }  );
+
+
   const { write: mint } = useContractWrite({
     address: id as `0x${string}`,
     abi: vTokenabi,
@@ -94,6 +109,12 @@ const {data:MembershipFacet}  = useContractRead({
     abi: vTokenabi,
     functionName: "allowance",
   });
+  const {data:borrowBalance}  = useContractRead({
+    address: id as `0x${string}`,
+    abi: vTokenabi,
+    functionName: "borrowBalanceStored",
+    args:[address as `0x${string}`]
+  });
   const { write: approveVtoken } = useContractWrite({
     address: id as `0x${string}`,
     abi: vTokenabi,
@@ -114,7 +135,6 @@ const {data:MembershipFacet}  = useContractRead({
     abi: vTokenabi,
     functionName: "repayBorrow",
   });
-console.log({Membership})
   const marketHandler = async () => {
     if(Membership == false){
       await enterMarket();
@@ -123,7 +143,7 @@ console.log({Membership})
       await exitMarket();
     }
   }
-
+console.log(borrowBalance)
 
   return (
     <Modal isOpen={isOpen} onClose={onOpenChange}>
@@ -149,6 +169,11 @@ console.log({Membership})
                 mintBNB={mintBNB}
                 marketHandler={marketHandler}
                 Membership={Membership}
+                vtokenbalance={vtokenbalance}
+                underlyingbalance={underlyingbalance}
+                borrowPower={borrowPower}
+                accountLiquidity={accountLiquidity}
+                borrowBalance={borrowBalance}
               />
             </Tab>
             <Tab key="withdraw" className="w-full" title="Withdraw">

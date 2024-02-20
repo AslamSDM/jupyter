@@ -1,15 +1,20 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { testnet } from "@/components/contracts";
-import { useContractRead, useContractReads } from "wagmi";
-import { PoolLensabi } from "@/components/abi/Poolabi";
+import {  useContractReads } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { CircularProgress } from "@nextui-org/react";
 import IsolatedPoolsTable from "@/components/isolatedPoolsTable";
 import { formatUnits } from "viem";
 import { oracleabi } from "@/components/abi/oracleabi";
 import { formatNumber } from "../utils/formatNumber";
+import { bsc } from "viem/chains";
+import { createPublicClient, http } from "viem";
+
+const bscClient = createPublicClient({
+    chain: bsc,
+    transport: http()
+  })
 
 const IsolatedPoolsPage = () => {
   const [pools, setPools] = useState([]);
@@ -50,66 +55,130 @@ const IsolatedPoolsPage = () => {
     }
     fetchData();
   }, []);
-  const oracles = useContractReads({
-    contracts: pools.flatMap((p: any) =>
-    p.vTokens.map((vToken: any) => ({
-      address: p.priceOracle,
-      abi: oracleabi,
-      functionName: "getUnderlyingPrice",
-      args: [vToken.vToken],
-    }))
-  ),
-    enabled: true,
-  });
   useEffect(() => {
-    if (oracles.data === undefined) {
-      oracles.refetch();
-      console.log("refresh");
-      return;
-    }
-    if (priceData["0x0"] === undefined) {
-      return
-    }
-    if (Array.isArray(oracles.data) && oracles.data.length === 0) return;
-    if (oracles.data.length === 0 || !oracles.data) return;
-    let priceData_temp: any = {};
-    let total: any = {};
-    let vTokens = pools.flatMap((pool: any) => pool.vTokens);
+    async function fetchPrices(){
+      const f =  await bscClient.multicall({
+         contracts: pools.flatMap((p: any) =>
+         p.vTokens.map((vToken: any) => ({
+           address: p.priceOracle,
+           abi: oracleabi,
+           functionName: "getUnderlyingPrice",
+           args: [vToken.vToken],
+         }))
+       ),
+       })
+       console.log(f);
+       if(f === undefined){
 
-    vTokens.forEach((vToken: any, i: number) => {
+         return;
+        }
+        
+      if (Array.isArray(f) && f?.length=== 0) return;
+      if (f.length === 0 || !f) return;
+      let priceData_temp: any = {};
+      let total: any = {};
+      let vTokens = pools.flatMap((pool: any) => pool.vTokens);
+      
+      vTokens.forEach((vToken: any, i: number) => {
+      
+        if (
+          vToken &&
+          vToken.vToken &&
+          f &&
+          i < f.length
+          && f[i]?.result
+        ) {
+          priceData_temp[vToken.vToken] = {
+            price: formatUnits(f[i]?.result as bigint,vToken.underlyingDecimals==18?18:(vToken.underlyingDecimals==9?27:30)),
+            decimal: vToken.underlyingDecimals,
+            totalSupply: Number(formatUnits(vToken.totalSupply,8)) * Number(formatUnits(f[i]?.result as bigint,vToken.underlyingDecimals==18?18:(vToken.underlyingDecimals==9?27:30))),
+            totalBorrow: Number(formatUnits(vToken.totalBorrows,18)) * Number(formatUnits(f[i]?.result as bigint,vToken.underlyingDecimals==18?18:(vToken.underlyingDecimals==9?27:30))),
+            rawtotalBorrow: vToken.totalBorrows,
+          };
+          total["supply"] = total["supply"] || 0;
+          total["borrow"] = total["borrow"] || 0;
+          total["supply"] += priceData_temp[vToken.vToken]?.totalSupply;
+          total["borrow"] += priceData_temp[vToken.vToken]?.totalBorrow;    
+        } else {
+          priceData_temp[vToken?.vToken] = null;
+        }
+        setPriceData(priceData_temp);
+      });
+          pools.forEach((pool: any) => {
+            pool.vTokens.forEach((vToken: any) => {
+              total[pool.name] = total[pool.name] || { supply: 0, borrow: 0 };
+              total[pool.name]["supply"] += priceData_temp[vToken.vToken]?.totalSupply;
+              total[pool.name]["borrow"] += priceData_temp[vToken.vToken]?.totalBorrow;
+        });});
+        setTotalSupply(total);
+       return f;
+      
 
-      if (
-        vToken &&
-        vToken.vToken &&
-        oracles &&
-        oracles.data &&
-        i < oracles.data.length
-        && oracles.data[i]?.result
-      ) {
-        priceData_temp[vToken.vToken] = {
-          price: formatUnits(oracles.data[i]?.result as bigint,vToken.underlyingDecimals==18?18:(vToken.underlyingDecimals==9?27:30)),
-          decimal: vToken.underlyingDecimals,
-          totalSupply: Number(formatUnits(vToken.totalSupply,8)) * Number(formatUnits(oracles.data[i]?.result as bigint,vToken.underlyingDecimals==18?18:(vToken.underlyingDecimals==9?27:30))),
-          totalBorrow: Number(formatUnits(vToken.totalBorrows,18)) * Number(formatUnits(oracles.data[i]?.result as bigint,vToken.underlyingDecimals==18?18:(vToken.underlyingDecimals==9?27:30))),
-          rawtotalBorrow: vToken.totalBorrows,
-        };
-        total["supply"] = total["supply"] || 0;
-        total["borrow"] = total["borrow"] || 0;
-        total["supply"] += priceData_temp[vToken.vToken]?.totalSupply;
-        total["borrow"] += priceData_temp[vToken.vToken]?.totalBorrow;    
-      } else {
-        priceData_temp[vToken?.vToken] = null;
-      }
-      setPriceData(priceData_temp);
-    });
-        pools.forEach((pool: any) => {
-          pool.vTokens.forEach((vToken: any) => {
-            total[pool.name] = total[pool.name] || { supply: 0, borrow: 0 };
-            total[pool.name]["supply"] += priceData_temp[vToken.vToken]?.totalSupply;
-            total[pool.name]["borrow"] += priceData_temp[vToken.vToken]?.totalBorrow;
-      });});
-      setTotalSupply(total);
-  }, [oracles,pools,priceData]);
+    }
+    fetchPrices();
+  }, [pools]);
+  console.log(totalSupply);
+  // const oracles = useContractReads({
+  //   contracts: pools.flatMap((p: any) =>
+  //   p.vTokens.map((vToken: any) => ({
+  //     address: p.priceOracle,
+  //     abi: oracleabi,
+  //     functionName: "getUnderlyingPrice",
+  //     args: [vToken.vToken],
+  //   }))
+  // ),
+  //   enabled: true,
+
+  // });
+  // useEffect(() => {
+  //   if (oracles.data === undefined) {
+  //     oracles.refetch();
+  //     console.log("refresh");
+  //     return;
+  //   }
+  //   if (priceData["0x0"] === undefined) {
+  //     return
+  //   }
+  //   if (Array.isArray(oracles.data) && oracles.data.length === 0) return;
+  //   if (oracles.data.length === 0 || !oracles.data) return;
+  //   let priceData_temp: any = {};
+  //   let total: any = {};
+  //   let vTokens = pools.flatMap((pool: any) => pool.vTokens);
+
+  //   vTokens.forEach((vToken: any, i: number) => {
+
+  //     if (
+  //       vToken &&
+  //       vToken.vToken &&
+  //       oracles &&
+  //       oracles.data &&
+  //       i < oracles.data.length
+  //       && oracles.data[i]?.result
+  //     ) {
+  //       priceData_temp[vToken.vToken] = {
+  //         price: formatUnits(oracles.data[i]?.result as bigint,vToken.underlyingDecimals==18?18:(vToken.underlyingDecimals==9?27:30)),
+  //         decimal: vToken.underlyingDecimals,
+  //         totalSupply: Number(formatUnits(vToken.totalSupply,8)) * Number(formatUnits(oracles.data[i]?.result as bigint,vToken.underlyingDecimals==18?18:(vToken.underlyingDecimals==9?27:30))),
+  //         totalBorrow: Number(formatUnits(vToken.totalBorrows,18)) * Number(formatUnits(oracles.data[i]?.result as bigint,vToken.underlyingDecimals==18?18:(vToken.underlyingDecimals==9?27:30))),
+  //         rawtotalBorrow: vToken.totalBorrows,
+  //       };
+  //       total["supply"] = total["supply"] || 0;
+  //       total["borrow"] = total["borrow"] || 0;
+  //       total["supply"] += priceData_temp[vToken.vToken]?.totalSupply;
+  //       total["borrow"] += priceData_temp[vToken.vToken]?.totalBorrow;    
+  //     } else {
+  //       priceData_temp[vToken?.vToken] = null;
+  //     }
+  //     setPriceData(priceData_temp);
+  //   });
+  //       pools.forEach((pool: any) => {
+  //         pool.vTokens.forEach((vToken: any) => {
+  //           total[pool.name] = total[pool.name] || { supply: 0, borrow: 0 };
+  //           total[pool.name]["supply"] += priceData_temp[vToken.vToken]?.totalSupply;
+  //           total[pool.name]["borrow"] += priceData_temp[vToken.vToken]?.totalBorrow;
+  //     });});
+  //     setTotalSupply(total);
+  // }, [oracles,pools,priceData]);
 
   const columns = [
     {
