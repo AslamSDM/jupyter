@@ -27,8 +27,8 @@ function LineChartComponent() {
 
   for (let i = 0; i < 100; i++) {
     data.push({
-      borrowApy: parseFloat((Math.random() * 100).toFixed(2)), // random number between 0 and 100 with max 2 decimal points
-      supplyApy: parseFloat((Math.random() * 100).toFixed(2)), // random number between 0 and 100 with max 2 decimal points
+      borrowApy: parseFloat(i.toFixed(2)), // linearly increasing from 0 to 99
+      supplyApy: parseFloat((2 * i).toFixed(2)), // linearly increasing from 0 to 198
       utilizationRate: parseFloat((Math.random() * 100).toFixed(2)), // random number between 0 and 100 with max 2 decimal points
     });
   }
@@ -42,6 +42,7 @@ function LineChartComponent() {
         {ticks.map((tick, index) => (
           <ReferenceLine key={index} y={tick} stroke="#606060" />
         ))}
+        <ReferenceLine x={20} stroke="#0000DD" isFront={false} />
         <XAxis
           type="number"
           ticks={ticks}

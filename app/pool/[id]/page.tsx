@@ -147,6 +147,22 @@ const PoolComponent = () => {
         <div className="w-2/3 space-y-8">
           <div className="w-full bg-[#1E2431] rounded-xl p-8 space-y-8">
             <h2 className="text-3xl font-semibold text-white">Supply Info</h2>
+            <ul className="flex gap-8 items-center">
+              <li className="flex flex-col gap-2">
+                <p className="text-gray-300">Total Supply</p>
+                <p className="text-white">{`$516.33M`}</p>
+              </li>
+              <div className="w-px h-12 bg-gray-500"></div>
+              <li className="flex flex-col gap-2">
+                <p className="text-gray-300">APY</p>
+                <p className="text-white">{`0.02%`}</p>
+              </li>
+              <div className="w-px h-12 bg-gray-500"></div>
+              <li className="flex flex-col gap-2">
+                <p className="text-gray-300">Distribution APY</p>
+                <p className="text-white">{`0.02%`}</p>
+              </li>
+            </ul>
             <AreaChartComponent
               data={supplyHistory}
               yFieldLabel="Supply APY"
@@ -158,6 +174,22 @@ const PoolComponent = () => {
           </div>
           <div className="w-full bg-[#1E2431] rounded-xl p-8 space-y-8">
             <h2 className="text-3xl font-semibold text-white">Borrow Info</h2>
+            <ul className="flex gap-8 items-center">
+              <li className="flex flex-col gap-2">
+                <p className="text-gray-300">Total Borrow</p>
+                <p className="text-white">{`$516.33M`}</p>
+              </li>
+              <div className="w-px h-12 bg-gray-500"></div>
+              <li className="flex flex-col gap-2">
+                <p className="text-gray-300">APY</p>
+                <p className="text-white">{`0.02%`}</p>
+              </li>
+              <div className="w-px h-12 bg-gray-500"></div>
+              <li className="flex flex-col gap-2">
+                <p className="text-gray-300">Distribution APY</p>
+                <p className="text-white">{`0.02%`}</p>
+              </li>
+            </ul>
             <AreaChartComponent
               data={borrowHistory}
               yFieldLabel="Borrow APY"
@@ -211,15 +243,15 @@ const PoolComponent = () => {
             </CardHeader>
             <CardBody className="px-0">
               {poolInfo.map((info, index) => (
-                <div key={index} className="">
+                <ul key={index} className="">
                   <Divider />
-                  <div className="py-3 flex justify-between">
+                  <li className="py-3 flex justify-between">
                     <p className="text-gray-500">{info.label}</p>
                     <p className="text-white">
                       {info.data ? info.data.toString().substring(0, 5) : ""}
                     </p>
-                  </div>
-                </div>
+                  </li>
+                </ul>
               ))}
             </CardBody>
           </Card>
