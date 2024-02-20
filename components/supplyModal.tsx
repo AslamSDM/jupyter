@@ -84,32 +84,42 @@ const {data:MembershipFacet}  = useContractRead({
   })
   //Vtoken fn
 
-const {data:underlyingbalance} = useBalance({ address:address,token: pool.underlyingAddress }  );
-const {data:vtokenbalance} = useBalance({address:address, token: id as `0x${string}` }  );
-
+const {data:underlyingbalance,refetch:underlyingbalancerefresh} = useBalance({ address:address,token: pool.underlyingAddress }  );
+const {data:vtokenbalance,refetch:vtokenbalancerefetch} = useBalance({address:address, token: id as `0x${string}` }  );
 
   const { write: mint } = useContractWrite({
     address: id as `0x${string}`,
     abi: vTokenabi,
     functionName: "mint",
+    onSuccess: () => {
+      refetchbalance();
+    }
   });
   const { write: mintBNB } = useContractWrite({
     address: id as `0x${string}`,
     abi: vBNBTokenabi,
     functionName: "mint",
+    onSuccess: () => {
+      refetchbalance();
+    }
   });
 
   const { write: approve } = useContractWrite({
     address: pool.underlyingAddress as `0x${string}`,
     abi: vTokenabi,
     functionName: "approve",
+    onSuccess: () => {
+      allowance.refetch();
+      refetchbalance();
+    },
   });
-  const { data: allowance } = useContractRead({
+  const allowance  = useContractRead({
     address: pool.underlyingAddress as `0x${string}`,
     abi: vTokenabi,
     functionName: "allowance",
+    args:[address as `0x${string}`,id as `0x${string}`]
   });
-  const {data:borrowBalance}  = useContractRead({
+  const {data:borrowBalance , refetch:borrowBalancerefetch}  = useContractRead({
     address: id as `0x${string}`,
     abi: vTokenabi,
     functionName: "borrowBalanceStored",
@@ -120,21 +130,41 @@ const {data:vtokenbalance} = useBalance({address:address, token: id as `0x${stri
     abi: vTokenabi,
     functionName: "approve",
   });
+  const allowanceVtoken  = useContractRead({
+    address: pool.underlyingAddress as `0x${string}`,
+    abi: vTokenabi,
+    functionName: "allowance",
+    args:[address as `0x${string}`,id as `0x${string}`]
+  });
   const { write: borrow } = useContractWrite({
     address: id as `0x${string}`,
     abi: vBNBTokenabi,
     functionName: "borrow",
+    onSuccess: () => {
+      refetchbalance();
+    }
   });
   const { write: redeem } = useContractWrite({
     address: id as `0x${string}`,
     abi: vTokenabi,
     functionName: "redeemUnderlying",
+    onSuccess: () => {
+      refetchbalance();
+    }
   });
   const { write: repay } = useContractWrite({
     address: id as `0x${string}`,
     abi: vTokenabi,
     functionName: "repayBorrow",
+    onSuccess: () => {
+      refetchbalance();
+      borrowBalancerefetch();
+    }
   });
+  const refetchbalance = () => {
+    underlyingbalancerefresh();
+    vtokenbalancerefetch();
+  }
   const marketHandler = async () => {
     if(Membership == false){
       await enterMarket();
@@ -143,7 +173,6 @@ const {data:vtokenbalance} = useBalance({address:address, token: id as `0x${stri
       await exitMarket();
     }
   }
-console.log(borrowBalance)
 
   return (
     <Modal isOpen={isOpen} onClose={onOpenChange}>
@@ -164,6 +193,7 @@ console.log(borrowBalance)
               <SupplyTab
                 pool={pool}
                 id={id}
+                isConnected={isConnected}
                 mint={mint}
                 approve={approve}
                 mintBNB={mintBNB}
@@ -174,18 +204,46 @@ console.log(borrowBalance)
                 borrowPower={borrowPower}
                 accountLiquidity={accountLiquidity}
                 borrowBalance={borrowBalance}
-              />
+                allowance={allowance}
+                refetchbalance= {refetchbalance}
+                />
             </Tab>
             <Tab key="withdraw" className="w-full" title="Withdraw">
               <WithdrawTab
                 pool={pool}
-                approveVtoken={approveVtoken}
-                redeem={redeem}
                 id={id}
-              />
+                isConnected={isConnected}
+                mint={mint}
+                mintBNB={mintBNB}
+                marketHandler={marketHandler}
+                Membership={Membership}
+                vtokenbalance={vtokenbalance}
+                underlyingbalance={underlyingbalance}
+                borrowPower={borrowPower}
+                accountLiquidity={accountLiquidity}
+                borrowBalance={borrowBalance}
+                allowance={allowanceVtoken}
+                refetchbalance= {refetchbalance}
+                approve={approveVtoken}
+                redeem={redeem}
+                />
             </Tab>
             <Tab key="borrow" className="w-full" title="Borrow">
-              <Borrowtab pool={pool} borrow={borrow} />
+              <Borrowtab pool={pool} borrow={borrow} 
+                id={id}
+                isConnected={isConnected}
+                approve={approve}
+                mintBNB={mintBNB}
+                marketHandler={marketHandler}
+                Membership={Membership}
+                vtokenbalance={vtokenbalance}
+                underlyingbalance={underlyingbalance}
+                borrowPower={borrowPower}
+                accountLiquidity={accountLiquidity}
+                borrowBalance={borrowBalance}
+                allowance={allowance}
+                refetchbalance= {refetchbalance}
+              />
             </Tab>
             <Tab key="repay" className="w-full" title="Repay">
               <RepayTab pool={pool} repay={repay} approve={approve} id={id} />

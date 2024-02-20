@@ -1,24 +1,35 @@
 import Image from "next/image";
 import { useState } from "react";
 import { Input, Button, Divider } from "@nextui-org/react";
-import { ethers } from "ethers";
+import { formatUnits, parseUnits } from "viem";
 
-function Borrowtab({ pool, borrow }: any) {
+function Borrowtab({   pool,
+  id,
+  approve,
+  marketHandler,
+  Membership,
+  vtokenbalance,
+  underlyingbalance,
+  accountLiquidity,
+  borrowBalance,
+  isConnected,
+  allowance,
+  refetchbalance, borrow }: any) {
   const [amount, setAmount] = useState(0);
 
   const handleborrowsubmit = async (e: any) => {
     e.preventDefault();
-    console.log(amount);
     if (pool.underlyingSymbol === "BNB") {
       borrow({
-        args: [ethers.parseUnits(amount.toString(), pool.underlyingDecimal)],
+        args: [parseUnits(amount.toString(), pool.underlyingDecimal)],
       });
     } else {
       borrow({
-        args: [ethers.parseUnits(amount.toString(), pool.underlyingDecimal)],
+        args: [parseUnits(amount.toString(), pool.underlyingDecimal)],
       });
     }
   };
+
   return (
     <form
       className="flex flex-col gap-3 items-center text-white"
@@ -47,7 +58,12 @@ function Borrowtab({ pool, borrow }: any) {
       <div className="flex flex-col w-full gap-2">
         <div className="flex justify-between">
           <p className="text-gray-400">Borrowable Amount</p>
-          <p>{`0 ${pool.name}`}</p>
+          <p> {(
+            Number(
+              formatUnits(accountLiquidity ? accountLiquidity[1] : "", 18)
+            )
+            *100/ Number(pool.tokenPriceCents)
+          ).toFixed(6) +" "+pool.underlyingSymbol}</p>
         </div>
         <Divider className="my-4 bg-gray-600" />
         <div className="flex justify-between">

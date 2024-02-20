@@ -63,7 +63,6 @@ const PoolComponent = () => {
     }
     fetchPools();
   }, []);
-  console.log(Number(getDailyRate(pool.borrowRatePerBlock,pool.underlyingDecimal))*pool.totalsupplyusd)
   
   const poolInfo = [
     { label: "Token Price", data: formatNumber((pool.tokenPriceCents)) },
