@@ -243,10 +243,24 @@ const {data:vtokenbalance,refetch:vtokenbalancerefetch} = useBalance({address:ad
                 borrowBalance={borrowBalance}
                 allowance={allowance}
                 refetchbalance= {refetchbalance}
-              />
+                />
             </Tab>
             <Tab key="repay" className="w-full" title="Repay">
-              <RepayTab pool={pool} repay={repay} approve={approve} id={id} />
+              <RepayTab pool={pool} repay={repay} approve={approve} id={id} 
+              isConnected={isConnected}
+              mint={mint}
+              mintBNB={mintBNB}
+              marketHandler={marketHandler}
+              Membership={Membership}
+              vtokenbalance={vtokenbalance}
+              underlyingbalance={underlyingbalance}
+              borrowPower={borrowPower}
+              accountLiquidity={accountLiquidity}
+              borrowBalance={borrowBalance}
+              allowance={allowance}
+              refetchbalance= {refetchbalance}
+              
+              />
             </Tab>
           </Tabs>
         </ModalBody>

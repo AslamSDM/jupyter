@@ -22,7 +22,7 @@ function SupplyTab({
   borrowBalance,
   isConnected,
   allowance,
-  refetchbalance
+  refetchbalance,
 }: any) {
   const [amount, setAmount] = useState(0);
   // const [openSeach, setOpenSearch] = useState(false);
@@ -30,7 +30,7 @@ function SupplyTab({
 
   const handlesupplysubmit = async (e: any) => {
     e.preventDefault();
-    if(allowance.data < parseUnits(String(amount), pool.underlyingDecimal)){
+    if (allowance.data < parseUnits(String(amount), pool.underlyingDecimal)) {
       return;
     }
     if (pool.underlyingSymbol === "BNB") {
@@ -45,16 +45,18 @@ function SupplyTab({
   const handleApprove = async (e: any) => {
     e.preventDefault();
     approve({
-      args: [
-        id,
-        parseUnits(amount.toString(), pool.underlyingDecimal),
-      ],
+      args: [id, parseUnits(amount.toString(), pool.underlyingDecimal)],
     }).then(() => {
       refetchbalance();
       allowance.refetch();
     });
-  }
-
+  };
+  const progress =
+    ((Number(formatUnits(borrowBalance ?? "", pool.underlyingDecimal)) *
+      Number(pool.tokenPriceCents)) /
+      100 /
+      Number(formatUnits(accountLiquidity ? accountLiquidity[1] : "", 18))) *
+    100;
   return (
     <form
       className="flex flex-col gap-3 items-center text-white"
@@ -141,8 +143,10 @@ function SupplyTab({
       <div className="flex flex-col w-full gap-2">
         <div className="flex justify-between">
           <p className="text-gray-400">Wallet Balance</p>
-          {vtokenbalance!=undefined ? (
-            <p>{`${Number(underlyingbalance?.formatted).toFixed(4)} ${pool.underlyingSymbol}`}</p>
+          {vtokenbalance != undefined ? (
+            <p>{`${Number(underlyingbalance?.formatted).toFixed(4)} ${
+              pool.underlyingSymbol
+            }`}</p>
           ) : (
             <p>0.00</p>
           )}
@@ -171,55 +175,68 @@ function SupplyTab({
         </div>
         <Divider className="my-4 bg-gray-600" />
         <div className="flex justify-between">
-          <p className="text-gray-400">{`Current : $${(Number(formatUnits(borrowBalance??"",pool.underlyingDecimal))*Number(pool.tokenPriceCents)/100).toFixed(3)}`}</p>
+          <p className="text-gray-400">{`Current : $${(
+            (Number(formatUnits(borrowBalance ?? "", pool.underlyingDecimal)) *
+              Number(pool.tokenPriceCents)) /
+            100
+          ).toFixed(3)}`}</p>
           <p>
-            Max{" "}$
+            Max $
             {Number(
               formatUnits(accountLiquidity ? accountLiquidity[1] : "", 18)
             ).toFixed(3)}
           </p>
         </div>
+        {/* Progress Bar */}
         <div className="relative w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
+          <div
+            className={`${
+              progress > 85 ? "bg-red-600" : "bg-green-600"
+            } h-2.5 absolute rounded-full`}
+            style={{ width: `${progress}%` }}
+          ></div>
           <div
             className="bg-red-600 h-2.5 dark:bg-blue-500 absolute w-1"
             style={{ left: "85%" }}
           ></div>
         </div>
         <div className="flex justify-between">
-          <p className="text-gray-400">{`Supply Balance (${
-             pool.underlyingSymbol
-          })`}</p>
+          <p className="text-gray-400">{`Supply Balance (${pool.underlyingSymbol})`}</p>
 
-          {vtokenbalance!=undefined?(amount === 0 ? (
-            <p>
-              {(
-                Number(vtokenbalance?.formatted) /
-                Number(
-                  getExchangeRate(
-                    pool.exchangeRateMantissa,
-                    8,
-                    pool.underlyingDecimal
-                  )
-                )
-              ).toFixed(6)}
-            </p>
-          ) : (
-            <>
+          {vtokenbalance != undefined ? (
+            amount === 0 ? (
               <p>
                 {(
                   Number(vtokenbalance?.formatted) /
-                    Number(
-                      getExchangeRate(
-                        pool.exchangeRateMantissa,
-                        8,
-                        pool.underlyingDecimal
-                      )
-                    ) +
-                  Number(amount)
+                  Number(
+                    getExchangeRate(
+                      pool.exchangeRateMantissa,
+                      8,
+                      pool.underlyingDecimal
+                    )
+                  )
                 ).toFixed(6)}
               </p>
-            </>
-          )):<p>0.00</p>}
+            ) : (
+              <>
+                <p>
+                  {(
+                    Number(vtokenbalance?.formatted) /
+                      Number(
+                        getExchangeRate(
+                          pool.exchangeRateMantissa,
+                          8,
+                          pool.underlyingDecimal
+                        )
+                      ) +
+                    Number(amount)
+                  ).toFixed(6)}
+                </p>
+              </>
+            )
+          ) : (
+            <p>0.00</p>
+          )}
         </div>
         <div className="flex justify-between">
           <p className="text-gray-400">Borrow limit</p>
@@ -234,41 +251,41 @@ function SupplyTab({
           <p>0.02%</p>
         </div> */}
       </div>
-      {
-        isConnected ? (
-          (Number(allowance.data) < Number(parseUnits(String(amount), pool.underlyingDecimal)) || pool.underlyingSymbol=="BNB")?(
-            <Button
-              variant="bordered"
-              color="primary"
-              className="w-full"
-              type="submit"
-              onClick={(e:any)=> handleApprove(e)}
-            >
-              Approve
-            </Button>
-          ) : (
-            <Button
-              variant="solid"
-              color="primary"
-              className="w-full"
-              type="submit"
-              onClick={(e:any)=> handlesupplysubmit(e)}
-            >
-              Supply
-            </Button>
-          )
-        ) : (
+      {isConnected ? (
+        Number(allowance.data) <
+          Number(parseUnits(String(amount), pool.underlyingDecimal)) ||
+        pool.underlyingSymbol == "BNB" ? (
           <Button
             variant="bordered"
             color="primary"
             className="w-full"
             type="submit"
-            disabled
+            onClick={(e: any) => handleApprove(e)}
           >
-           Connect Wallet
+            Approve
+          </Button>
+        ) : (
+          <Button
+            variant="solid"
+            color="primary"
+            className="w-full"
+            type="submit"
+            onClick={(e: any) => handlesupplysubmit(e)}
+          >
+            Supply
           </Button>
         )
-      }
+      ) : (
+        <Button
+          variant="bordered"
+          color="primary"
+          className="w-full"
+          type="submit"
+          disabled
+        >
+          Connect Wallet
+        </Button>
+      )}
     </form>
   );
 }

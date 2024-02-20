@@ -2,6 +2,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { Input, Button, Divider } from "@nextui-org/react";
 import { formatUnits, parseUnits } from "viem";
+import { getExchangeRate } from "@/app/utils/formatNumber";
 
 function Borrowtab({   pool,
   id,
@@ -13,7 +14,6 @@ function Borrowtab({   pool,
   accountLiquidity,
   borrowBalance,
   isConnected,
-  allowance,
   refetchbalance, borrow }: any) {
   const [amount, setAmount] = useState(0);
 
@@ -29,7 +29,12 @@ function Borrowtab({   pool,
       });
     }
   };
-
+  const progress =
+    ((Number(formatUnits(borrowBalance ?? "", pool.underlyingDecimal)) *
+      Number(pool.tokenPriceCents)) /
+      100 /
+      Number(formatUnits(accountLiquidity ? accountLiquidity[1] : "", 18))) *
+    100;
   return (
     <form
       className="flex flex-col gap-3 items-center text-white"
@@ -42,13 +47,19 @@ function Borrowtab({   pool,
         onChange={(e) => {
           setAmount(Number(e.target.value));
         }}
+        value={String(amount)}
         startContent={
           <Image src={pool.logo} alt="logo" width={20} height={20} />
         }
         endContent={
           <Button
             size="sm"
-            onClick={() => {}}
+            onClick={() => {
+              setAmount(Number(
+                formatUnits(accountLiquidity ? accountLiquidity[1] : "", 18)
+              )
+              *100*0.8/ Number(pool.tokenPriceCents))
+            }}
             className="bg-[#2D3549] text-white"
           >
             80% Limit
@@ -71,51 +82,126 @@ function Borrowtab({   pool,
             <Image src={pool.logo} alt="logo" width={20} height={20} />
             <p className="text-gray-400">Supply APY</p>
           </div>
-          <p>0.02%</p>
+          <p>{Number(pool.supplyApy).toFixed(3)}%</p>
         </div>
         <div className="flex justify-between">
           <div className="flex justify-start gap-1">
             <Image src={pool.logo} alt="logo" width={20} height={20} />
-            <p className="text-gray-400">Distribution APY (XVS)</p>
+            <p className="text-gray-400">Distribution APY</p>
           </div>
-          <p>0.02%</p>
+          <p>{Number(pool.supplyXvsApy).toFixed(3)}%</p>
         </div>
         <div className="flex justify-between">
           <p className="text-gray-400">Total APY</p>
-          <p>0.02%</p>
+          {(Number(pool.supplyXvsApy) + Number(pool.supplyApy)).toFixed(3)}%
         </div>
         <Divider className="my-4 bg-gray-600" />
         <div className="flex justify-between">
-          <p className="text-gray-400">{`Current : $0`}</p>
-          <p>Max 0.02%</p>
+          <p className="text-gray-400">{`Current :  $${(Number(formatUnits(borrowBalance??"",pool.underlyingDecimal))*Number(pool.tokenPriceCents)/100).toFixed(3)}`}</p>
+          <p>Max{" "}$
+            {Number(
+              formatUnits(accountLiquidity ? accountLiquidity[1] : "", 18)
+            ).toFixed(3)}</p>
         </div>
         <div className="relative w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
+        <div
+            className={`${
+              progress > 85 ? "bg-red-600" : "bg-green-600"
+            } h-2.5 absolute rounded-full`}
+            style={{ width: `${progress}%` }}
+          ></div>
           <div
             className="bg-red-600 h-2.5 dark:bg-blue-500 absolute w-1"
             style={{ left: "85%" }}
           ></div>
         </div>
         <div className="flex justify-between">
-          <p className="text-gray-400">{`Borrow Balance (${pool.name})`}</p>
-          <p>0.02%</p>
+        <p className="text-gray-400">{`Supply Balance (${
+             pool.underlyingSymbol
+          })`}</p>
+
+          {vtokenbalance!=undefined?(amount === 0 ? (
+            <p>
+              {(
+                Number(vtokenbalance?.formatted) /
+                Number(
+                  getExchangeRate(
+                    pool.exchangeRateMantissa,
+                    8,
+                    pool.underlyingDecimal
+                  )
+                )
+              ).toFixed(6)}
+            </p>
+          ) : (
+            <>
+              <p>
+                {(
+                  Number(vtokenbalance?.formatted) /
+                    Number(
+                      getExchangeRate(
+                        pool.exchangeRateMantissa,
+                        8,
+                        pool.underlyingDecimal
+                      )
+                    ) -
+                  Number(amount)
+                ).toFixed(6)}
+              </p>
+            </>
+          )):<p>0.00</p>}
         </div>
         <div className="flex justify-between">
-          <p className="text-gray-400">Borrow limit used</p>
-          <p>0.02%</p>
+          <p className="text-gray-400">Borrow limit</p>
+          <p>
+            {Number(
+              formatUnits(accountLiquidity ? accountLiquidity[1] : "", 18)
+            ).toFixed(3)}
+          </p>
         </div>
-        <div className="flex justify-between">
+
+        {/* <div className="flex justify-between">
           <p className="text-gray-400">Daily earnings</p>
           <p>0.02%</p>
-        </div>
+        </div> */}
       </div>
-      <Button
-        variant="bordered"
-        color="primary"
-        className="w-full"
-        type="submit"
-      >
-        Enter a valid amount to borrow
-      </Button>
+      {
+        isConnected ? (
+          (Number(
+            formatUnits(accountLiquidity ? accountLiquidity[1] : "", 18)
+          ) < Number(parseUnits(String(amount), pool.underlyingDecimal))) ?(
+            <Button
+              variant="bordered"
+              color="primary"
+              className="w-full"
+              type="submit"
+              disabled
+            >
+              Borrow Limit Exceeded
+            </Button>
+          ) : (
+            <Button
+              variant="solid"
+              color="primary"
+              className="w-full"
+              type="submit"
+              onClick={(e:any)=> handleborrowsubmit(e)}
+            >
+              Withdraw
+            </Button>
+          )
+        ) : (
+          <Button
+            variant="bordered"
+            color="primary"
+            className="w-full"
+            type="submit"
+            disabled
+          >
+           Connect Wallet
+          </Button>
+        )
+      }
     </form>
   );
 }

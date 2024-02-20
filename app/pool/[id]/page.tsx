@@ -8,14 +8,22 @@ import AreaChartComponent from "@/components/charts/Areachart";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import SupplyModal from "@/components/supplyModal";
 import getImage from "@/components/abi/tokenImage";
-import { decodeMantissa, formatNumber, getDailyRate, getExchangeRate } from "@/app/utils/formatNumber";
+import {
+  decodeMantissa,
+  formatNumber,
+  getDailyRate,
+  getExchangeRate,
+} from "@/app/utils/formatNumber";
 import { formatUnits } from "viem";
+import LineChartComponent from "@/components/charts/Linechart";
 
 const PoolComponent = () => {
   const { id } = useParams();
   const [pool, setPool] = useState<any>([]);
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState<any>([]);
+  const [supplyHistory, setSupplyHistory] = useState<any>([]);
+  const [borrowHistory, setBorrowHistory] = useState<any>([]);
   const [selectedTab, setSelectedTab] = useState<any>("supply");
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -49,8 +57,10 @@ const PoolComponent = () => {
       let totalLiquidity = 0;
       let totalAssets = response.data.result.length;
       response.data.result.forEach((item: any) => {
-        totalSupply += Number(item.totalsupplyusd)/100;
-        totalBorrow += decodeMantissa(item.totalBorrowsMantissa,0,0) * Number(item.tokenPriceCents);
+        totalSupply += Number(item.totalsupplyusd) / 100;
+        totalBorrow +=
+          decodeMantissa(item.totalBorrowsMantissa, 0, 0) *
+          Number(item.tokenPriceCents);
         totalLiquidity += Number(item.liquidityCents);
       });
       setTotalData({
@@ -65,50 +75,108 @@ const PoolComponent = () => {
   }, []);
   
   const poolInfo = [
-    { label: "Token Price", data: formatNumber((pool.tokenPriceCents)) },
-    { label: "Market Liquidity", data: formatNumber(Number(totalData.totalLiquidity)?.toString()) },
+    { label: "Token Price", data: formatNumber(pool.tokenPriceCents) },
+    {
+      label: "Market Liquidity",
+      data: formatNumber(Number(totalData.totalLiquidity)?.toString()),
+    },
     { label: "Supplier Count", data: pool.supplierCount },
     { label: "Borrower Count", data: pool.borrowerCount },
-    { label: "Supply Cap", data: formatNumber(formatUnits(pool.supplyCapsMantissa??"",pool.underlyingDecimal-2))+" "+pool.underlyingSymbol },
-    { label: "Borrow Cap", data: formatNumber(formatUnits(pool.borrowCapsMantissa??"",pool.underlyingDecimal-2))+" "+pool.underlyingSymbol },
+    {
+      label: "Supply Cap",
+      data:
+        formatNumber(
+          formatUnits(pool.supplyCapsMantissa ?? "", pool.underlyingDecimal - 2)
+        ) +
+        " " +
+        pool.underlyingSymbol,
+    },
+    {
+      label: "Borrow Cap",
+      data:
+        formatNumber(
+          formatUnits(pool.borrowCapsMantissa ?? "", pool.underlyingDecimal - 2)
+        ) +
+        " " +
+        pool.underlyingSymbol,
+    },
     // {
     //   label: "Daily supplying interests",
     //   data: "pool",
     // },
     // { label: "Daily borrowing interests", data: Number(getDailyRate(pool.borrowRatePerBlock,pool.underlyingDecimal))*pool.totalsupplyusd },
     // { label: "Daily XVS distributed", data: "pool" },
-    { label: "Reserves", data: Number(formatUnits(pool.totalReservesMantissa??"",pool.underlyingDecimal)).toFixed(4)+" "+pool.underlyingSymbol },
-    { label: "Reserve Factor", data: formatUnits(pool.reserveFactorMantissa??"",16)+"%" },
+    {
+      label: "Reserves",
+      data:
+        Number(
+          formatUnits(pool.totalReservesMantissa ?? "", pool.underlyingDecimal)
+        ).toFixed(4) +
+        " " +
+        pool.underlyingSymbol,
+    },
+    {
+      label: "Reserve Factor",
+      data: formatUnits(pool.reserveFactorMantissa ?? "", 16) + "%",
+    },
     {
       label: "Collateral Factor",
-      data: formatUnits(pool.collateralFactorMantissa??"",16)+"%",
+      data: formatUnits(pool.collateralFactorMantissa ?? "", 16) + "%",
     },
-    { label: `${pool.underlyingSymbol} minted`, data: formatNumber(formatUnits(pool.totalSupplyMantissa??"",6)) },
+    {
+      label: `${pool.underlyingSymbol} minted`,
+      data: formatNumber(formatUnits(pool.totalSupplyMantissa ?? "", 6)),
+    },
 
-    { label: "Exchange rate", data: "1"+ pool.underlyingSymbol +"="+ getExchangeRate(pool.exchangeRateMantissa??"",8,pool.underlyingDecimal) +" v"+ pool.underlyingSymbol },
-
+    {
+      label: "Exchange rate",
+      data:
+        "1" +
+        pool.underlyingSymbol +
+        "=" +
+        getExchangeRate(
+          pool.exchangeRateMantissa ?? "",
+          8,
+          pool.underlyingDecimal
+        ) +
+        " v" +
+        pool.underlyingSymbol,
+    },
   ];
   useEffect(() => {
     // Fetch data from API
     async function fetchhistory() {
       setLoading(true);
-      const response = await axios.get(
-        "https://api.venus.io/markets/history",
-        {
-          params: {
-            asset: id,
-          },
-        }
-      );
+      const response = await axios.get("https://api.venus.io/markets/history", {
+        params: {
+          asset: id,
+        },
+      });
       const { data } = response.data.result;
-      let chartData: any = [];
-      data.forEach((item: any, index: number) => {
-        chartData.push({
-          name: index + 1,
-          val: item.totalSupplyCents,
+      console.log(response);
+      let supplyChartData: any = [];
+      let borrowChartData: any = [];
+      data.forEach((item: any) => {
+        const date = new Date(item.blockTimestamp * 1000).toLocaleDateString(
+          "en-GB"
+        );
+        const supplyApy = item.supplyApy;
+        const totalSupply = formatNumber(item.totalSupplyCents);
+        const borrowApy = item.borrowApy;
+        const totalBorrow = formatNumber(item.totalBorrowCents);
+        supplyChartData.push({
+          date: date,
+          supplyApy: supplyApy,
+          totalSupply: totalSupply,
+        });
+        borrowChartData.push({
+          date: date,
+          borrowApy: borrowApy,
+          totalBorrow: totalBorrow,
         });
       });
-      setHistory(chartData);
+      setSupplyHistory(supplyChartData);
+      setBorrowHistory(borrowChartData);
       setLoading(false);
     }
     async function fetchpool() {
@@ -151,9 +219,36 @@ const PoolComponent = () => {
         <Chip>{pool.name}</Chip>
         <ConnectButton />
       </div>
-      <div className="flex flex-row justify-between">
-        <div className="w-2/3">
-          <AreaChartComponent data={history} />
+      <div className="flex flex-row justify-between items-start">
+        <div className="w-2/3 space-y-8">
+          <div className="w-full bg-[#1E2431] rounded-xl p-8 space-y-8">
+            <h2 className="text-3xl font-semibold text-white">Supply Info</h2>
+            <AreaChartComponent
+              data={supplyHistory}
+              yFieldLabel="Supply APY"
+              yFieldName="supplyApy"
+              color="#4ADE80"
+              tooltipFieldName="totalSupply"
+              tooltipFieldLabel="Total Supply"
+            />
+          </div>
+          <div className="w-full bg-[#1E2431] rounded-xl p-8 space-y-8">
+            <h2 className="text-3xl font-semibold text-white">Borrow Info</h2>
+            <AreaChartComponent
+              data={borrowHistory}
+              yFieldLabel="Borrow APY"
+              yFieldName="borrowApy"
+              color="#E93D66"
+              tooltipFieldName="totalBorrow"
+              tooltipFieldLabel="Total Borrow"
+            />
+          </div>
+          <div className="w-full bg-[#1E2431] rounded-xl p-8 space-y-8">
+            <h2 className="text-3xl font-semibold text-white">
+              Interest Rate Model
+            </h2>
+            <LineChartComponent />
+          </div>
         </div>
         <div className="w-1/4 flex flex-col gap-6">
           <Card className="bg-[#1E2431] p-3">
@@ -191,17 +286,19 @@ const PoolComponent = () => {
               Market Info
             </CardHeader>
             <CardBody className="px-0">
-              {totalData? poolInfo.map((info, index) => (
-                <div key={index} className="">
-                  <Divider />
-                  <div className="py-3 flex justify-between">
-                    <p className="text-gray-500">{info.label}</p>
-                    <p className="text-white">
-                      {info.data ? info.data: ""}
-                    </p>
-                  </div>
-                </div>
-              )):null}
+              {totalData
+                ? poolInfo.map((info, index) => (
+                    <div key={index} className="">
+                      <Divider />
+                      <div className="py-3 flex justify-between">
+                        <p className="text-gray-500">{info.label}</p>
+                        <p className="text-white">
+                          {info.data ? info.data : ""}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                : null}
             </CardBody>
           </Card>
         </div>

@@ -20,6 +20,12 @@ function WithdrawTab({ pool, approve, id, redeem,
   const handleApprove = async (e: any) => {
     approve({ args: [id, parseUnits(amount.toString(), 8)] });
   }
+  const progress =
+  ((Number(formatUnits(borrowBalance ?? "", pool.underlyingDecimal)) *
+    Number(pool.tokenPriceCents)) /
+    100 /
+    Number(formatUnits(accountLiquidity ? accountLiquidity[1] : "", 18))) *
+  100;
   return (
     <form
       className="flex flex-col gap-3 items-center text-white"
@@ -29,6 +35,8 @@ function WithdrawTab({ pool, approve, id, redeem,
         placeholder="0.00"
         variant="bordered"
         type="number"
+        value={String(amount)}
+
         onChange={(e) => {
           setAmount(Number(e.target.value));
         }}
@@ -38,7 +46,20 @@ function WithdrawTab({ pool, approve, id, redeem,
         endContent={
           <Button
             size="sm"
-            onClick={() => {}}
+            onClick={() => {
+              setAmount(Number(vtokenbalance!=undefined? (
+                  (
+                    Number(vtokenbalance?.formatted) /
+                    Number(
+                      getExchangeRate(
+                        pool.exchangeRateMantissa,
+                        8,
+                        pool.underlyingDecimal
+                      )
+                    )
+                  )
+              ):0.00));
+            }}
             className="bg-[#2D3549] text-white"
           >
             Max
@@ -91,6 +112,12 @@ function WithdrawTab({ pool, approve, id, redeem,
             ).toFixed(3)}</p>
         </div>
         <div className="relative w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
+        <div
+            className={`${
+              progress > 85 ? "bg-red-600" : "bg-green-600"
+            } h-2.5 absolute rounded-full`}
+            style={{ width: `${progress}%` }}
+          ></div>
           <div
             className="bg-red-600 h-2.5 dark:bg-blue-500 absolute w-1"
             style={{ left: "85%" }}
@@ -148,7 +175,15 @@ function WithdrawTab({ pool, approve, id, redeem,
       </div>
       {
         isConnected ? (
-          (Number(allowance.data) < Number(parseUnits(String(amount), pool.underlyingDecimal)) || pool.underlyingSymbol=="BNB")?(
+          (Number(vtokenbalance?.formatted) /
+          Number(
+            getExchangeRate(
+              pool.exchangeRateMantissa,
+              8,
+              pool.underlyingDecimal
+            )
+          ))>Number(amount)?(
+          ((Number(allowance.data) < Number(parseUnits(String(amount), pool.underlyingDecimal)) || pool.underlyingSymbol=="BNB")?(
             <Button
               variant="bordered"
               color="primary"
@@ -167,6 +202,16 @@ function WithdrawTab({ pool, approve, id, redeem,
               onClick={(e:any)=> handlewithdrawsubmit(e)}
             >
               Withdraw
+            </Button>
+          ))):(
+            <Button
+              variant="bordered"
+              color="primary"
+              className="w-full"
+              type="submit"
+              disabled
+            >
+              Withdraw Limit Exceeded
             </Button>
           )
         ) : (
