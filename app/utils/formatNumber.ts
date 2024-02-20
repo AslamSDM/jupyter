@@ -34,4 +34,20 @@ export function getRate(rate: string, vdecimals: number) {
     return apy;
 
   }
+  export function getDailyRate(rate: string, vdecimals: number) {
+    const value = Number(rate);
+    const decimals = vdecimals;
+    const blocksPerDay = 20 * 60 * 24;
   
+    // Calculate daily interest rate
+    const dailyRate = (Math.pow(value / Math.pow(10, decimals) * blocksPerDay + 1, 1 / 365) - 1) * 100;
+  
+    return dailyRate;
+  }
+
+export function getExchangeRate(rate: string, vdecimals: number, udecimals: number) {
+    const value = Number(rate);
+    const decimals = 18 - vdecimals + udecimals;
+    const f = value / Math.pow(10, decimals);
+    return (1/f).toFixed(6);
+  }
