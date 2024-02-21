@@ -3,7 +3,7 @@ import { Chip, Progress, Switch } from "@nextui-org/react";
 import Image from "next/image";
 import getImage from "@/components/abi/tokenImage";
 
-function BorrowedAssetsTable({assets}:any) {
+function BorrowedAssetsTable({assets,borrolimit}:any) {
   const fields = [
     {
       key: "asset",
@@ -20,14 +20,15 @@ function BorrowedAssetsTable({assets}:any) {
   const progress = 50;
 
   const renderCell = useCallback((columnKey: any, value: any) => {
-    const imageurl = getImage("Venus "+value.underlyingSymbol);
 
+    if(!value) return null;
+    const imageurl = getImage(value?.name??"");
     switch (columnKey) {
       case "asset":
         return (
           <div className="flex items-center gap-1 pl-2">
             <Image
-              src={getImage(imageurl)}
+              src={imageurl}
               alt="logo"
               width={24}
               height={24}
@@ -35,26 +36,33 @@ function BorrowedAssetsTable({assets}:any) {
             <p className="text-white">{value.underlyingSymbol}</p>
           </div>
         );
-      case "apyLtv":
+      case "apy":
         return (
           <div className=" flex flex-col gap-0.5 justify-end items-end">
             <h2 className="text-white">
-              {value.supplyApy.toFixed(2)}%
+              {value.supplyApy?Number(value.borrowApy).toFixed(2):0}%
             </h2>
      
           </div>
         );
       case "balance":
+        console.log(value?.supply)
         return (
           <div className=" flex flex-col gap-0.5 justify-end text-white">
-            <h2>{value.supply } {value.underlyingSymbol}</h2>
-            <h2 className="text-[#AAB3CA]">$ {value.borrow* Number(value.tokenPriceCents) / 100}</h2>
+            <h2>{(value?.supply ).toFixed(5)} {value?.underlyingSymbol}</h2>
+            <h2 className="text-[#AAB3CA]">$ {(value?.borrow* Number(value?.tokenPriceCents) / 100).toFixed(2)}</h2>
           </div>
         );
-      case "collateral":
+      case "percentageLimit":
         return (
-          <div className=" flex flex-col items-end">
-            <Switch size="sm" />
+          <div className="w-full flex flex-col gap-0.5 items-end pl-6">
+            <h2>{borrolimit??0}%</h2>
+            <div className="relative w-full bg-gray-200 rounded-full h-1.5">
+              <div
+                className="h-1.5 bg-green-600 absolute rounded-full"
+                style={{ width: `${borrolimit??0}%` }}
+              ></div>
+            </div>
           </div>
         );
 
@@ -107,16 +115,17 @@ function BorrowedAssetsTable({assets}:any) {
         </thead>
         <tbody className="text-white">
           <tr>
-          {assets.map((field:any,i:number) => 
-              
-              field.borrow>0?(
-
-                <td key={i} className="text-end py-2">
-                  {renderCell(i, field)}
-                </td>):null
-              
-            
-          )}
+          {assets.map((asset:any) => (
+          <tr>
+      
+              {fields.map((field) => (
+                <td key={field.key}>
+                  {renderCell(field.key, asset)}
+                </td>
+              ))}
+          </tr>
+            )
+            )}
           </tr>
         </tbody>
       </table>

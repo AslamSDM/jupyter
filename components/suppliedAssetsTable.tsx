@@ -75,7 +75,6 @@ function SuppliedAssetsTable({assets}:any) {
         return null;
     }
   }, []);
-console.log(assets)
 
   const renderHeaderCell = useCallback((columnKey: any) => {
     switch (columnKey) {
