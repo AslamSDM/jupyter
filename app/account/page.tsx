@@ -167,14 +167,13 @@ function Page() {
         if (p.result.length == 0) return;
         const all_pools = pools_json.flatMap((pool: any) => pool.vTokens);
         const vToken = all_pools.filter((pool: any) => pool.vToken == p.result);
-        console.log(String(iso_asset_symbol[i].result).match(/v(.*?)_/)[1])
         return {
           name: isolated_comp[i].name,
           comp: isolated_comp[i].comptroller,
           assets: {
             ...vToken[0],
-            underlyingSymbol:String(iso_asset_symbol[i].result).match(/v(.*?)_/)[1],
-            name: "Venus "+String(String(iso_asset_symbol[i].result)).match(/v(.*?)_/)[1],
+            underlyingSymbol: String(iso_asset_symbol[i]?.result).match(/v(.*?)_/)?.[1] || "",
+            name: "Venus " + (iso_asset_symbol[i].result ? String(iso_asset_symbol[i].result)?.match(/v(.*?)_/)?.[1] : ""),
             price: Number(
               formatUnits(
                 (iso_asset_price[i].result as bigint) ?? "",
