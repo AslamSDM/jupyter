@@ -8,14 +8,14 @@ import { vTokenabi } from "@/components/abi/vTokenabi";
 import { bsc } from "viem/chains";
 import { AbiItem, createPublicClient, formatUnits, http } from "viem";
 import { newcomptrollerabi } from "@/components/abi/comptrollerabi";
-import { getExchangeRate } from "../utils/formatNumber";
+import { getExchangeRate, getRate } from "../utils/formatNumber";
 import { oracleabi } from "@/components/abi/oracleabi";
 
 const bscClient = createPublicClient({
     chain: bsc,
     transport: http()
   })
-function page() {
+function Page() {
   const{isConnected,address} = useAccount()
   const [loading, setLoading] = useState(false);
   const [core_pools, setCorepools] = useState<any>([]);
@@ -108,7 +108,7 @@ function page() {
       })
       const iso_asset_supply = await bscClient.multicall({
         contracts: isolatedassets.map((p: any) => ({
-          address: p.result,
+          address:p.result.length>0?String(p.result[0]):"0x6592b5DE802159F3E74B2486b091D11a8256ab8A",
           abi: vTokenabi as AbiItem[],
           functionName: "balanceOf",
           args:[address]
@@ -117,31 +117,42 @@ function page() {
       })
       const iso_asset_borrow = await bscClient.multicall({
         contracts: isolatedassets.map((p: any) => ({
-          address: p.result,
+          address:p.result.length>0?String(p.result[0]):"0x6592b5DE802159F3E74B2486b091D11a8256ab8A",
           abi: vTokenabi as AbiItem[],
           functionName: "borrowBalanceStored",
           args:[address]
         }))
       })
+
+      console.log({iso_asset_borrow})
+
       const iso_asset_symbol = await bscClient.multicall({
-        contracts: isolatedassets.map((p: any) => ({
-          address: p.result,
-          abi: vTokenabi as AbiItem[],
-          functionName: "symbol",
-        }))
+        contracts: isolatedassets.map((p: any,i:number) => {
+          let address = p.result.length === 1 ? String(isolatedassets[i].result[0]) : "0x6592b5DE802159F3E74B2486b091D11a8256ab8A";
+          if (!address.startsWith('0x')) {
+            address = '0x' + address;
+          }
+          return {
+            address,
+            abi: vTokenabi as AbiItem[],
+            functionName: "symbol",
+          };
+        })
       })
       const iso_asset_price = await bscClient.multicall({
         contracts: isolatedassets.map((p: any,i:number) => ({
           address: "0x6592b5DE802159F3E74B2486b091D11a8256ab8A",
           abi: oracleabi as AbiItem[],
           functionName: "getUnderlyingPrice",
-          args:[p.result]
+          args:[p.result[0]??""]
         }))
       })
+      console.log({iso_asset_symbol})
       isolatedassets= isolatedassets.map((p:any,i:number)=>{
         if(p.result.length==0) return
         const all_pools = pools_json.flatMap((pool:any)=>pool.vTokens)
         const vToken = all_pools.filter((pool:any)=>pool.vToken==p.result)
+        console.log(vToken)
           return {
             name:isolated_comp[i].name,
             comp:isolated_comp[i].comptroller,  
@@ -149,9 +160,10 @@ function page() {
               ...vToken[0],
               underlyingSymbol:iso_asset_symbol[i].result,
               price:Number(formatUnits(iso_asset_price[i].result as bigint??"",vToken[0].underlyingDecimal)),
-              supply:Number(formatUnits(iso_asset_supply[i].result as bigint??"",8))/Number(getExchangeRate(vToken[0].exchangeRateMantissa,8,vToken[0].underlyingDecimal)),
-              borrow:formatUnits(iso_asset_borrow[i].result as bigint??"",vToken[0].underlyingDecimal)
-              
+              supply:Number(formatUnits(iso_asset_supply[i].result as bigint??"",8))/Number(getExchangeRate(vToken[0].exchangeRateCurrent,8,Number(vToken[0].underlyingDecimals))),
+              borrow:formatUnits(iso_asset_borrow[i].result as bigint??"",vToken[0].underlyingDecimal),
+              supplyApy: getRate(vToken[0].supplyRatePerBlock,Number(vToken[0].underlyingDecimals)),
+              borrowApy: getRate(vToken[0].borrowRatePerBlock,Number(vToken[0].underlyingDecimals))
             }
           }
       })
@@ -164,7 +176,26 @@ function page() {
     fetchPools();
     setLoading(false);
   }, []);
-  console.log({isolatedassets})
+  console.log(isolatedassets)
+  const core_supply_total = coreassets.reduce((acc:any,cur:any)=>acc+(cur.supply*Number(cur.tokenPriceCents)/100),0)  
+  const core_borrow_total = coreassets.reduce((acc:any,cur:any)=>acc+(cur.borrow*Number(cur.tokenPriceCents)/100),0) 
+  const isolated_supply_total = isolatedassets.reduce((acc:any,cur:any)=>acc+(cur.assets.supply*cur.assets.price),0)
+  const isolated_borrow_total = isolatedassets.reduce((acc:any,cur:any)=>acc+(cur.assets.borrow*cur.assets.price),0)
+  const total_supplied = core_supply_total+isolated_supply_total
+  const total_borrowed = core_borrow_total+isolated_borrow_total
+  const annual_supply_interest_core = coreassets.reduce((acc:any,cur:any)=>acc+(cur.supply*cur.tokenPriceCents*cur.supplyApy/10000),0)
+  const annual_borrow_interest_core = coreassets.reduce((acc:any,cur:any)=>acc+(cur.borrow*cur.tokenPriceCents*cur.borrowApy/10000),0)
+  const annual_supply_interest_iso = isolatedassets.reduce((acc:any,cur:any)=>acc+(cur.assets.supply*cur.assets.price*cur.assets.supplyApy/100),0)
+  
+  const annual_borrow_interest_iso = isolatedassets.reduce((acc:any,cur:any)=>acc+(cur.assets.borrow*cur.assets.price*cur.assets.borrowApy/100),0)
+  const total_supply_interest = annual_supply_interest_core+annual_supply_interest_iso
+  const total_borrow_interest = annual_borrow_interest_core+annual_borrow_interest_iso
+
+
+  const core_net_apy = (annual_supply_interest_core-annual_borrow_interest_core)*100/core_supply_total
+  const iso_net_apy = (annual_supply_interest_iso-annual_borrow_interest_iso)*100/isolated_supply_total
+  const net_apy = (total_supply_interest-total_borrow_interest)*100/total_supplied
+  console.log({core_net_apy,iso_net_apy,net_apy})
 
   // const {data:core_pools_borrows} = useContractReads({
   //   contracts: coreassets.map((p: any) => ({
@@ -293,4 +324,4 @@ function page() {
   );
 }
 
-export default page;
+export default Page;
