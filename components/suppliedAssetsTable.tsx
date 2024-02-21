@@ -3,8 +3,20 @@ import { Chip, Switch } from "@nextui-org/react";
 import Image from "next/image";
 import getImage from "@/components/abi/tokenImage";
 
-function SuppliedAssetsTable() {
+function SuppliedAssetsTable({assets}:any) {
   const suppliedTableFields = [
+    {
+      key: "asset",
+      label: "Asset",
+    },
+    {
+      key: "apyLtv",
+      label: "APY / LTV",
+    },
+    { key: "balance", label: "Balance" },
+    { key: "collateral", label: "Collateral" },
+  ];
+  const suppliedTable = [
     {
       key: "asset",
       label: "Asset",
@@ -18,35 +30,37 @@ function SuppliedAssetsTable() {
   ];
 
   const renderCell = useCallback((columnKey: any, value: any) => {
+    if(!value) return null;
+    const imageurl = getImage(value?.name??"");
+    console.log(value.supply)
     switch (columnKey) {
       case "asset":
         return (
           <div className="flex items-center gap-1 pl-2">
             <Image
-              src={getImage("Venus BTC")}
+              src={imageurl}
               alt="logo"
               width={24}
               height={24}
             />
-            <p className="text-white">BTCB</p>
+            <p className="text-white">{value.underlyingSymbol}</p>
           </div>
         );
       case "apyLtv":
         return (
           <div className=" flex flex-col gap-0.5 justify-end items-end">
             <h2 className="text-white">
-              0.06% / <span className="text-[#AAB3CA]">80%</span>
+              {value.supplyApy?Number(value.supplyApy).toFixed(2):0}%
             </h2>
-            <Chip color="success" size="sm" radius="full">
-              0.06%
-            </Chip>
+     
           </div>
         );
       case "balance":
+        console.log(value?.supply)
         return (
           <div className=" flex flex-col gap-0.5 justify-end text-white">
-            <h2>0.00028 BTCB</h2>
-            <h2 className="text-[#AAB3CA]">$14.37</h2>
+            <h2>{value?.supply } {value?.underlyingSymbol}</h2>
+            <h2 className="text-[#AAB3CA]">$ {value?.supply* Number(value?.tokenPriceCents) / 100}</h2>
           </div>
         );
       case "collateral":
@@ -60,6 +74,7 @@ function SuppliedAssetsTable() {
         return null;
     }
   }, []);
+console.log(assets)
 
   const renderHeaderCell = useCallback((columnKey: any) => {
     switch (columnKey) {
@@ -73,7 +88,7 @@ function SuppliedAssetsTable() {
         return (
           <div className="flex justify-end">
             <button>
-              <p className="">APY / LTV</p>
+              <p className="">APY </p>
             </button>
           </div>
         );
@@ -90,6 +105,8 @@ function SuppliedAssetsTable() {
         return null;
     }
   }, []);
+
+  if (!assets) return null;
   return (
     <div className="w-[45%] bg-[#1E2431] rounded-xl p-6 space-y-4">
       <h2 className="text-xl text-white font-bold">Supplied Assets</h2>
@@ -105,9 +122,9 @@ function SuppliedAssetsTable() {
         </thead>
         <tbody className="text-white">
           <tr>
-            {suppliedTableFields.map((field) => (
+            {suppliedTableFields.map((field,i:number) => (
               <td key={field.key} className="text-end py-2">
-                {renderCell(field.key, "0.00028 BTCB")}
+                {renderCell(field.key, assets[i])}
               </td>
             ))}
           </tr>

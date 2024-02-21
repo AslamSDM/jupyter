@@ -318,28 +318,28 @@ function Page() {
       <div className="w-full rounded-xl bg-[#1E2431] flex justify-start gap-10 p-6 font-semibold text-xl">
         <div className="flex flex-col">
           <p className="text-gray-400">Net APY</p>
-          <p className="text-green-400">{net_apy}%</p>
+          <p className="text-green-400">{net_apy.toFixed(2)}%</p>
         </div>
+        {/* <div className="flex flex-col">
         <div className="h-full w-px bg-gray-600"></div>
-        <div className="flex flex-col">
    <p className="text-gray-400">Daily Earnings</p>
           <p className="text-white">100</p>
-        </div>
+        </div> */}
         <div className="h-full w-px bg-gray-600"></div> 
           <div className="flex flex-col">
             <p className="text-gray-400">Total Supply</p>
-            <p className="text-white">${total_supplied}</p>
+            <p className="text-white">${total_supplied.toFixed(2)}</p>
           </div>
           <div className="h-full w-px bg-gray-600"></div>
           <div className="flex flex-col">
             <p className="text-gray-400">Total Borrow</p>
-            <p className="text-white">${total_borrowed}</p>
+            <p className="text-white">${total_borrowed.toFixed(2)}</p>
           </div>
-          <div className="h-full w-px bg-gray-600"></div>
+          {/* <div className="h-full w-px bg-gray-600"></div>
      <div className="flex flex-col">
           <p className="text-gray-400">Total Vault Stake</p>
           <p className="text-white">100</p>
-        </div> 
+        </div>  */}
         </div>
         <div className="flex flex-col gap-4 items-start">
           <h2 className="text-xl text-white font-bold">Pools</h2>
@@ -375,22 +375,22 @@ function Page() {
               <div className="flex justify-start gap-10">
                 <div className="flex flex-col">
                   <p className="text-gray-400">Net APY</p>
-                  <p className="text-green-400">{}</p>
+                  <p className="text-green-400">{core_net_apy.toFixed(2)}</p>
                 </div>
-                <div className="h-full w-px bg-gray-600"></div>
+                {/* <div className="h-full w-px bg-gray-600"></div>
                 <div className="flex flex-col">
                   <p className="text-gray-400">Daily Earnings</p>
                   <p className="text-white">100</p>
-                </div>
+                </div> */}
                 <div className="h-full w-px bg-gray-600"></div>
                 <div className="flex flex-col">
                   <p className="text-gray-400">Total Supply</p>
-                  <p className="text-white">100</p>
+                  <p className="text-white">${core_supply_total.toFixed(2)}</p>
                 </div>
                 <div className="h-full w-px bg-gray-600"></div>
                 <div className="flex flex-col">
                   <p className="text-gray-400">Total Borrow</p>
-                  <p className="text-white">100</p>
+                  <p className="text-white">${core_borrow_total.toFixed(2)}</p>
                 </div>
               </div>
               <div className="flex flex-col gap-2">
@@ -414,8 +414,8 @@ function Page() {
               </div>
             </div>
             <div className="flex justify-between items-start w-full">
-              <SuppliedAssetsTable />
-              <BorrowedAssetsTable />
+              <SuppliedAssetsTable className="w-1/2" assets={coreassets} />
+              <BorrowedAssetsTable className="w-1/2" assets={coreassets} />
             </div>
           </Tab>
             )

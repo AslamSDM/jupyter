@@ -3,7 +3,7 @@ import { Chip, Progress, Switch } from "@nextui-org/react";
 import Image from "next/image";
 import getImage from "@/components/abi/tokenImage";
 
-function BorrowedAssetsTable() {
+function BorrowedAssetsTable({assets}:any) {
   const fields = [
     {
       key: "asset",
@@ -20,47 +20,41 @@ function BorrowedAssetsTable() {
   const progress = 50;
 
   const renderCell = useCallback((columnKey: any, value: any) => {
+    const imageurl = getImage("Venus "+value.underlyingSymbol);
+
     switch (columnKey) {
       case "asset":
         return (
-          <div className="flex items-center gap-0.5 pl-2">
+          <div className="flex items-center gap-1 pl-2">
             <Image
-              src={getImage("Venus BTC")}
+              src={getImage(imageurl)}
               alt="logo"
               width={24}
               height={24}
             />
-            <p className="text-white">BTCB</p>
+            <p className="text-white">{value.underlyingSymbol}</p>
           </div>
         );
-      case "apy":
+      case "apyLtv":
         return (
-          <div className=" flex flex-col justify-end gap-0.5 items-end">
+          <div className=" flex flex-col gap-0.5 justify-end items-end">
             <h2 className="text-white">
-              0.06% / <span className="text-[#AAB3CA]">80%</span>
+              {value.supplyApy.toFixed(2)}%
             </h2>
-            <Chip color="success" size="sm" radius="full">
-              0.06%
-            </Chip>
+     
           </div>
         );
       case "balance":
         return (
-          <div className=" flex flex-col justify-end text-white">
-            <h2>0.00028 BTCB</h2>
-            <h2 className="text-[#AAB3CA]">$14.37</h2>
+          <div className=" flex flex-col gap-0.5 justify-end text-white">
+            <h2>{value.supply } {value.underlyingSymbol}</h2>
+            <h2 className="text-[#AAB3CA]">$ {value.borrow* Number(value.tokenPriceCents) / 100}</h2>
           </div>
         );
-      case "percentageLimit":
+      case "collateral":
         return (
-          <div className="w-full flex flex-col gap-0.5 items-end pl-6">
-            <h2>50%</h2>
-            <div className="relative w-full bg-gray-200 rounded-full h-1.5">
-              <div
-                className="h-1.5 bg-green-600 absolute rounded-full"
-                style={{ width: `${progress}%` }}
-              ></div>
-            </div>
+          <div className=" flex flex-col items-end">
+            <Switch size="sm" />
           </div>
         );
 
@@ -113,11 +107,16 @@ function BorrowedAssetsTable() {
         </thead>
         <tbody className="text-white">
           <tr>
-            {fields.map((field) => (
-              <td key={field.key} className="text-end py-2">
-                {renderCell(field.key, "0.00028 BTCB")}
-              </td>
-            ))}
+          {assets.map((field:any,i:number) => 
+              
+              field.borrow>0?(
+
+                <td key={i} className="text-end py-2">
+                  {renderCell(i, field)}
+                </td>):null
+              
+            
+          )}
           </tr>
         </tbody>
       </table>
