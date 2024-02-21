@@ -272,38 +272,38 @@ function Page() {
   const net_apy =
     ((total_supply_interest - total_borrow_interest) * 100) / total_supplied;
 
-    const {data:accountLiquidity} = useContractRead({
-      address:  corecomptroller as `0x${string}`,
-      abi:newcomptrollerabi,
-      functionName:"getAccountLiquidity",
-      args:[address as `0x${string}`]
-    })
-    const borrowPower = useContractRead({
-      address:  "" as `0x${string}`,
-      abi:newcomptrollerabi,
-      functionName:"getBorrowingPower",
-      args:[address as `0x${string}`]
-    })
+  const { data: accountLiquidity } = useContractRead({
+    address: corecomptroller as `0x${string}`,
+    abi: newcomptrollerabi,
+    functionName: "getAccountLiquidity",
+    args: [address as `0x${string}`],
+  });
+  const borrowPower = useContractRead({
+    address: "" as `0x${string}`,
+    abi: newcomptrollerabi,
+    functionName: "getBorrowingPower",
+    args: [address as `0x${string}`],
+  });
   return (
     <>
-    <div className="w-full flex flex-col gap-8 px-10 py-8">
-      <div className="flex justify-between">
-        <h2 className="text-xl text-white font-bold">Account</h2>
-        <ConnectButton />
-      </div>
-
-      <h2 className="text-xl text-white font-bold">Summary</h2>
-      <div className="w-full rounded-xl bg-[#1E2431] flex justify-start gap-10 p-6 font-semibold text-xl">
-        <div className="flex flex-col">
-          <p className="text-gray-400">Net APY</p>
-          <p className="text-green-400">{net_apy.toFixed(2)}%</p>
+      <div className="w-full flex flex-col gap-8 px-10 py-8">
+        <div className="flex justify-between">
+          <h2 className="text-xl text-white font-bold">Account</h2>
+          <ConnectButton />
         </div>
-        {/* <div className="flex flex-col">
+
+        <h2 className="text-xl text-white font-bold">Summary</h2>
+        <div className="w-full rounded-xl bg-[#1E2431] flex justify-start gap-10 p-6 font-semibold text-xl">
+          <div className="flex flex-col">
+            <p className="text-gray-400">Net APY</p>
+            <p className="text-green-400">{net_apy.toFixed(2)}%</p>
+          </div>
+          {/* <div className="flex flex-col">
         <div className="h-full w-px bg-gray-600"></div>
    <p className="text-gray-400">Daily Earnings</p>
           <p className="text-white">100</p>
         </div> */}
-        <div className="h-full w-px bg-gray-600"></div> 
+          <div className="h-full w-px bg-gray-600"></div>
           <div className="flex flex-col">
             <p className="text-gray-400">Total Supply</p>
             <p className="text-white">${total_supplied.toFixed(2)}</p>
@@ -321,7 +321,7 @@ function Page() {
         </div>
         <div className="flex flex-col gap-4 items-start">
           <h2 className="text-xl text-white font-bold">Pools</h2>
-          <div className="flex gap-4">
+          {/* <div className="flex gap-4">
             <Button
               href="/core-pool"
               as={Link}
@@ -341,75 +341,84 @@ function Page() {
             >
               GameFi
             </Button>
-          </div>
+            
+          </div> */}
+          <Tabs variant="bordered">
+            <Tab key="core-pool" title="Venus Core Pool">
+              <div className="flex gap-4">Hello</div>
+            </Tab>
+            <Tab key="gamefi" title="GameFi">
+              <div className="flex gap-4">Hi</div>
+            </Tab>
+          </Tabs>
         </div>
         <Tabs variant="bordered">
-          {
-            coreassets.length > 0 && (
-              
-          <Tab key="core-pool" title="Venus Core Pool">
-            <h2 className="text-xl text-white font-bold">Summary</h2>
-            <div className="w-full rounded-xl bg-[#1E2431] flex justify-between p-6 font-semibold text-xl">
-              <div className="flex justify-start gap-10">
-                <div className="flex flex-col">
-                  <p className="text-gray-400">Net APY</p>
-                  <p className="text-green-400">{core_net_apy.toFixed(2)}</p>
-                </div>
-                {/* <div className="h-full w-px bg-gray-600"></div>
+          {coreassets.length > 0 && (
+            <Tab key="core-pool" title="Venus Core Pool">
+              <h2 className="text-xl text-white font-bold">Summary</h2>
+              <div className="w-full rounded-xl bg-[#1E2431] flex justify-between p-6 font-semibold text-xl">
+                <div className="flex justify-start gap-10">
+                  <div className="flex flex-col">
+                    <p className="text-gray-400">Net APY</p>
+                    <p className="text-green-400">{core_net_apy.toFixed(2)}</p>
+                  </div>
+                  {/* <div className="h-full w-px bg-gray-600"></div>
                 <div className="flex flex-col">
                   <p className="text-gray-400">Daily Earnings</p>
                   <p className="text-white">100</p>
                 </div> */}
-                <div className="h-full w-px bg-gray-600"></div>
-                <div className="flex flex-col">
-                  <p className="text-gray-400">Total Supply</p>
-                  <p className="text-white">${core_supply_total.toFixed(2)}</p>
+                  <div className="h-full w-px bg-gray-600"></div>
+                  <div className="flex flex-col">
+                    <p className="text-gray-400">Total Supply</p>
+                    <p className="text-white">
+                      ${core_supply_total.toFixed(2)}
+                    </p>
+                  </div>
+                  <div className="h-full w-px bg-gray-600"></div>
+                  <div className="flex flex-col">
+                    <p className="text-gray-400">Total Borrow</p>
+                    <p className="text-white">
+                      ${core_borrow_total.toFixed(2)}
+                    </p>
+                  </div>
                 </div>
-                <div className="h-full w-px bg-gray-600"></div>
-                <div className="flex flex-col">
-                  <p className="text-gray-400">Total Borrow</p>
-                  <p className="text-white">${core_borrow_total.toFixed(2)}</p>
+                <div className="flex flex-col gap-2">
+                  <div className="flex justify-between gap-8">
+                    <p className="text-gray-400 text-sm">
+                      Borrow Limit used: <span className="text-white">0%</span>
+                    </p>
+                    <p className="text-gray-400 text-sm">
+                      Limit: <span className="text-white">$8.20</span>
+                    </p>
+                  </div>
+                  <div className="relative w-full bg-gray-200 rounded-full h-2.5">
+                    <div
+                      className="bg-red-600 h-2.5 dark:bg-blue-500 absolute w-1"
+                      style={{ left: "85%" }}
+                    ></div>
+                  </div>
+                  <p className="text-gray-400 text-sm text-end">
+                    Your safe limit: <span className="text-white">0%</span>
+                  </p>
                 </div>
               </div>
-              <div className="flex flex-col gap-2">
-                <div className="flex justify-between gap-8">
-                  <p className="text-gray-400 text-sm">
-                    Borrow Limit used: <span className="text-white">0%</span>
-                  </p>
-                  <p className="text-gray-400 text-sm">
-                    Limit: <span className="text-white">$8.20</span>
-                  </p>
-                </div>
-                <div className="relative w-full bg-gray-200 rounded-full h-2.5">
-                  <div
-                    className="bg-red-600 h-2.5 dark:bg-blue-500 absolute w-1"
-                    style={{ left: "85%" }}
-                  ></div>
-                </div>
-                <p className="text-gray-400 text-sm text-end">
-                  Your safe limit: <span className="text-white">0%</span>
-                </p>
+              <div className="flex justify-between items-start w-full">
+                <SuppliedAssetsTable />
+                <BorrowedAssetsTable assets={coreassets} />
               </div>
-            </div>
-            <div className="flex justify-between items-start w-full">
-              <SuppliedAssetsTable className="w-1/2" assets={coreassets} />
-              <BorrowedAssetsTable className="w-1/2" assets={coreassets} />
-            </div>
-          </Tab>
-            )
-          
-          }
-          {
-              isolatedassets.length > 0 && 
-              isolatedassets.map((pool:any,i:number)=>{
-                <Tab key={i} title={pool.name}>
-
+            </Tab>
+          )}
+          {isolatedassets.length > 0 &&
+            isolatedassets.map((pool: any, i: number) => {
+              <Tab key={i} title={pool.name}>
                 <h2 className="text-xl text-white font-bold">Summary</h2>
                 <div className="w-full rounded-xl bg-[#1E2431] flex justify-between p-6 font-semibold text-xl">
                   <div className="flex justify-start gap-10">
                     <div className="flex flex-col">
                       <p className="text-gray-400">Net APY</p>
-                      <p className="text-green-400">{iso_net_apy.toFixed(3)}%</p>
+                      <p className="text-green-400">
+                        {iso_net_apy.toFixed(3)}%
+                      </p>
                     </div>
                     <div className="h-full w-px bg-gray-600"></div>
                     {/* <div className="flex flex-col">
@@ -430,7 +439,8 @@ function Page() {
                   <div className="flex flex-col gap-2">
                     <div className="flex justify-between gap-8">
                       <p className="text-gray-400 text-sm">
-                        Borrow Limit used: <span className="text-white">0%</span>
+                        Borrow Limit used:{" "}
+                        <span className="text-white">0%</span>
                       </p>
                       <p className="text-gray-400 text-sm">
                         Limit: <span className="text-white">$8.20</span>
@@ -451,16 +461,11 @@ function Page() {
                   <SuppliedAssetsTable />
                   <BorrowedAssetsTable />
                 </div>
-              </Tab>
-              })
-              
-             
-                
-          }
+              </Tab>;
+            })}
         </Tabs>
       </div>
     </>
-
   );
 }
 
