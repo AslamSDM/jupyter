@@ -13,6 +13,8 @@ import { AbiItem, createPublicClient, formatUnits, http } from "viem";
 import { newcomptrollerabi } from "@/components/abi/comptrollerabi";
 import { getExchangeRate, getRate } from "../utils/formatNumber";
 import { oracleabi } from "@/components/abi/oracleabi";
+import { MoonLoader } from "react-spinners";
+import { match } from "assert";
 
 const bscClient = createPublicClient({
   chain: bsc,
@@ -136,7 +138,6 @@ function Page() {
         })),
       });
 
-
       const iso_asset_symbol = await bscClient.multicall({
         contracts: isolatedassets.map((p: any, i: number) => {
           let address =
@@ -161,20 +162,23 @@ function Page() {
           args: [p.result[0] ?? ""],
         })),
       });
-      isolatedassets = isolatedassets.map((p: any, i: number) => {
+
+      isolatedassets =  isolatedassets.map( (p: any, i: number) => {
         if (p.result.length == 0) return;
         const all_pools = pools_json.flatMap((pool: any) => pool.vTokens);
         const vToken = all_pools.filter((pool: any) => pool.vToken == p.result);
+        console.log(String(iso_asset_symbol[i].result).match(/v(.*?)_/)[1])
         return {
           name: isolated_comp[i].name,
           comp: isolated_comp[i].comptroller,
           assets: {
             ...vToken[0],
-            underlyingSymbol: iso_asset_symbol[i].result,
+            underlyingSymbol:String(iso_asset_symbol[i].result).match(/v(.*?)_/)[1],
+            name: "Venus "+String(String(iso_asset_symbol[i].result)).match(/v(.*?)_/)[1],
             price: Number(
               formatUnits(
                 (iso_asset_price[i].result as bigint) ?? "",
-                vToken[0].underlyingDecimal
+                vToken[0].underlyingDecimals
               )
             ),
             supply:
@@ -213,6 +217,7 @@ function Page() {
     fetchPools();
     setLoading(false);
   }, []);
+console.log({isolatedassets})
   const core_supply_total = coreassets.reduce(
     (acc: any, cur: any) =>
       acc + (cur.supply * Number(cur.tokenPriceCents)) / 100,
@@ -224,18 +229,19 @@ function Page() {
     0
   );
   const isolated_supply_total = isolatedassets.reduce(
-    (acc: any, cur: any) => acc + cur.assets.supply * cur.assets.price,
+    (acc: any, cur: any) => acc + cur.assets?.supply * cur.assets?.price,
     0
   );
+
   const isolated_borrow_total = isolatedassets.reduce(
-    (acc: any, cur: any) => acc + cur.assets.borrow * cur.assets.price,
+    (acc: any, cur: any) => acc + cur.assets?.borrow * cur.assets?.price,
     0
   );
   const total_supplied = core_supply_total + isolated_supply_total;
   const total_borrowed = core_borrow_total + isolated_borrow_total;
   const annual_supply_interest_core = coreassets.reduce(
     (acc: any, cur: any) =>
-      acc + (cur.supply * cur.tokenPriceCents * cur.supplyApy) / 10000,
+      acc + (cur?.supply * cur.tokenPriceCents * cur.supplyApy) / 10000,
     0
   );
   const annual_borrow_interest_core = coreassets.reduce(
@@ -245,13 +251,13 @@ function Page() {
   );
   const annual_supply_interest_iso = isolatedassets.reduce(
     (acc: any, cur: any) =>
-      acc + (cur.assets.supply * cur.assets.price * cur.assets.supplyApy) / 100,
+      acc + (cur.assets?.supply * cur.assets?.price * cur.assets?.supplyApy) / 100,
     0
   );
 
   const annual_borrow_interest_iso = isolatedassets.reduce(
     (acc: any, cur: any) =>
-      acc + (cur.assets.borrow * cur.assets.price * cur.assets.borrowApy) / 100,
+      acc + (cur.assets?.borrow * cur.assets?.price * cur.assets?.borrowApy) / 100,
     0
   );
   const total_supply_interest =
@@ -267,47 +273,66 @@ function Page() {
     isolated_supply_total;
   const net_apy =
     ((total_supply_interest - total_borrow_interest) * 100) / total_supplied;
+    // const groupedAssets = isolatedassets.reduce((acc:any, asset:any) => {
+    //   const key = asset.name;
+    //   if (!acc[key]) {
+    //     acc[key] = []
+    //   }
+    //   acc[key].push(asset);
+    //   return acc;
+    // }, {});
+    // const groupedAssetsArray = Object.values(groupedAssets);
 
-console.log({isolatedassets})
+    // console.log(groupedAssetsArray);
 
-  return (
-    <>
-      <div className="w-full flex flex-col gap-8 px-10 py-8">
-        <div className="flex justify-between">
-          <h2 className="text-xl text-white font-bold">Account</h2>
-          <ConnectButton />
+  if (loading) {
+    return (
+      <>
+        <div className="flex flex-col w-full items-center justify-center h-screen gap-4 ">
+          <MoonLoader color="#ffffff" />
+          Loading
         </div>
-
-        <h2 className="text-xl text-white font-bold">Summary</h2>
-        <div className="w-full rounded-xl bg-[#1E2431] flex justify-start gap-10 p-6 font-semibold text-xl">
-          <div className="flex flex-col">
-            <p className="text-gray-400">Net APY</p>
-            <p className="text-green-400">{net_apy.toFixed(2)}%</p>
+      </>
+    );
+  } else
+    return (
+      <>
+        <div className="w-full flex flex-col gap-8 px-10 py-8">
+          <div className="flex justify-between">
+            <h2 className="text-xl text-white font-bold">Account</h2>
+            <ConnectButton />
           </div>
-          {/* <div className="flex flex-col">
+
+          <h2 className="text-xl text-white font-bold">Summary</h2>
+          <div className="w-full rounded-xl bg-[#1E2431] flex justify-start gap-10 p-6 font-semibold text-xl">
+            <div className="flex flex-col">
+              <p className="text-gray-400">Net APY</p>
+              <p className="text-green-400">{net_apy.toFixed(2)}%</p>
+            </div>
+            {/* <div className="flex flex-col">
         <div className="h-full w-px bg-gray-600"></div>
    <p className="text-gray-400">Daily Earnings</p>
           <p className="text-white">100</p>
         </div> */}
-          <div className="h-full w-px bg-gray-600"></div>
-          <div className="flex flex-col">
-            <p className="text-gray-400">Total Supply</p>
-            <p className="text-white">${total_supplied.toFixed(2)}</p>
-          </div>
-          <div className="h-full w-px bg-gray-600"></div>
-          <div className="flex flex-col">
-            <p className="text-gray-400">Total Borrow</p>
-            <p className="text-white">${total_borrowed.toFixed(2)}</p>
-          </div>
-          {/* <div className="h-full w-px bg-gray-600"></div>
+            <div className="h-full w-px bg-gray-600"></div>
+            <div className="flex flex-col">
+              <p className="text-gray-400">Total Supply</p>
+              <p className="text-white">${total_supplied.toFixed(2)}</p>
+            </div>
+            <div className="h-full w-px bg-gray-600"></div>
+            <div className="flex flex-col">
+              <p className="text-gray-400">Total Borrow</p>
+              <p className="text-white">${total_borrowed.toFixed(2)}</p>
+            </div>
+            {/* <div className="h-full w-px bg-gray-600"></div>
      <div className="flex flex-col">
           <p className="text-gray-400">Total Vault Stake</p>
           <p className="text-white">100</p>
         </div>  */}
-        </div>
-        <div className="flex flex-col gap-4 items-start">
-          <h2 className="text-xl text-white font-bold">Pools</h2>
-          {/* <div className="flex gap-4">
+          </div>
+          <div className="flex flex-col gap-4 items-start">
+            <h2 className="text-xl text-white font-bold">Pools</h2>
+            {/* <div className="flex gap-4">
             <Button
               href="/core-pool"
               as={Link}
@@ -329,18 +354,17 @@ console.log({isolatedassets})
             </Button>
             
           </div> */}
-          <Tabs variant="bordered">
+            {/* <Tabs variant="bordered">
             <Tab key="core-pool" title="Venus Core Pool">
               <div className="flex gap-4">Hello</div>
             </Tab>
             <Tab key="gamefi" title="GameFi">
               <div className="flex gap-4">Hi</div>
             </Tab>
-          </Tabs>
-        </div>
-        <Tabs variant="bordered">
- 
+          </Tabs> */}
 
+          </div>
+          <Tabs variant="light">
           {
             coreassets.length > 0 && (
               
@@ -369,7 +393,7 @@ console.log({isolatedassets})
                   <p className="text-white">${core_borrow_total.toFixed(2)}</p>
                 </div>
               </div>
-              <div className="flex flex-col gap-2">
+              {/* <div className="flex flex-col gap-2">
                 <div className="flex justify-between gap-8">
                   <p className="text-gray-400 text-sm">
                     Borrow Limit used: <span className="text-white">0%</span>
@@ -387,7 +411,7 @@ console.log({isolatedassets})
                 <p className="text-gray-400 text-sm text-end">
                   Your safe limit: <span className="text-white">0%</span>
                 </p>
-              </div>
+              </div> */}
             </div>
             <div className="flex justify-between items-start w-full">
               <SuppliedAssetsTable className="w-1/2" assets={coreassets} isolated={false} corecomptroller={corecomptroller} />
@@ -399,67 +423,72 @@ console.log({isolatedassets})
             )
           
           }
-          {
-              isolatedassets.length > 0 && 
-              isolatedassets.map((pool:any,i:number)=>{
-                <Tab key={i} title={pool.name}>
-                <h2 className="text-xl text-white font-bold">Summary</h2>
-                <div className="w-full rounded-xl bg-[#1E2431] flex justify-between p-6 font-semibold text-xl">
-                  <div className="flex justify-start gap-10">
-                    <div className="flex flex-col">
-                      <p className="text-gray-400">Net APY</p>
-                      <p className="text-green-400">
-                        {iso_net_apy.toFixed(3)}%
-                      </p>
-                    </div>
-                    <div className="h-full w-px bg-gray-600"></div>
-                    {/* <div className="flex flex-col">
+            {isolatedassets.length > 0 &&
+              isolatedassets.map((pool: any, i: number) => (
+                <Tab key={i + 1} title={pool.name}>
+                  <div className="space-y-4">
+
+                  <h2 className="text-xl text-white font-bold">Summary</h2>
+                  <div className="w-full rounded-xl bg-[#1E2431] flex justify-between p-6 font-semibold text-xl">
+                    <div className="flex justify-start gap-10">
+                      <div className="flex flex-col">
+                        <p className="text-gray-400">Net APY</p>
+                        <p className="text-green-400">
+                          {iso_net_apy.toFixed(3)}%
+                        </p>
+                      </div>
+                      <div className="h-full w-px bg-gray-600"></div>
+                      {/* <div className="flex flex-col">
                       <p className="text-gray-400">Daily Earnings</p>
                       <p className="text-white">100</p>
+                      <div className="h-full w-px bg-gray-600"></div>
                     </div> */}
-                    <div className="h-full w-px bg-gray-600"></div>
-                    <div className="flex flex-col">
-                      <p className="text-gray-400">Total Supply</p>
-                      <p className="text-white"></p>
+                      <div className="flex flex-col">
+                        <p className="text-gray-400">Total Supply</p>
+                        <p className="text-white">${isolated_supply_total.toFixed(2)}</p>
+                      </div>
+                      <div className="h-full w-px bg-gray-600"></div>
+                      <div className="flex flex-col">
+                        <p className="text-gray-400">Total Borrow</p>
+                        <p className="text-white">${isolated_borrow_total.toFixed(2)}</p>
+                      </div>
                     </div>
-                    <div className="h-full w-px bg-gray-600"></div>
-                    <div className="flex flex-col">
-                      <p className="text-gray-400">Total Borrow</p>
-                      <p className="text-white">100</p>
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <div className="flex justify-between gap-8">
+                    {/* <div className="flex flex-col gap-2">
+                      <div className="flex justify-between gap-8">
                       <p className="text-gray-400 text-sm">
-                        Borrow Limit used:{" "}
-                        <span className="text-white">0%</span>
-                      </p>
-                      <p className="text-gray-400 text-sm">
+                          Borrow Limit used:{" "}
+                          <span className="text-white">0%</span>
+                        </p>
+                        <p className="text-gray-400 text-sm">
                         Limit: <span className="text-white">$8.20</span>
-                      </p>
-                    </div>
-                    <div className="relative w-full bg-gray-200 rounded-full h-2.5">
-                      <div
+                        </p>
+                        </div>
+                        <div className="relative w-full bg-gray-200 rounded-full h-2.5">
+                        <div
                         className="bg-red-600 h-2.5 dark:bg-blue-500 absolute w-1"
                         style={{ left: "85%" }}
-                      ></div>
-                    </div>
-                    <p className="text-gray-400 text-sm text-end">
-                      Your safe limit: <span className="text-white">0%</span>
-                    </p>
+                        ></div>
+                        </div>
+                        <p className="text-gray-400 text-sm text-end">
+                        Your safe limit: <span className="text-white">0%</span>
+                        </p>
+                      </div> */}
                   </div>
-                </div>
-                <div className="flex justify-between items-start w-full">
-                  <SuppliedAssetsTable />
-                  <BorrowedAssetsTable />
-                </div>
-              </Tab>
-              })
-          }
-        </Tabs>
-      </div>
-    </>
-  );
+                  <div className="flex justify-between items-start w-full">
+                    {pool.assets ? (
+                      <>
+                        <SuppliedAssetsTable assets={[pool.assets]} isolated={true} />
+                        <BorrowedAssetsTable assets={[pool.assets]} isolated={true} />
+                      </>
+                    ) : null}
+                  </div>
+              </div>
+                </Tab>
+              ))}
+          </Tabs>
+        </div>
+      </>
+    );
 }
 
 export default Page;

@@ -150,10 +150,10 @@ function BorrowedAssetsTable({assets,isolated,corecomptroller}:any) {
           </tr>
         </thead>
         <tbody className="text-white">
-          {assets.map((asset:any) => (
+          {assets.map((asset:any,i:number) => (
             asset.borrow>0?(
 
-              <tr>
+              <tr key={i}>
             
               {fields.map((field) => (
                 <td key={field.key}>

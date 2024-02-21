@@ -40,8 +40,12 @@ function SuppliedAssetsTable({assets,isolated,corecomptroller}:any) {
 
 
   const renderCell = useCallback((columnKey: any, value: any) => {
+    console.log(value)
     if(!value) return null;
     const imageurl = getImage(value?.name??"");
+    if(isolated){
+      value["tokenPriceCents"]= value.price*100
+    }
     switch (columnKey) {
       case "asset":
         return (
@@ -135,8 +139,8 @@ function SuppliedAssetsTable({assets,isolated,corecomptroller}:any) {
           </tr>
         </thead>
         <tbody className="text-white">
-            {assets.map((asset:any) => (
-          <tr>
+            {assets.map((asset:any,i:number) => (
+          <tr key={i}>
       
               {suppliedTable.map((field) => (
                 <td key={field.key}>
