@@ -5,6 +5,7 @@ import { Switch, Input, Button, Divider } from "@nextui-org/react";
 import { getExchangeRate } from "@/app/utils/formatNumber";
 import { formatUnits, parseUnits } from "viem";
 import { useWaitForTransaction } from "wagmi";
+import getImage from "./abi/tokenImage";
 // import CoinSearch from "./coinSearch";
 // import getImage from "./abi/tokenImage";
 
@@ -52,6 +53,7 @@ function SupplyTab({
       allowance.refetch();
     });
   };
+  const imageurl = getImage(("Venus "+pool.underlyingSymbol));
   const progress =
     ((Number(formatUnits(borrowBalance ?? "", pool.underlyingDecimal)) *
       Number(pool.tokenPriceCents)) /
@@ -83,7 +85,7 @@ function SupplyTab({
           }
         }}
         startContent={
-          <Image src={pool.logo} alt="logo" width={20} height={20} />
+          <Image src={pool.logo??imageurl} alt="logo" width={20} height={20} />
         }
         endContent={
           <div className="flex gap-2">
@@ -155,7 +157,7 @@ function SupplyTab({
         <Divider className="my-4 bg-gray-600" />
         <div className="flex justify-between">
           <div className="flex justify-start gap-1">
-            <Image src={pool.logo} alt="logo" width={20} height={20} />
+            <Image src={pool.logo??imageurl} alt="logo" width={20} height={20} />
             <p className="text-gray-400">Supply APY</p>
           </div>
 
@@ -167,7 +169,7 @@ function SupplyTab({
 <>
         <div className="flex justify-between">
           <div className="flex justify-start gap-1">
-            <Image src={pool.logo} alt="logo" width={20} height={20} />
+          <Image src="https://app.venus.io/assets/xvs-e7b82352.svg" alt="logo" width={20} height={20} />
             <p className="text-gray-400">Distribution APY (XVS)</p>
           </div>
           <p>{Number(pool.supplyXvsApy).toFixed(3)}%</p>

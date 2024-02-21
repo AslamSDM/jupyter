@@ -50,8 +50,6 @@ const IsolatedPoolsPage = () => {
         "Liquid Staked BNB": { total_supply: 0, total_borrow: 0 },
         Tron: { total_supply: 0, total_borrow: 0 },
       };
-
-
     }
     fetchData();
   }, []);

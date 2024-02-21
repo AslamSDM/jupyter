@@ -1,14 +1,212 @@
-import React from "react";
+"use client"
+import React, { useEffect, useState } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Button, Chip, Link } from "@nextui-org/react";
+import { useAccount, useContractRead, useContractReads} from "wagmi"
+import axios from "axios";
+import { vTokenabi } from "@/components/abi/vTokenabi";
+import { bsc } from "viem/chains";
+import { AbiItem, createPublicClient, formatUnits, http } from "viem";
+import { newcomptrollerabi } from "@/components/abi/comptrollerabi";
+import { getExchangeRate } from "../utils/formatNumber";
+import { oracleabi } from "@/components/abi/oracleabi";
 
+const bscClient = createPublicClient({
+    chain: bsc,
+    transport: http()
+  })
 function page() {
+  const{isConnected,address} = useAccount()
+  const [loading, setLoading] = useState(false);
+  const [core_pools, setCorepools] = useState<any>([]);
+  const [isolated_pools, setIsolatedpools] = useState<any>([]);
+  const [corecomptroller, setCorecomptroller] = useState<any>("");
+  const [coreassets, setCoreassets] = useState<any>([]);
+  const [isolatedassets, setIsolatedassets] = useState<any>([]);
+  const [isolatedcomptrollers, setIsolatedcomptrollers] = useState<any>([]);
+
+  useEffect(() => {
+    async function fetchPools() {
+      const response = await axios.get(
+        "https://api.venus.io/markets/core-pool?limit=60"
+        );
+      setCorepools(response.data.result);
+      const comptroller = await bscClient.readContract({
+        address: response.data.result[0].address,
+        abi: vTokenabi,
+        functionName: "comptroller",
+      });
+      setCorecomptroller(comptroller);
+      if (!comptroller) return;
+      if(!isConnected) return;
+      let coreassets: any[] = await bscClient.readContract({
+        address: comptroller as `0x${string}`,
+        abi: newcomptrollerabi,
+        functionName: "getAssetsIn",
+        args: [address]
+      }) as any[];
+      if (!coreassets) return;
+      if (!Array.isArray(coreassets)) return;
+      const temp = response.data.result.map((p: any) => {
+        if (coreassets.includes(p.address)) {
+          return p
+        }
+      })
+      coreassets = temp.filter((p: any) => p != undefined)
+
+      const core_asset_supply = await bscClient.multicall({
+        contracts: coreassets.map((p: any) => ({
+          address: p.address,
+          abi: vTokenabi as AbiItem[],
+          functionName: "balanceOf",
+          args:[address]
+
+        }))
+      })
+      const core_asset_borrow = await bscClient.multicall({
+        contracts: coreassets.map((p: any) => ({
+          address: p.address,
+          abi: vTokenabi as AbiItem[],
+          functionName: "borrowBalanceStored",
+          args:[address]
+        }))
+      })
+
+      coreassets = coreassets.map((p:any,i:number)=>({
+        ...p,
+        supply:Number(formatUnits(core_asset_supply[i].result as bigint,8))/Number(getExchangeRate(p.exchangeRateMantissa,8,p.underlyingDecimal)),
+        borrow:formatUnits(core_asset_borrow[i].result as bigint,p.underlyingDecimal)
+      }))
+
+
+
+      setCoreassets(coreassets);
+    }
+    async function fetchData() {
+      const res = await fetch("/api/isolatedpools?chain=bsc");
+      const data = await res.json();
+      const pools_json = JSON.parse(data);
+      let isolated_comp:any = []
+      pools_json.forEach((pool:any)=>{
+        if(!isolated_comp.includes(pool.comptroller)){
+          isolated_comp.push({
+            comptroller:pool.comptroller,
+            priceOracle:pool.priceOracle,
+            name:pool.name
+          })
+        }
+      })
+      setIsolatedpools(pools_json);
+      setIsolatedcomptrollers(isolated_comp)
+      let isolatedassets:any = await bscClient.multicall({
+      contracts: isolated_comp.map((p: any) => ({
+        address: p.comptroller,
+        abi: newcomptrollerabi,
+        functionName: "getAssetsIn",
+        args:[address]
+      }))
+      })
+      const iso_asset_supply = await bscClient.multicall({
+        contracts: isolatedassets.map((p: any) => ({
+          address: p.result,
+          abi: vTokenabi as AbiItem[],
+          functionName: "balanceOf",
+          args:[address]
+
+        }))
+      })
+      const iso_asset_borrow = await bscClient.multicall({
+        contracts: isolatedassets.map((p: any) => ({
+          address: p.result,
+          abi: vTokenabi as AbiItem[],
+          functionName: "borrowBalanceStored",
+          args:[address]
+        }))
+      })
+      const iso_asset_symbol = await bscClient.multicall({
+        contracts: isolatedassets.map((p: any) => ({
+          address: p.result,
+          abi: vTokenabi as AbiItem[],
+          functionName: "symbol",
+        }))
+      })
+      const iso_asset_price = await bscClient.multicall({
+        contracts: isolatedassets.map((p: any,i:number) => ({
+          address: "0x6592b5DE802159F3E74B2486b091D11a8256ab8A",
+          abi: oracleabi as AbiItem[],
+          functionName: "getUnderlyingPrice",
+          args:[p.result]
+        }))
+      })
+      isolatedassets= isolatedassets.map((p:any,i:number)=>{
+        if(p.result.length==0) return
+        const all_pools = pools_json.flatMap((pool:any)=>pool.vTokens)
+        const vToken = all_pools.filter((pool:any)=>pool.vToken==p.result)
+          return {
+            name:isolated_comp[i].name,
+            comp:isolated_comp[i].comptroller,  
+            assets:{
+              ...vToken[0],
+              underlyingSymbol:iso_asset_symbol[i].result,
+              price:Number(formatUnits(iso_asset_price[i].result as bigint??"",vToken[0].underlyingDecimal)),
+              supply:Number(formatUnits(iso_asset_supply[i].result as bigint??"",8))/Number(getExchangeRate(vToken[0].exchangeRateMantissa,8,vToken[0].underlyingDecimal)),
+              borrow:formatUnits(iso_asset_borrow[i].result as bigint??"",vToken[0].underlyingDecimal)
+              
+            }
+          }
+      })
+      isolatedassets = isolatedassets.filter((p:any)=>{return p!=undefined})
+      setIsolatedassets(isolatedassets)
+      
+    }
+    setLoading(true);
+    fetchData();
+    fetchPools();
+    setLoading(false);
+  }, []);
+  console.log({isolatedassets})
+
+  // const {data:core_pools_borrows} = useContractReads({
+  //   contracts: coreassets.map((p: any) => ({
+  //     address: p.address,
+  //     abi: vTokenabi,
+  //     functionName: "borrowBalanceStored",
+  //     args:[address as `0x${string}`]
+  //   }))
+  // })
+  // const {data:core_pools_supplies} = useContractReads({
+  //   contracts: coreassets.map((p: any) => ({
+  //     address: p.address,
+  //     abi: vTokenabi,
+  //     functionName: "balanceOf",
+  //     args:[address as `0x${string}`]
+  //   }))
+  // })
+  // const {data:isolated_pools_borrows} = useContractReads({
+  //   contracts: isolatedassets.map((p: any) => ({
+  //     address: p.assets[0],
+  //     abi: vTokenabi,
+  //     functionName: "borrowBalanceStored",
+  //     args:[address as `0x${string}`]
+  //   }))
+  // })
+  // const {data:isolated_pools_supplies} = useContractReads({
+  //   contracts: isolatedassets.map((p: any) => ({
+  //     address: p.assets[0],
+  //     abi: vTokenabi,
+  //     functionName: "balanceOf",
+  //     args:[address as `0x${string}`]
+  //   }))
+  // })
+
+
   return (
     <div className="w-full flex flex-col gap-8 px-10 py-8">
       <div className="flex justify-between">
         <h2 className="text-xl text-white font-bold">Account</h2>
         <ConnectButton />
       </div>
+
       <h2 className="text-xl text-white font-bold">Summary</h2>
       <div className="w-full rounded-xl bg-[#1E2431] flex justify-start gap-10 p-6 font-semibold text-xl">
         <div className="flex flex-col">

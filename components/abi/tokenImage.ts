@@ -140,7 +140,7 @@ export default function getImage(name: string) {
     { name: "Venus UST", link: "https://app.venus.io/assets/ust-9718b760.svg" },
   ];
 
-  const image = coinImages.find((coin) => coin.name === name);
+  const image = coinImages.find((coin) => coin.name == name);
   if (image) {
     return image.link;
   }

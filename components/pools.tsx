@@ -25,7 +25,6 @@ export default function Pools() {
     const sortedPools = [...pools].sort((a: any, b: any) => {
       const aValue = a[sortKey];
       const bValue = b[sortKey];
-
       if (typeof aValue === "number" && typeof bValue === "number")
         return aValue - bValue;
       else if (typeof aValue === "string" && typeof bValue === "string")

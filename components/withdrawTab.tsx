@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Input, Button, Divider } from "@nextui-org/react";
 import { formatUnits, parseUnits } from "viem";
 import { getExchangeRate } from "@/app/utils/formatNumber";
+import getImage from "./abi/tokenImage";
 
 function WithdrawTab({ pool, approve, id, redeem,
   isConnected,underlyingbalance, vtokenbalance, allowance, refetchbalance,accountLiquidity,borrowBalance,isolated
@@ -26,6 +27,7 @@ function WithdrawTab({ pool, approve, id, redeem,
     100 /
     Number(formatUnits(accountLiquidity ? accountLiquidity[1] : "", 18))) *
   100;
+  const imageurl = getImage(("Venus "+pool.underlyingSymbol));
   return (
     <form
       className="flex flex-col gap-3 items-center text-white"
@@ -41,7 +43,7 @@ function WithdrawTab({ pool, approve, id, redeem,
           setAmount(Number(e.target.value));
         }}
         startContent={
-          <Image src={pool.logo} alt="logo" width={20} height={20} />
+          <Image src={pool.logo??imageurl} alt="logo" width={20} height={20} />
         }
         endContent={
           <Button
@@ -87,7 +89,7 @@ function WithdrawTab({ pool, approve, id, redeem,
         <Divider className="my-4" />
         <div className="flex justify-between">
           <div className="flex justify-start gap-1">
-            <Image src={pool.logo} alt="logo" width={20} height={20} />
+            <Image src={pool.logo??imageurl} alt="logo" width={20} height={20} />
             <p className="text-gray-400">Supply APY</p>
           </div>
           <p>{Number(pool.supplyApy)<0.01?"<0.01":Number(pool.supplyApy).toFixed(3)}%</p>
@@ -98,7 +100,7 @@ function WithdrawTab({ pool, approve, id, redeem,
 <>
         <div className="flex justify-between">
           <div className="flex justify-start gap-1">
-            <Image src={pool.logo} alt="logo" width={20} height={20} />
+          <Image src="https://app.venus.io/assets/xvs-e7b82352.svg" alt="logo" width={20} height={20} />
             <p className="text-gray-400">Distribution APY (XVS)</p>
           </div>
           <p>{Number(pool.supplyXvsApy).toFixed(3)}%</p>

@@ -82,10 +82,14 @@ function SupplyModal({
     functionName:"getBorrowingPower",
     args:[address as `0x${string}`]
   })
-  //Vtoken fn
+  console.log(borrowPower);
+  console.log({accountLiquidity});
 
 const {data:underlyingbalance,refetch:underlyingbalancerefresh} = useBalance({ address:address,token: pool.underlyingAssetAddress }  );
 const {data:vtokenbalance,refetch:vtokenbalancerefetch} = useBalance({address:address, token: id as `0x${string}` }  );
+console.log({vtokenbalance});
+console.log(pool);
+console.log({comptroller});
   const { write: mint } = useContractWrite({
     address: id as `0x${string}`,
     abi: vTokenabi,
@@ -172,13 +176,12 @@ const {data:vtokenbalance,refetch:vtokenbalancerefetch} = useBalance({address:ad
       await exitMarket();
     }
   }
-  console.log(allowance);
 
   return (
     <Modal isOpen={isOpen} onClose={onOpenChange}>
       <ModalContent className="items-center bg-[#1E2431]">
         <ModalHeader className="text-center text-white">
-          {pool.name}
+          {pool.underlyingSymbol}
         </ModalHeader>
         <Divider />
         <ModalBody className="w-full items-center">
@@ -202,7 +205,7 @@ const {data:vtokenbalance,refetch:vtokenbalancerefetch} = useBalance({address:ad
                 vtokenbalance={vtokenbalance}
                 underlyingbalance={underlyingbalance}
                 borrowPower={borrowPower}
-                accountLiquidity={accountLiquidity}
+                accountLiquidity={borrowPower.data}
                 borrowBalance={borrowBalance}
                 allowance={allowance}
                 refetchbalance= {refetchbalance}
@@ -221,7 +224,7 @@ const {data:vtokenbalance,refetch:vtokenbalancerefetch} = useBalance({address:ad
                 vtokenbalance={vtokenbalance}
                 underlyingbalance={underlyingbalance}
                 borrowPower={borrowPower}
-                accountLiquidity={accountLiquidity}
+                accountLiquidity={borrowPower.data}
                 borrowBalance={borrowBalance}
                 allowance={allowanceVtoken}
                 refetchbalance= {refetchbalance}
@@ -241,7 +244,7 @@ const {data:vtokenbalance,refetch:vtokenbalancerefetch} = useBalance({address:ad
                 vtokenbalance={vtokenbalance}
                 underlyingbalance={underlyingbalance}
                 borrowPower={borrowPower}
-                accountLiquidity={accountLiquidity}
+                accountLiquidity={borrowPower.data}
                 borrowBalance={borrowBalance}
                 allowance={allowance}
                 refetchbalance= {refetchbalance}
@@ -258,7 +261,7 @@ const {data:vtokenbalance,refetch:vtokenbalancerefetch} = useBalance({address:ad
               vtokenbalance={vtokenbalance}
               underlyingbalance={underlyingbalance}
               borrowPower={borrowPower}
-              accountLiquidity={accountLiquidity}
+              accountLiquidity={borrowPower.data}
               borrowBalance={borrowBalance}
               allowance={allowance}
               refetchbalance= {refetchbalance}

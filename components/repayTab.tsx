@@ -42,13 +42,15 @@ const handleApprove = async (e: any) => {
     });
   };
   
-  
+  const imageurl = getImage(("Venus "+pool.underlyingSymbol));
+
   const progress =
     ((Number(formatUnits(borrowBalance ?? "", pool.underlyingDecimal)) *
       Number(pool.tokenPriceCents)) /
       100 /
       Number(formatUnits(accountLiquidity ? accountLiquidity[1] : "", 18))) *
     100;
+
   return (
     <form
       className="flex flex-col gap-3 items-center text-white"
@@ -67,7 +69,7 @@ const handleApprove = async (e: any) => {
           setAmount(Number(e.target.value));
         }}
         startContent={
-          <Image src={pool.logo} alt="logo" width={20} height={20} />
+          <Image src={pool.logo??imageurl} alt="logo" width={20} height={20} />
         }
         endContent={
           <div className="flex gap-2">
@@ -178,7 +180,7 @@ const handleApprove = async (e: any) => {
         <Divider className="my-4 bg-gray-600" />
         <div className="flex justify-between">
           <div className="flex justify-start gap-1">
-            <Image src={pool.logo} alt="logo" width={20} height={20} />
+            <Image src={pool.logo??imageurl} alt="logo" width={20} height={20} />
             <p className="text-gray-400">Supply APY</p>
           </div>
 
@@ -190,7 +192,7 @@ const handleApprove = async (e: any) => {
 <>
         <div className="flex justify-between">
           <div className="flex justify-start gap-1">
-            <Image src={pool.logo} alt="logo" width={20} height={20} />
+          <Image src="https://app.venus.io/assets/xvs-e7b82352.svg" alt="logo" width={20} height={20} />
             <p className="text-gray-400">Distribution APY (XVS)</p>
           </div>
           <p>{Number(pool.supplyXvsApy).toFixed(3)}%</p>
@@ -275,6 +277,18 @@ const handleApprove = async (e: any) => {
             {Number(
               formatUnits(accountLiquidity ? accountLiquidity[1] : "", 18)
             ).toFixed(3)}
+          </p>
+        </div>
+        <div className="flex justify-between">
+          <p className="text-gray-400">Borrow limit used</p>
+          <p>
+            {amount==0? (Number(formatUnits(borrowBalance??"",pool.underlyingDecimal))*100/Number(
+              formatUnits(accountLiquidity ? accountLiquidity[1] : "", pool.underlyingDecimal)
+            )).toFixed(3):(
+              (Number(formatUnits(borrowBalance??"",pool.underlyingDecimal))+amount*100)/Number(
+                formatUnits(accountLiquidity ? accountLiquidity[1] : "", pool.underlyingDecimal)
+              )
+            ).toFixed(3)}%
           </p>
         </div>
         {/* <div className="flex justify-between">
