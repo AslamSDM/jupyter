@@ -42,6 +42,11 @@ const PoolComponent = () => {
     borrow:0
   });
   useEffect(() => {
+
+  }, [section]);
+  // console.log({pool});
+
+  useEffect(() => {
     async function fetchData() {
       setLoading(true);
       const res = await fetch("/api/isolatedpools?chain=bsc");
@@ -76,10 +81,10 @@ const PoolComponent = () => {
     //   functionName:"borrowRatePerBlock",
     // })
     // console.log(borrowrate);
-    console.log(vToken[0].borrowRatePerBlock,vToken[0].underlyingDecimals);
+    // console.log(vToken[0].borrowRatePerBlock,vToken[0].underlyingDecimals);
     vToken[0]["tokenPriceCents"] = formatUnits(price as bigint??"", vToken[0].underlyingDecimals);
     vToken[0]["underlyingSymbol"] = usymbol;
-    vToken[0]["underlyingDecimal"] = vToken[0].underlyingDecimals;
+    vToken[0]["underlyingDecimal"] = Number(vToken[0].underlyingDecimals);
     vToken[0]["underlyingAddress"] = vToken[0].underlyingAssetAddress;
     vToken[0]["exchangeRateMantissa"] = vToken[0].exchangeRateCurrent;
     vToken[0]["borrowApy"] = getRate(vToken[0].borrowRatePerBlock as string??"",Number(vToken[0].underlyingDecimals));
@@ -88,15 +93,7 @@ const PoolComponent = () => {
       setPool(vToken[0]);
       setLoading(false);
     }
-    fetchData();
-  }, [section]);
-  console.log({pool});
-  console.log({comptroller});
-
-  useEffect(() => {
-  
     async function fetchhistory() {
-      setLoading(true);
       const response = await axios.get("https://api.venus.io/markets/history", {
         params: {
           asset: id,
@@ -135,9 +132,12 @@ const PoolComponent = () => {
       setSupplyHistory(supplyChartData);
       setBorrowHistory(borrowChartData);
       setLineChartData(lineChartData);
-      setLoading(false);
     }
+    setLoading(true);
     fetchhistory();
+    fetchData();
+    setLoading(false);
+
   }, [id,pool,comptroller]);
   const poolInfo = [
     { label: "Token Price", data: formatNumber(pool.tokenPriceCents) },
@@ -208,11 +208,7 @@ const PoolComponent = () => {
         pool.underlyingSymbol,
     },
   ];
-  console.log(  getExchangeRate(
-    pool.exchangeRateCurrent ?? "",
-    8,
-    pool.underlyingDecimals
-  ));
+
   if (loading) {
     return (
       <>
@@ -227,8 +223,11 @@ const PoolComponent = () => {
   return (
     <div className="w-full py-8 px-10">
       <div className="flex justify-between mb-4">
-        <Chip>{pool.name}</Chip>
-        <ConnectButton />
+      <h2 className="text-xl text-gray-400 font-bold">
+          Isolated pools /{section}/ <span className="text-white">{pool. underlyingSymbol
+}</span>
+        </h2>
+                <ConnectButton />
       </div>
       <div className="flex flex-row justify-between">
       <div className="w-2/3 space-y-8">

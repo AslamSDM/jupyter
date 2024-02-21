@@ -17,7 +17,6 @@ function Borrowtab({   pool,
   isConnected,
   refetchbalance, borrow,isolated }: any) {
   const [amount, setAmount] = useState(0);
-console.log(pool.underlyingSymbol);
   const handleborrowsubmit = async (e: any) => {
     e.preventDefault();
     if (pool.underlyingSymbol === "BNB") {
@@ -30,12 +29,14 @@ console.log(pool.underlyingSymbol);
       });
     }
   };
+  const imageurl = getImage(("Venus "+pool.underlyingSymbol));
   const progress =
-    ((Number(formatUnits(borrowBalance ?? "", pool.underlyingDecimal)) *
-      Number(pool.tokenPriceCents)) /
-      100 /
-      Number(formatUnits(accountLiquidity ? accountLiquidity[1] : "", 18))) *
-    100;
+  ((Number(formatUnits(borrowBalance ?? "", pool.underlyingDecimal)) *
+  Number(pool.tokenPriceCents)) /
+  100 /
+  Number(formatUnits(accountLiquidity ? accountLiquidity[1] : "", 18))) *
+  100;
+  console.log(Number(formatUnits(borrowBalance??"",pool.underlyingDecimal))*100);
   return (
     <form
       className="flex flex-col gap-3 items-center text-white"
@@ -50,7 +51,7 @@ console.log(pool.underlyingSymbol);
         }}
         value={String(amount)}
         startContent={
-          <Image src={pool.logo} alt="logo" width={20} height={20} />
+          <Image src={pool.logo??imageurl} alt="logo" width={20} height={20} />
         }
         endContent={
           <Button
@@ -70,17 +71,22 @@ console.log(pool.underlyingSymbol);
       <div className="flex flex-col w-full gap-2">
         <div className="flex justify-between">
           <p className="text-gray-400">Borrowable Amount</p>
-          <p> {(
+          <p> {isolated?((
             Number(
-              formatUnits(accountLiquidity ? accountLiquidity[1] : "", 18)
+              formatUnits(accountLiquidity ? accountLiquidity[1] : "", pool.underlyingDecimal)
+            )
+            / Number(pool.tokenPriceCents)
+          ).toFixed(6)):((
+            Number(
+              formatUnits(accountLiquidity ? accountLiquidity[1] : "", pool.underlyingDecimal)
             )
             *100/ Number(pool.tokenPriceCents)
-          ).toFixed(6) +" "+pool.underlyingSymbol}</p>
+          ).toFixed(6)) +" "+pool.underlyingSymbol}</p>
         </div>
         <Divider className="my-4 bg-gray-600" />
         <div className="flex justify-between">
           <div className="flex justify-start gap-1">
-            <Image src={pool.logo??getImage("Venus "+pool.underlyingSymbol)} alt="logo" width={20} height={20} />
+          <Image src={pool.logo??imageurl} alt="logo" width={20} height={20} />
             <p className="text-gray-400">Supply APY</p>
           </div>
           <p>{Number(pool.supplyApy)<0.01?"<0.01":Number(pool.supplyApy).toFixed(3)}%</p>
@@ -91,7 +97,7 @@ console.log(pool.underlyingSymbol);
 <>
         <div className="flex justify-between">
           <div className="flex justify-start gap-1">
-            <Image src={getImage("Venus XVS")} alt="logo" width={20} height={20} />
+            <Image src="https://app.venus.io/assets/xvs-e7b82352.svg" alt="logo" width={20} height={20} />
             <p className="text-gray-400">Distribution APY (XVS)</p>
           </div>
           <p>{Number(pool.supplyXvsApy).toFixed(3)}%</p>
@@ -99,7 +105,7 @@ console.log(pool.underlyingSymbol);
         <div className="flex justify-between">
           <p className="text-gray-400">Total APY</p>
           <p>
-            {(Number(pool.supplyXvsApy) + Number(pool.supplyApy)).toFixed(3)}%
+            {(-Number(pool.supplyXvsApy) + Number(pool.supplyApy)).toFixed(3)}%
           </p>
         </div>
 </>
@@ -126,35 +132,21 @@ console.log(pool.underlyingSymbol);
           ></div>
         </div>
         <div className="flex justify-between">
-        <p className="text-gray-400">{`Supply Balance (${
+        <p className="text-gray-400">{`Borrow Balance (${
              pool.underlyingSymbol
           })`}</p>
 
           {vtokenbalance!=undefined?(amount === 0 ? (
             <p>
               {(
-                Number(vtokenbalance?.formatted) /
-                Number(
-                  getExchangeRate(
-                    pool.exchangeRateMantissa,
-                    8,
-                    pool.underlyingDecimal
-                  )
-                )
+                Number(formatUnits(borrowBalance??"",pool.underlyingDecimal))
               ).toFixed(6)}
             </p>
           ) : (
             <>
               <p>
                 {(
-                  Number(vtokenbalance?.formatted) /
-                    Number(
-                      getExchangeRate(
-                        pool.exchangeRateMantissa,
-                        8,
-                        pool.underlyingDecimal
-                      )
-                    ) -
+                  Number(formatUnits(borrowBalance??"",pool.underlyingDecimal)) +
                   Number(amount)
                 ).toFixed(6)}
               </p>
@@ -169,6 +161,18 @@ console.log(pool.underlyingSymbol);
             ).toFixed(3)}
           </p>
         </div>
+        <div className="flex justify-between">
+          <p className="text-gray-400">Borrow limit used</p>
+          <p>
+            {amount==0? (Number(formatUnits(borrowBalance??"",pool.underlyingDecimal))*100/Number(
+              formatUnits(accountLiquidity ? accountLiquidity[1] : "", pool.underlyingDecimal)
+            )).toFixed(3):(
+              (Number(formatUnits(borrowBalance??"",pool.underlyingDecimal))+amount*100)/Number(
+                formatUnits(accountLiquidity ? accountLiquidity[1] : "", pool.underlyingDecimal)
+              )
+            ).toFixed(3)}%
+          </p>
+        </div>
 
         {/* <div className="flex justify-between">
           <p className="text-gray-400">Daily earnings</p>
@@ -178,8 +182,8 @@ console.log(pool.underlyingSymbol);
       {
         isConnected ? (
           (Number(
-            formatUnits(accountLiquidity ? accountLiquidity[1] : "", 18)
-          ) < Number(parseUnits(String(amount), pool.underlyingDecimal))) ?(
+            formatUnits(accountLiquidity ? accountLiquidity[1] : "", pool.underlyingDecimal)
+          ) < Number(((amount)))) ?(
             <Button
               variant="bordered"
               color="primary"
