@@ -2,8 +2,12 @@ import React, { useCallback } from "react";
 import { Chip, Progress, Switch } from "@nextui-org/react";
 import Image from "next/image";
 import getImage from "@/components/abi/tokenImage";
+import { useAccount, useContractRead } from "wagmi";
+import { newcomptrollerabi } from "./abi/comptrollerabi";
+import { formatUnits } from "viem";
 
-function BorrowedAssetsTable({assets,borrolimit}:any) {
+function BorrowedAssetsTable({assets,isolated,corecomptroller}:any) {
+  const {address} = useAccount()
   const fields = [
     {
       key: "asset",
@@ -16,13 +20,25 @@ function BorrowedAssetsTable({assets,borrolimit}:any) {
     { key: "balance", label: "Balance" },
     { key: "percentageLimit", label: "% of limit" },
   ];
-
-  const progress = 50;
-
+  const {data:accountLiquidity} = useContractRead({
+    address: !isolated? corecomptroller: assets.comptroller as `0x${string}`,
+    abi:newcomptrollerabi,
+    functionName:"getAccountLiquidity",
+    args:[address as `0x${string}`]
+  })
+  const borrowPower = useContractRead({
+    address: !isolated? corecomptroller: assets.comptroller as `0x${string}`,
+    abi:newcomptrollerabi,
+    functionName:"getBorrowingPower",
+    args:[address as `0x${string}`]
+  })
   const renderCell = useCallback((columnKey: any, value: any) => {
 
     if(!value) return null;
     const imageurl = getImage(value?.name??"");
+    if(isolated){
+      value["tokenPriceCents"]= value.price*100
+    }
     switch (columnKey) {
       case "asset":
         return (
@@ -46,7 +62,6 @@ function BorrowedAssetsTable({assets,borrolimit}:any) {
           </div>
         );
       case "balance":
-        console.log(value?.supply)
         return (
           <div className=" flex flex-col gap-0.5 justify-end text-white">
             <h2 className="flex justify-end">{(value?.supply ).toFixed(5)} {value?.underlyingSymbol}</h2>
@@ -54,17 +69,33 @@ function BorrowedAssetsTable({assets,borrolimit}:any) {
           </div>
         );
       case "percentageLimit":
-        return (
-          <div className="w-full flex flex-col gap-0.5 justify-end items-end pl-6">
-            <h2>{borrolimit??0}%</h2>
+        if(isolated){
+          if(!borrowPower.data || !Array.isArray(borrowPower.data)) return null;
+          return (
+            <div className="w-full flex flex-col gap-0.5 justify-end items-end pl-6">
+            <h2>{(value?.borrow* Number(value?.price))/Number(formatUnits(borrowPower.data[1] as bigint,18))}%</h2>
             <div className="relative w-full bg-gray-200 rounded-full h-1.5">
               <div
                 className="h-1.5 bg-green-600 absolute rounded-full"
-                style={{ width: `${borrolimit??0}%` }}
+                style={{ width: `${(value?.borrow* Number(value?.price))/Number(isolated?formatUnits(borrowPower.data[1] as bigint??"",18)??"":(accountLiquidity??""))}%` }}
+                ></div>
+            </div>
+          </div>
+        );
+      }else{
+        if(!accountLiquidity|| !Array.isArray(accountLiquidity)) return null;
+        return (
+          <div className="w-full flex flex-col gap-0.5 justify-end items-end pl-6">
+            <h2>{((value?.borrow* Number(value?.tokenPriceCents) )/Number(formatUnits(accountLiquidity[1] as bigint,18))).toFixed(2)}%</h2>
+            <div className="relative w-full bg-gray-200 rounded-full h-1.5">
+              <div
+                className="h-1.5 bg-green-600 absolute rounded-full"
+                style={{ width: `${((value?.borrow* Number(value?.tokenPriceCents) )/Number(formatUnits(accountLiquidity[1] as bigint,18))).toFixed(0)}%` }}
               ></div>
             </div>
           </div>
         );
+        }
 
       default:
         return null;
@@ -120,14 +151,18 @@ function BorrowedAssetsTable({assets,borrolimit}:any) {
         </thead>
         <tbody className="text-white">
           {assets.map((asset:any) => (
-          <tr>
-      
+            asset.borrow>0?(
+
+              <tr>
+            
               {fields.map((field) => (
                 <td key={field.key}>
                   {renderCell(field.key, asset)}
                 </td>
               ))}
           </tr>
+              ):
+              null
             )
             )}
         </tbody>

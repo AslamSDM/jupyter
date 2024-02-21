@@ -136,7 +136,6 @@ function Page() {
         })),
       });
 
-      console.log({ iso_asset_borrow });
 
       const iso_asset_symbol = await bscClient.multicall({
         contracts: isolatedassets.map((p: any, i: number) => {
@@ -162,12 +161,10 @@ function Page() {
           args: [p.result[0] ?? ""],
         })),
       });
-      console.log({ iso_asset_symbol });
       isolatedassets = isolatedassets.map((p: any, i: number) => {
         if (p.result.length == 0) return;
         const all_pools = pools_json.flatMap((pool: any) => pool.vTokens);
         const vToken = all_pools.filter((pool: any) => pool.vToken == p.result);
-        console.log(vToken);
         return {
           name: isolated_comp[i].name,
           comp: isolated_comp[i].comptroller,
@@ -216,7 +213,6 @@ function Page() {
     fetchPools();
     setLoading(false);
   }, []);
-  console.log(isolatedassets);
   const core_supply_total = coreassets.reduce(
     (acc: any, cur: any) =>
       acc + (cur.supply * Number(cur.tokenPriceCents)) / 100,
@@ -272,18 +268,8 @@ function Page() {
   const net_apy =
     ((total_supply_interest - total_borrow_interest) * 100) / total_supplied;
 
-    const {data:accountLiquidity} = useContractRead({
-      address:  corecomptroller as `0x${string}`,
-      abi:newcomptrollerabi,
-      functionName:"getAccountLiquidity",
-      args:[address as `0x${string}`]
-    })
-    const borrowPower = useContractRead({
-      address:  "" as `0x${string}`,
-      abi:newcomptrollerabi,
-      functionName:"getBorrowingPower",
-      args:[address as `0x${string}`]
-    })
+console.log({isolatedassets})
+
   return (
     <>
     <div className="w-full flex flex-col gap-8 px-10 py-8">
@@ -344,10 +330,13 @@ function Page() {
           </div>
         </div>
         <Tabs variant="bordered">
+ 
+
           {
             coreassets.length > 0 && (
               
           <Tab key="core-pool" title="Venus Core Pool">
+            <div className="space-y-4">
             <h2 className="text-xl text-white font-bold">Summary</h2>
             <div className="w-full rounded-xl bg-[#1E2431] flex justify-between p-6 font-semibold text-xl">
               <div className="flex justify-start gap-10">
@@ -392,9 +381,11 @@ function Page() {
               </div>
             </div>
             <div className="flex justify-between items-start w-full">
-              <SuppliedAssetsTable className="w-1/2" assets={coreassets} />
-              <BorrowedAssetsTable className="w-1/2" assets={coreassets} />
+              <SuppliedAssetsTable className="w-1/2" assets={coreassets} isolated={false} corecomptroller={corecomptroller} />
+              <BorrowedAssetsTable className="w-1/2" assets={coreassets} isolated={false} corecomptroller={corecomptroller} />
             </div>
+            </div>
+
           </Tab>
             )
           
@@ -403,7 +394,6 @@ function Page() {
               isolatedassets.length > 0 && 
               isolatedassets.map((pool:any,i:number)=>{
                 <Tab key={i} title={pool.name}>
-
                 <h2 className="text-xl text-white font-bold">Summary</h2>
                 <div className="w-full rounded-xl bg-[#1E2431] flex justify-between p-6 font-semibold text-xl">
                   <div className="flex justify-start gap-10">
@@ -453,9 +443,6 @@ function Page() {
                 </div>
               </Tab>
               })
-              
-             
-                
           }
         </Tabs>
       </div>

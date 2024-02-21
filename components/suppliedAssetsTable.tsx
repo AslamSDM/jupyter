@@ -2,8 +2,11 @@ import React, { useCallback } from "react";
 import { Chip, Switch } from "@nextui-org/react";
 import Image from "next/image";
 import getImage from "@/components/abi/tokenImage";
+import { useAccount, useContractWrite } from "wagmi";
+import { newcomptrollerabi } from "./abi/comptrollerabi";
 
-function SuppliedAssetsTable({assets}:any) {
+function SuppliedAssetsTable({assets,isolated,corecomptroller}:any) {
+  const {address} = useAccount()
   const suppliedTableFields = [
     {
       key: "asset",
@@ -29,11 +32,16 @@ function SuppliedAssetsTable({assets}:any) {
     { key: "collateral", label: "Collateral" },
   ];
 
+  const { write: exitMarket } = useContractWrite({
+    address: !isolated? corecomptroller: assets.comptroller as `0x${string}`,
+    abi: newcomptrollerabi,
+    functionName: "exitMarket",
+  });
+
+
   const renderCell = useCallback((columnKey: any, value: any) => {
-    console.log({value, columnKey})
     if(!value) return null;
     const imageurl = getImage(value?.name??"");
-    console.log(value.supply)
     switch (columnKey) {
       case "asset":
         return (
@@ -57,7 +65,6 @@ function SuppliedAssetsTable({assets}:any) {
           </div>
         );
       case "balance":
-        console.log(value?.supply)
         return (
           <div className=" flex flex-col gap-0.5 justify-end text-white">
             <h2 className="flex justify-end">{(value?.supply ).toFixed(5)} {value?.underlyingSymbol}</h2>
@@ -67,7 +74,9 @@ function SuppliedAssetsTable({assets}:any) {
       case "collateral":
         return (
           <div className="flex flex-col justify-end relative">
-            <Switch className="absolute right-0" size="sm" />
+            <Switch isSelected onClick={()=>exitMarket({
+              args:[value?.address]
+            })} className="absolute right-0" size="sm" />
           </div>
         );
 
@@ -113,7 +122,7 @@ function SuppliedAssetsTable({assets}:any) {
 
   if (!assets) return null;
   return (
-    <div className="w-[48%] bg-[#1E2431] rounded-xl p-6 space-y-4">
+    <div className="w-[49%] bg-[#1E2431] rounded-xl p-6 space-y-4">
       <h2 className="text-xl text-white font-bold">Supplied Assets</h2>
       <table className="w-full text-md">
         <thead className="text-[#AAB3CA] text-md text-end">
