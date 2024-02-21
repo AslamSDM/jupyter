@@ -49,13 +49,13 @@ function BorrowedAssetsTable({assets,borrolimit}:any) {
         console.log(value?.supply)
         return (
           <div className=" flex flex-col gap-0.5 justify-end text-white">
-            <h2>{(value?.supply ).toFixed(5)} {value?.underlyingSymbol}</h2>
-            <h2 className="text-[#AAB3CA]">$ {(value?.borrow* Number(value?.tokenPriceCents) / 100).toFixed(2)}</h2>
+            <h2 className="flex justify-end">{(value?.supply ).toFixed(5)} {value?.underlyingSymbol}</h2>
+            <h2 className="flex justify-end text-[#AAB3CA]">$ {(value?.borrow* Number(value?.tokenPriceCents) / 100).toFixed(2)}</h2>
           </div>
         );
       case "percentageLimit":
         return (
-          <div className="w-full flex flex-col gap-0.5 items-end pl-6">
+          <div className="w-full flex flex-col gap-0.5 justify-end items-end pl-6">
             <h2>{borrolimit??0}%</h2>
             <div className="relative w-full bg-gray-200 rounded-full h-1.5">
               <div
@@ -88,10 +88,15 @@ function BorrowedAssetsTable({assets,borrolimit}:any) {
           </div>
         );
       case "balance":
-        return <p className="">Balance</p>;
+        return (
+          
+          <div className="flex justify-end">
+          <p className="">Balance</p>
+          </div>
+            )
       case "percentageLimit":
         return (
-          <div className=" flex flex-col justify-end">
+          <div className=" flex justify-end">
             <p className="">% of limit</p>
           </div>
         );
@@ -101,7 +106,7 @@ function BorrowedAssetsTable({assets,borrolimit}:any) {
     }
   }, []);
   return (
-    <div className="w-[45%] bg-[#1E2431] rounded-xl p-6 space-y-2">
+    <div className="w-[48%] bg-[#1E2431] rounded-xl p-6 space-y-2">
       <h2 className="text-xl text-white font-bold">Borrowed Assets</h2>
       <table className="w-full text-md">
         <thead className="text-[#AAB3CA] text-md text-end">
@@ -114,7 +119,6 @@ function BorrowedAssetsTable({assets,borrolimit}:any) {
           </tr>
         </thead>
         <tbody className="text-white">
-          <tr>
           {assets.map((asset:any) => (
           <tr>
       
@@ -126,7 +130,6 @@ function BorrowedAssetsTable({assets,borrolimit}:any) {
           </tr>
             )
             )}
-          </tr>
         </tbody>
       </table>
     </div>
