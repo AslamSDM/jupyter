@@ -271,41 +271,19 @@ function Page() {
     isolated_supply_total;
   const net_apy =
     ((total_supply_interest - total_borrow_interest) * 100) / total_supplied;
-  console.log({ core_net_apy, iso_net_apy, net_apy });
 
-  // const {data:core_pools_borrows} = useContractReads({
-  //   contracts: coreassets.map((p: any) => ({
-  //     address: p.address,
-  //     abi: vTokenabi,
-  //     functionName: "borrowBalanceStored",
-  //     args:[address as `0x${string}`]
-  //   }))
-  // })
-  // const {data:core_pools_supplies} = useContractReads({
-  //   contracts: coreassets.map((p: any) => ({
-  //     address: p.address,
-  //     abi: vTokenabi,
-  //     functionName: "balanceOf",
-  //     args:[address as `0x${string}`]
-  //   }))
-  // })
-  // const {data:isolated_pools_borrows} = useContractReads({
-  //   contracts: isolatedassets.map((p: any) => ({
-  //     address: p.assets[0],
-  //     abi: vTokenabi,
-  //     functionName: "borrowBalanceStored",
-  //     args:[address as `0x${string}`]
-  //   }))
-  // })
-  // const {data:isolated_pools_supplies} = useContractReads({
-  //   contracts: isolatedassets.map((p: any) => ({
-  //     address: p.assets[0],
-  //     abi: vTokenabi,
-  //     functionName: "balanceOf",
-  //     args:[address as `0x${string}`]
-  //   }))
-  // })
-
+    const {data:accountLiquidity} = useContractRead({
+      address:  corecomptroller as `0x${string}`,
+      abi:newcomptrollerabi,
+      functionName:"getAccountLiquidity",
+      args:[address as `0x${string}`]
+    })
+    const borrowPower = useContractRead({
+      address:  "" as `0x${string}`,
+      abi:newcomptrollerabi,
+      functionName:"getBorrowingPower",
+      args:[address as `0x${string}`]
+    })
   return (
     <>
     <div className="w-full flex flex-col gap-8 px-10 py-8">
