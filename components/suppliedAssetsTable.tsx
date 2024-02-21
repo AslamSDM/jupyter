@@ -30,6 +30,7 @@ function SuppliedAssetsTable({assets}:any) {
   ];
 
   const renderCell = useCallback((columnKey: any, value: any) => {
+    console.log({value, columnKey})
     if(!value) return null;
     const imageurl = getImage(value?.name??"");
     console.log(value.supply)
@@ -121,13 +122,17 @@ console.log(assets)
           </tr>
         </thead>
         <tbody className="text-white">
+            {assets.map((asset:any) => (
           <tr>
-            {suppliedTableFields.map((field,i:number) => (
-              <td key={field.key} className="text-end py-2">
-                {renderCell(field.key, assets[i])}
-              </td>
-            ))}
+      
+              {suppliedTable.map((field) => (
+                <td key={field.key}>
+                  {renderCell(field.key, asset)}
+                </td>
+              ))}
           </tr>
+            )
+            )}
         </tbody>
       </table>
     </div>
