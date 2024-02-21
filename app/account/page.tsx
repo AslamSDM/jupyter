@@ -1,7 +1,10 @@
 "use client"
 import React, { useEffect, useState } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { Button, Chip, Link } from "@nextui-org/react";
+import { Button, Link, Tabs, Tab } from "@nextui-org/react";
+import SuppliedAssetsTable from "@/components/suppliedAssetsTable";
+import BorrowedAssetsTable from "@/components/borrowedAssetsTable";
+
 import { useAccount, useContractRead, useContractReads} from "wagmi"
 import axios from "axios";
 import { vTokenabi } from "@/components/abi/vTokenabi";
@@ -267,15 +270,35 @@ function Page() {
       </div>
       <div className="flex flex-col gap-4 items-start">
         <h2 className="text-xl text-white font-bold">Pools</h2>
-        <Button
-          href="/core-pool"
-          as={Link}
-          color="primary"
-          radius="full"
-          size="sm"
-        >
-          Venus Core Pool
-        </Button>
+        {/* <Tabs variant="light">
+          <Tab key="core-pool" title="Venus Core Pool" />
+          {/* <h2>Hello</h2>
+          </Tab> */}
+        {/* <Tab key="gameFi" title="GameFi">
+            <h2>HI</h2>
+          </Tab> */}
+        {/* </Tabs> */}
+        <div className="flex gap-4">
+          <Button
+            href="/core-pool"
+            as={Link}
+            color="primary"
+            radius="full"
+            size="sm"
+          >
+            Venus Core Pool
+          </Button>
+          <Button
+            href="/core-pool"
+            as={Link}
+            color="warning"
+            radius="full"
+            size="sm"
+            className="text-white"
+          >
+            GameFi
+          </Button>
+        </div>
       </div>
       <h2 className="text-xl text-white font-bold">Summary</h2>
       <div className="w-full rounded-xl bg-[#1E2431] flex justify-between p-6 font-semibold text-xl">
@@ -319,6 +342,10 @@ function Page() {
             Your safe limit: <span className="text-white">0%</span>
           </p>
         </div>
+      </div>
+      <div className="flex justify-between items-start w-full">
+        <SuppliedAssetsTable />
+        <BorrowedAssetsTable />
       </div>
     </div>
   );
