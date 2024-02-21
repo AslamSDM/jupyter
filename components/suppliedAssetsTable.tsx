@@ -60,8 +60,8 @@ function SuppliedAssetsTable({assets}:any) {
         console.log(value?.supply)
         return (
           <div className=" flex flex-col gap-0.5 justify-end text-white">
-            <h2>{value?.supply } {value?.underlyingSymbol}</h2>
-            <h2 className="text-[#AAB3CA]">$ {value?.supply* Number(value?.tokenPriceCents) / 100}</h2>
+            <h2>{(value?.supply ).toFixed(5)} {value?.underlyingSymbol}</h2>
+            <h2 className="text-[#AAB3CA]">$ {(value?.supply* Number(value?.tokenPriceCents) / 100).toFixed(2)}</h2>
           </div>
         );
       case "collateral":
