@@ -2,75 +2,217 @@
 import { useParams } from "next/navigation";
 import useHistory from "@/hooks/useHistory";
 import { MoonLoader } from "react-spinners";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, use } from "react";
 import axios from "axios";
 import { Card, CardBody, CardHeader } from "@nextui-org/card";
 import { Chip, Divider, useDisclosure } from "@nextui-org/react";
 import AreaChartComponent from "@/components/charts/Areachart";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import SupplyModal from "@/components/supplyModal";
+import SupplyModal from "@/components/isolatedsupplyModal";
+import { formatNumber, getExchangeRate, getRate } from "@/app/utils/formatNumber";
+import { formatUnits } from "viem";
+import { bsc } from "viem/chains";
+import { createPublicClient, http } from "viem";
+import { oracleabi } from "@/components/abi/oracleabi";
+import { vTokenabi } from "@/components/abi/vTokenabi";
+
+const bscClient = createPublicClient({
+    chain: bsc,
+    transport: http()
+  })
 
 const PoolComponent = () => {
-  const { id } = useParams();
-  const [pool, setpool] = useState<any>([]);
+  const { section,id } = useParams();
+  const [pool, setPool] = useState<any>([]);
+  const [comptroller, setComptroller] = useState<any>([]);
+  const [supplyHistory, setSupplyHistory] = useState<any>([]);
+  const [borrowHistory, setBorrowHistory] = useState<any>([]);
+  const [lineChartData, setLineChartData] = useState<any>([]);
+  const [loading, setLoading] = useState(false);
+
   const [selectedTab, setSelectedTab] = useState<any>("supply");
-  const { history, loading } = useHistory(id.toString());
+  // const { history, loading } = useHistory(id.toString());
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+ const [priceData, setPriceData] = useState({
+    "0x0": { price: 1, decimal: 18 },
+  });
+  const [totalSupply, setTotalSupply] = useState({
+    supply:0,
+    borrow:0
+  });
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      const res = await fetch("/api/isolatedpools?chain=bsc");
+      const data = await res.json();
+      const pools_json = JSON.parse(data);
+      const pool_ = pools_json.filter((pool: any) => pool.name === section);
+      const vTokens = pool_.flatMap((p: any) => p.vTokens);
+      const vToken = vTokens.filter((vToken: any) => vToken.vToken == id);
+      const price =  await bscClient.readContract({
+        address: pool_[0].priceOracle,
+        abi: oracleabi,
+        functionName: "getUnderlyingPrice",
+        args: [vToken[0].vToken],
+    })
+    const VtokenContract = {
+      address:vToken[0].vToken,
+      abi:vTokenabi
+    }
+    const usymbol = await bscClient.readContract({
+      address:vToken[0].underlyingAssetAddress,
+      abi:vTokenabi,
+      functionName:"symbol"
+    })
+    // const supplyrate = await bscClient.readContract({
+    //   address:vToken[0].vToken,
+    //   abi:vTokenabi,
+    //   functionName:"supplyRatePerBlock",
+    // })
+    // const borrowrate = await bscClient.readContract({
+    //   address:vToken[0].vToken,
+    //   abi:vTokenabi,
+    //   functionName:"borrowRatePerBlock",
+    // })
+    // console.log(borrowrate);
+    console.log(vToken[0].borrowRatePerBlock,vToken[0].underlyingDecimals);
+    vToken[0]["tokenPriceCents"] = formatUnits(price as bigint??"", vToken[0].underlyingDecimals);
+    vToken[0]["underlyingSymbol"] = usymbol;
+    vToken[0]["underlyingDecimal"] = vToken[0].underlyingDecimals;
+    vToken[0]["underlyingAddress"] = vToken[0].underlyingAssetAddress;
+    vToken[0]["exchangeRateMantissa"] = vToken[0].exchangeRateCurrent;
+    vToken[0]["borrowApy"] = getRate(vToken[0].borrowRatePerBlock as string??"",Number(vToken[0].underlyingDecimals));
+    vToken[0]["supplyApy"] = getRate(vToken[0].supplyRatePerBlock as string??"",Number(vToken[0].underlyingDecimals));
+      setComptroller(pool_[0]);
+      setPool(vToken[0]);
+      setLoading(false);
+    }
+    fetchData();
+  }, [section]);
+  console.log({pool});
+  console.log({comptroller});
 
+  useEffect(() => {
+  
+    async function fetchhistory() {
+      setLoading(true);
+      const response = await axios.get("https://api.venus.io/markets/history", {
+        params: {
+          asset: id,
+        },
+      });
+      const { data } = response.data.result;
+      let supplyChartData: any = [];
+      let borrowChartData: any = [];
+      let lineChartData: any = [];
+      const data_len = data.length;
+      data.forEach((item: any,index:number) => {
+        const date = new Date(item.blockTimestamp * 1000).toLocaleDateString(
+          "en-GB"
+        );
+        const supplyApy = item.supplyApy;
+        const totalSupply = formatNumber(item.totalSupplyCents);
+        const borrowApy = item.borrowApy;
+        const totalBorrow = formatNumber(item.totalBorrowCents);
+        lineChartData.push({
+          supplyApy: supplyApy,
+          borrowApy: borrowApy,
+          utilizationRate: (index/360)*100,
+          
+        });
+        supplyChartData.push({
+          date: date,
+          supplyApy: supplyApy,
+          totalSupply: totalSupply,
+        });
+        borrowChartData.push({
+          date: date,
+          borrowApy: borrowApy,
+          totalBorrow: totalBorrow,
+        });
+      });
+      setSupplyHistory(supplyChartData);
+      setBorrowHistory(borrowChartData);
+      setLineChartData(lineChartData);
+      setLoading(false);
+    }
+    fetchhistory();
+  }, [id,pool,comptroller]);
   const poolInfo = [
-    { label: "Token Price", data: pool.tokenPriceCents },
-    { label: "APY", data: Number(pool.supplyApy) + Number(pool.supplyXvsApy) },
-    { label: "APR", data: pool.supplyApr },
-    { label: "TVL", data: pool.supplyBalance },
-    { label: "Address", data: pool.address },
-    { label: "Borrow APY", data: pool.borrowApy },
-    { label: "Borrow Caps Mantissa", data: pool.borrowCapsMantissa },
-    { label: "Borrow Rate Per Block", data: pool.borrowRatePerBlock },
-    { label: "Borrow Xvs APR", data: pool.borrowXvsApr },
-    { label: "Borrow Xvs APY", data: pool.borrowXvsApy },
-    { label: "Borrower Count", data: pool.borrowerCount },
+    { label: "Token Price", data: formatNumber(pool.tokenPriceCents) },
+    // {
+    //   label: "Market Liquidity",
+    //   data: formatNumber(Number(totalData.totalLiquidity)?.toString()),
+    // },
+    { label: "Supply APY", data: (pool.supplyApy)?.toFixed(2)<0.01?"<0.01%":(pool.supplyApy)?.toFixed(2)+ "%" },
+    { label: "Borrow APY", data: (pool.borrowApy)?.toFixed(2)<0.01?"<0.01%":(pool.borrowApy)?.toFixed(2)+ "%" },
     {
-      label: "Borrower Daily Xvs Mantissa",
-      data: pool.borrowerDailyXvsMantissa,
+      label: "Supply Cap",
+      data:
+        formatNumber(
+          formatUnits(pool.supplyCaps ?? "", pool.underlyingDecimals - 2)
+        ) +
+        " " +
+        pool.underlyingSymbol,
     },
-    { label: "Cash Mantissa", data: pool.cashMantissa },
     {
-      label: "Collateral Factor Mantissa",
-      data: pool.collateralFactorMantissa,
+      label: "Borrow Cap",
+      data:
+        formatNumber(
+          formatUnits(pool.borrowCaps ?? "", pool.underlyingDecimals - 2)
+        ) +
+        " " +
+        pool.underlyingSymbol,
     },
-    { label: "Exchange Rate Mantissa", data: pool.exchangeRateMantissa },
+    // {
+    //   label: "Daily supplying interests",
+    //   data: "pool",
+    // },
+    // { label: "Daily borrowing interests", data: Number(getDailyRate(pool.borrowRatePerBlock,pool.underlyingDecimal))*pool.totalsupplyusd },
+    // { label: "Daily XVS distributed", data: "pool" },
     {
-      label: "Last Calculated Xvs Accrued Block Number",
-      data: pool.lastCalculatedXvsAccruedBlockNumber,
+      label: "Reserves",
+      data:
+        Number(
+          formatUnits(pool.totalReserves ?? "", pool.underlyingDecimals)
+        ).toFixed(4) +
+        " " +
+        pool.underlyingSymbol,
     },
-    { label: "Liquidity Cents", data: pool.liquidityCents },
-    { label: "Reserve Factor Mantissa", data: pool.reserveFactorMantissa },
-    { label: "Supplier Count", data: pool.supplierCount },
     {
-      label: "Supplier Daily Xvs Mantissa",
-      data: pool.supplierDailyXvsMantissa,
+      label: "Reserve Factor",
+      data: formatUnits(pool.reserveFactorMantissa ?? "", 16) + "%",
     },
-    { label: "Supply APY", data: pool.supplyApy },
-    { label: "Supply Caps Mantissa", data: pool.supplyCapsMantissa },
-    { label: "Supply Rate Per Block", data: pool.supplyRatePerBlock },
-    { label: "Supply Xvs APR", data: pool.supplyXvsApr },
-    { label: "Supply Xvs APY", data: Number(pool.supplyXvsApy).toFixed(10) },
-    { label: "Total Borrows Mantissa", data: pool.totalBorrowsMantissa },
     {
-      label: "Total Distributed Mantissa",
-      data: pool.totalDistributedMantissa,
+      label: "Collateral Factor",
+      data: formatUnits(pool.collateralFactorMantissa ?? "", 16) + "%",
     },
-    { label: "Total Reserves Mantissa", data: pool.totalReservesMantissa },
-    { label: "Total Supply Mantissa", data: pool.totalSupplyMantissa },
-    { label: "Underlying Address", data: pool.underlyingAddress },
-    { label: "Underlying Decimal", data: pool.underlyingDecimal },
-    { label: "Underlying Name", data: pool.underlyingName },
-    { label: "Underlying Price Mantissa", data: pool.underlyingPriceMantissa },
-    { label: "Xvs Borrow Index", data: pool.xvsBorrowIndex },
-    { label: "Xvs Supply Index", data: pool.xvsSupplyIndex },
-  ];
+    {
+      label: `${pool.underlyingSymbol} minted`,
+      data: formatNumber(formatUnits(pool.totalSupply ?? "", 6)),
+    },
 
+    {
+      label: "Exchange rate",
+      data:
+        "1" +
+        pool.underlyingSymbol +
+        "=" +
+        getExchangeRate(
+          pool.exchangeRateCurrent ?? "",
+          8,
+          pool.underlyingDecimals
+        ) +
+        " v" +
+        pool.underlyingSymbol,
+    },
+  ];
+  console.log(  getExchangeRate(
+    pool.exchangeRateCurrent ?? "",
+    8,
+    pool.underlyingDecimals
+  ));
   if (loading) {
     return (
       <>
@@ -89,9 +231,31 @@ const PoolComponent = () => {
         <ConnectButton />
       </div>
       <div className="flex flex-row justify-between">
-        <div className="w-2/3">
-          <AreaChartComponent data={history} />
-        </div>
+      <div className="w-2/3 space-y-8">
+
+      <div className="w-full bg-[#1E2431] rounded-xl p-8 space-y-8">
+            <h2 className="text-3xl font-semibold text-white">Supply Info</h2>
+            <AreaChartComponent
+              data={supplyHistory}
+              yFieldLabel="Supply APY"
+              yFieldName="supplyApy"
+              color="#4ADE80"
+              tooltipFieldName="totalSupply"
+              tooltipFieldLabel="Total Supply"
+            />
+          </div>
+          <div className="w-full bg-[#1E2431] rounded-xl p-8 space-y-8">
+            <h2 className="text-3xl font-semibold text-white">Borrow Info</h2>
+            <AreaChartComponent
+              data={borrowHistory}
+              yFieldLabel="Borrow APY"
+              yFieldName="borrowApy"
+              color="#E93D66"
+              tooltipFieldName="totalBorrow"
+              tooltipFieldLabel="Total Borrow"
+            />
+          </div>
+          </div>  
         <div className="w-1/4 flex flex-col gap-6">
           <Card className="bg-[#1E2431] p-3">
             <CardBody className="flex flex-row justify-between text-md text-center items-center text-white">
@@ -134,7 +298,7 @@ const PoolComponent = () => {
                   <div className="py-3 flex justify-between">
                     <p className="text-gray-500">{info.label}</p>
                     <p className="text-white">
-                      {info.data ? info.data.toString().substring(0, 5) : ""}
+                      {info.data ? info.data : ""}
                     </p>
                   </div>
                 </div>

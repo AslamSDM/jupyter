@@ -395,21 +395,39 @@ export function SidebarIcons({ pathLink }: any) {
           color="#AAB3CA"
           id="33"
           className="mr-4 h-6 w-6 text-inherit md:mr-0 xl:mr-4"
-        >
+          >
           <path
             d="M6.667 7.333H20M16 4l4 3.314-4 3.353M17.333 16.667H4M8 20l-4-3.314 4-3.352"
             stroke="currentColor"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-          ></path>
+            ></path>
         </svg>
       );
-    default:
-      return <DashboardIcon />;
-  }
+      default:
+        return <DashboardIcon />;
+      }
+    }
+    export const arrowIcon:React.FC<IconSvgProps> =()=>{
+      return(
+        <svg
+        viewBox="0 0 16 16"
+        width="16"
+        height="16"
+        color="#AAB3CA"
+        id="33"
+        className="mr-4 h-6 w-6 text-inherit md:mr-0 xl:mr-4"
+        
+    >
+      <path
+      d="m8 2.667-.94.94 3.72 3.726H2.667v1.333h8.113l-3.726 3.72.946.947L13.334 8 8 2.667Z"
+      stroke="currentColor"
+      strokeWidth="1"
+      ></path>
+    </svg>
+  )
 }
-
 export const DashboardIcon: React.FC<IconSvgProps> = (props) => {
   return (
     <svg

@@ -10,7 +10,6 @@ bsc,
   bscTestnet,
 } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
-import { ReactNode } from 'react';
 const { chains, publicClient } = configureChains(
     [bscTestnet, bsc],
     [
@@ -24,7 +23,7 @@ const { chains, publicClient } = configureChains(
     chains
   });
   
-  const wagmiConfig = createConfig({
+export const wagmiConfig = createConfig({
     autoConnect: true,
     connectors,
     publicClient
