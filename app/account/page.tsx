@@ -272,24 +272,24 @@ console.log({isolatedassets})
 
   return (
     <>
-    <div className="w-full flex flex-col gap-8 px-10 py-8">
-      <div className="flex justify-between">
-        <h2 className="text-xl text-white font-bold">Account</h2>
-        <ConnectButton />
-      </div>
-
-      <h2 className="text-xl text-white font-bold">Summary</h2>
-      <div className="w-full rounded-xl bg-[#1E2431] flex justify-start gap-10 p-6 font-semibold text-xl">
-        <div className="flex flex-col">
-          <p className="text-gray-400">Net APY</p>
-          <p className="text-green-400">{net_apy.toFixed(2)}%</p>
+      <div className="w-full flex flex-col gap-8 px-10 py-8">
+        <div className="flex justify-between">
+          <h2 className="text-xl text-white font-bold">Account</h2>
+          <ConnectButton />
         </div>
-        {/* <div className="flex flex-col">
+
+        <h2 className="text-xl text-white font-bold">Summary</h2>
+        <div className="w-full rounded-xl bg-[#1E2431] flex justify-start gap-10 p-6 font-semibold text-xl">
+          <div className="flex flex-col">
+            <p className="text-gray-400">Net APY</p>
+            <p className="text-green-400">{net_apy.toFixed(2)}%</p>
+          </div>
+          {/* <div className="flex flex-col">
         <div className="h-full w-px bg-gray-600"></div>
    <p className="text-gray-400">Daily Earnings</p>
           <p className="text-white">100</p>
         </div> */}
-        <div className="h-full w-px bg-gray-600"></div> 
+          <div className="h-full w-px bg-gray-600"></div>
           <div className="flex flex-col">
             <p className="text-gray-400">Total Supply</p>
             <p className="text-white">${total_supplied.toFixed(2)}</p>
@@ -307,7 +307,7 @@ console.log({isolatedassets})
         </div>
         <div className="flex flex-col gap-4 items-start">
           <h2 className="text-xl text-white font-bold">Pools</h2>
-          <div className="flex gap-4">
+          {/* <div className="flex gap-4">
             <Button
               href="/core-pool"
               as={Link}
@@ -327,7 +327,16 @@ console.log({isolatedassets})
             >
               GameFi
             </Button>
-          </div>
+            
+          </div> */}
+          <Tabs variant="bordered">
+            <Tab key="core-pool" title="Venus Core Pool">
+              <div className="flex gap-4">Hello</div>
+            </Tab>
+            <Tab key="gamefi" title="GameFi">
+              <div className="flex gap-4">Hi</div>
+            </Tab>
+          </Tabs>
         </div>
         <Tabs variant="bordered">
  
@@ -399,7 +408,9 @@ console.log({isolatedassets})
                   <div className="flex justify-start gap-10">
                     <div className="flex flex-col">
                       <p className="text-gray-400">Net APY</p>
-                      <p className="text-green-400">{iso_net_apy.toFixed(3)}%</p>
+                      <p className="text-green-400">
+                        {iso_net_apy.toFixed(3)}%
+                      </p>
                     </div>
                     <div className="h-full w-px bg-gray-600"></div>
                     {/* <div className="flex flex-col">
@@ -420,7 +431,8 @@ console.log({isolatedassets})
                   <div className="flex flex-col gap-2">
                     <div className="flex justify-between gap-8">
                       <p className="text-gray-400 text-sm">
-                        Borrow Limit used: <span className="text-white">0%</span>
+                        Borrow Limit used:{" "}
+                        <span className="text-white">0%</span>
                       </p>
                       <p className="text-gray-400 text-sm">
                         Limit: <span className="text-white">$8.20</span>
@@ -447,7 +459,6 @@ console.log({isolatedassets})
         </Tabs>
       </div>
     </>
-
   );
 }
 
