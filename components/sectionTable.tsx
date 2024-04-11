@@ -282,7 +282,7 @@ function PoolTable({ tableData, columns, poolType, priceData }: any) {
         </table>
       </div>
       {/* Mobile View */}
-      <div className="md:hidden w-full flex flex-col gap-8 justify-start">
+      <div className="md:hidden w-full flex flex-col gap-8 justify-start mb-28">
         {pools.map((pool: any, index: number) => {
           const symbol = isolatedtokens.find(
             (token: any) =>
