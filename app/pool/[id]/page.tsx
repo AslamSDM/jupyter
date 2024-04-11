@@ -74,7 +74,7 @@ const PoolComponent = () => {
     }
     fetchPools();
   }, []);
-  
+
   const poolInfo = [
     { label: "Token Price", data: formatNumber(pool.tokenPriceCents) },
     {
@@ -159,7 +159,7 @@ const PoolComponent = () => {
       let borrowChartData: any = [];
       let lineChartData: any = [];
       const data_len = data.length;
-      data.forEach((item: any,index:number) => {
+      data.forEach((item: any, index: number) => {
         const date = new Date(item.blockTimestamp * 1000).toLocaleDateString(
           "en-GB"
         );
@@ -170,8 +170,7 @@ const PoolComponent = () => {
         lineChartData.push({
           supplyApy: supplyApy,
           borrowApy: borrowApy,
-          utilizationRate: (index/360)*100,
-          
+          utilizationRate: (index / 360) * 100,
         });
         supplyChartData.push({
           date: date,
@@ -227,10 +226,12 @@ const PoolComponent = () => {
     <div className="w-full py-8 px-10">
       <div className="flex justify-between mb-4">
         <Chip>{pool.name}</Chip>
-        <ConnectButton />
+        <div className="hidden md:block">
+          <ConnectButton />
+        </div>
       </div>
-      <div className="flex flex-row justify-between items-start">
-        <div className="w-2/3 space-y-8">
+      <div className="flex flex-col md:flex-row justify-between items-start gap-4 md:gap-0">
+        <div className="w-full md:w-2/3 space-y-8">
           <div className="w-full bg-[#1E2431] rounded-xl p-8 space-y-8">
             <h2 className="text-3xl font-semibold text-white">Supply Info</h2>
             <AreaChartComponent
@@ -262,7 +263,7 @@ const PoolComponent = () => {
             />
           </div> */}
         </div>
-        <div className="w-1/4 flex flex-col gap-6">
+        <div className="w-full md:w-1/4 flex flex-col gap-6">
           <Card className="bg-[#1E2431] p-3">
             <CardBody className="flex flex-row justify-between text-md text-center items-center text-white">
               <button
