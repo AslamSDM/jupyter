@@ -58,11 +58,13 @@ function Page() {
   return (
     <div className="w-full flex flex-col gap-10 px-10 py-8">
       <div className="flex justify-between">
-        <h2 className="text-2xl text-white font-bold">Vaults</h2>
-        <ConnectButton />
+        <h2 className="text-3xl text-white font-bold">Vaults</h2>
+        <div className="hidden md:block">
+          <ConnectButton />
+        </div>
       </div>
-      <div className="w-full flex justify-between">
-        <div className="w-[47%] rounded-xl bg-[#1E2431] p-6 flex flex-col gap-8 justify-between items-start">
+      <div className="w-full flex flex-col md:flex-row justify-start md:justify-between gap-4 mb-20">
+        <div className="w-full md:w-[47%] rounded-xl bg-[#1E2431] p-6 flex flex-col gap-8 justify-between items-start">
           <div className="flex justify-start items-center gap-2">
             <Image
               src={xvsImage}
@@ -113,7 +115,7 @@ function Page() {
             </button>
           </div>
         </div>
-        <div className="w-[47%] rounded-xl bg-[#1E2431] p-6 flex flex-col gap-8 justify-between items-start">
+        <div className="w-full md:w-[47%] rounded-xl bg-[#1E2431] p-6 flex flex-col gap-8 justify-between items-start">
           <div className="flex justify-start items-center gap-2">
             <Image
               src={vaiImage}

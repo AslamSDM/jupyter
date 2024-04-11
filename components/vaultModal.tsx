@@ -6,7 +6,13 @@ import Image from "next/image";
 function VaultModal({ isOpen, onOpenChange, title, coin, buttonText }: any) {
   const [amount, setAmount] = useState(0);
   return (
-    <Modal isOpen={isOpen} onClose={onOpenChange}>
+    <Modal
+      scrollBehavior="outside"
+      placement={"top"}
+      isOpen={isOpen}
+      onClose={onOpenChange}
+      shouldBlockScroll={false}
+    >
       <ModalContent className="items-center bg-[#1E2431]">
         <ModalHeader className="text-center text-white">{title}</ModalHeader>
         <Divider />

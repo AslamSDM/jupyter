@@ -38,7 +38,7 @@ export default function RootLayout({
         )}
       >
         <Providers>
-          <div className="flex">
+          <div className="flex flex-col md:flex-row items-center md:items-start">
             <Sidebar />
             {children}
           </div>

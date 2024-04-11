@@ -6,6 +6,8 @@ import { columns } from "@/components/dummyData";
 import axios from "axios";
 import { CircularProgress } from "@nextui-org/react";
 import { decodeMantissa, formatNumber } from "../utils/formatNumber";
+import Logo from "../../assets/logo.svg";
+import Image from "next/image";
 
 function Page() {
   const [pools, setPools] = useState([]);
@@ -39,8 +41,10 @@ function Page() {
       let totalLiquidity = 0;
       let totalAssets = response.data.result.length;
       response.data.result.forEach((item: any) => {
-        totalSupply += Number(item.totalsupplyusd)/100;
-        totalBorrow += decodeMantissa(item.totalBorrowsMantissa,0,0) * Number(item.tokenPriceCents);
+        totalSupply += Number(item.totalsupplyusd) / 100;
+        totalBorrow +=
+          decodeMantissa(item.totalBorrowsMantissa, 0, 0) *
+          Number(item.tokenPriceCents);
         totalLiquidity += Number(item.liquidityCents);
       });
 
@@ -58,37 +62,82 @@ function Page() {
   }, []);
 
   return (
-    <div className="w-full flex flex-col gap-10 px-10 py-8">
-      <div className="flex justify-between">
-        <h2 className="text-xl text-white font-bold">Core pool</h2>
-        <ConnectButton />
+    <>
+      {/* Desktop View */}
+      <div className="w-full md:flex flex-col gap-10 px-10 py-8 hidden">
+        <div className="flex justify-between">
+          <h2 className="text-xl text-white font-bold">Core pool</h2>
+          <ConnectButton />
+        </div>
+        <div className="w-full rounded-xl bg-[#1E2431] flex justify-start gap-4 md:gap-10 p-4 md:p-6 font-semibold text-xs md:text-xl">
+          <div className="flex flex-col">
+            <p className="text-gray-400">Total Supply</p>
+            <p className="text-white">
+              ${formatNumber(String(totalData.totalSupply))}
+            </p>
+          </div>
+          <div className="flex flex-col">
+            <p className="text-gray-400">Total Borrow</p>
+            <p className="text-white">
+              ${formatNumber(String(totalData.totalBorrow))}
+            </p>
+          </div>
+          <div className="flex flex-col">
+            <p className="text-gray-400">Available Liquidity</p>
+            <p className="text-white">
+              ${formatNumber(String(totalData.totalLiquidity))}
+            </p>
+          </div>
+          <div className="flex flex-col">
+            <p className="text-gray-400">Assets</p>
+            <p className="text-white">{totalData.totalAssets}</p>
+          </div>
+        </div>
+        {loading ? (
+          <div className="w-full flex justify-center">
+            <CircularProgress />
+          </div>
+        ) : (
+          <PoolTable tableData={pools} columns={columns} />
+        )}
       </div>
-      <div className="w-full rounded-xl bg-[#1E2431] flex justify-start gap-10 p-6 font-semibold text-xl">
-        <div className="flex flex-col">
-          <p className="text-gray-400">Total Supply</p>
-          <p className="text-white">${formatNumber(String(totalData.totalSupply))}</p>
+
+      {/* Mobile View */}
+      <div className="w-full flex flex-col md:hidden px-6 py-4 gap-8">
+        <h2 className="font-bold text-3xl">Core Pool</h2>
+        <div className="w-full rounded-xl bg-[#1E2431] flex justify-start gap-4 md:gap-10 p-4 md:p-6 font-semibold text-xl">
+          <div className="flex flex-col">
+            <p className="text-gray-400 text-xs">Total Supply</p>
+            <p className="text-white text-sm">
+              ${formatNumber(String(totalData.totalSupply))}
+            </p>
+          </div>
+          <div className="flex flex-col">
+            <p className="text-gray-400 text-xs">Total Borrow</p>
+            <p className="text-white text-sm">
+              ${formatNumber(String(totalData.totalBorrow))}
+            </p>
+          </div>
+          <div className="flex flex-col">
+            <p className="text-gray-400 text-xs">Available Liquidity</p>
+            <p className="text-white text-sm">
+              ${formatNumber(String(totalData.totalLiquidity))}
+            </p>
+          </div>
+          <div className="flex flex-col">
+            <p className="text-gray-400 text-xs">Assets</p>
+            <p className="text-white text-sm">{totalData.totalAssets}</p>
+          </div>
         </div>
-        <div className="flex flex-col">
-          <p className="text-gray-400">Total Borrow</p>
-          <p className="text-white">${formatNumber(String(totalData.totalBorrow))}</p>
-        </div>
-        <div className="flex flex-col">
-          <p className="text-gray-400">Available Liquidity</p>
-          <p className="text-white">${formatNumber(String(totalData.totalLiquidity))}</p>
-        </div>
-        <div className="flex flex-col">
-          <p className="text-gray-400">Assets</p>
-          <p className="text-white">{totalData.totalAssets}</p>
-        </div>
+        {loading ? (
+          <div className="w-full flex justify-center">
+            <CircularProgress />
+          </div>
+        ) : (
+          <PoolTable tableData={pools} columns={columns} />
+        )}
       </div>
-      {loading ? (
-        <div className="w-full flex justify-center">
-          <CircularProgress />
-        </div>
-      ) : (
-        <PoolTable tableData={pools} columns={columns} />
-      )}
-    </div>
+    </>
   );
 }
 

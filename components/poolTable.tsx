@@ -241,40 +241,121 @@ function PoolTable({ tableData, columns, poolType }: any) {
     }
   }, []);
   return (
-    <div className="py-6 text-white bg-[#1E2431] rounded-3xl">
-      <table className="w-full text-md">
-        <thead className="text-[#AAB3CA] text-md text-end">
-          <tr>
-            {columns.map((column: any) => (
-              <th scope="col" className="font-medium" key={column.key}>
-                {renderHeaderCell(column.key)}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {pools.map((pool: any, index: number) => (
-            <tr key={index}>
+    <>
+      {/* Desktop View */}
+      <div className="hidden md:block py-6 text-white bg-[#1E2431] rounded-3xl">
+        <table className="w-full text-md">
+          <thead className="text-[#AAB3CA] text-md text-end">
+            <tr>
               {columns.map((column: any) => (
-                <td key={column.key} className="text-end px-4">
-                  <Link
-                    className="w-full grid col-6"
-                    href={
-                      poolType == "isolated"
-                        ? `/isolated-pool/`
-                        : `/pool/${pool.address}`
-                        
-                    }
-                  >
-                    {renderCell(pool, column.key)}
-                  </Link>
-                </td>
+                <th scope="col" className="font-medium" key={column.key}>
+                  {renderHeaderCell(column.key)}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {pools.map((pool: any, index: number) => (
+              <tr key={index}>
+                {columns.map((column: any) => (
+                  <td key={column.key} className="text-end px-4">
+                    <Link
+                      className="w-full grid col-6"
+                      href={
+                        poolType == "isolated"
+                          ? `/isolated-pool/`
+                          : `/pool/${pool.address}`
+                      }
+                    >
+                      {renderCell(pool, column.key)}
+                    </Link>
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Mobile View */}
+      <div className="md:hidden w-full flex flex-col gap-8 justify-start">
+        {/* Mapping over pools array */}
+        {pools.map((pool: any, index: number) => (
+          <div
+            key={index}
+            className="bg-[rgb(30,36,49)] rounded-xl p-4 flex flex-col gap-4"
+          >
+            {/* Pool logo and symbol */}
+            <div className="flex justify-start items-center gap-2">
+              <Image
+                src={getImage(pool.name)} // Fetching pool image based on its name
+                alt="logo"
+                width={24}
+                height={24}
+              />
+              <p className="text-white">{pool.symbol}</p>{" "}
+              {/* Displaying pool symbol */}
+            </div>
+            {/* Horizontal line */}
+            <div className="h-px w-full bg-gray-400" />
+            {/* Pool information */}
+            <div className="flex justify-between items-start">
+              {/* Left section */}
+              <div className="flex flex-col justify-start gap-2 w-1/2">
+                <p className="text-[#AAB3CA] text-xs">Pool</p>
+                <p className="text-white text-sm">GameFi</p>
+              </div>
+              {/* Right section */}
+              <div className="flex flex-col justify-start gap-2 w-1/2">
+                <p className="text-[#AAB3CA] text-xs">Wallet</p>
+                <p className="text-white text-sm">0 USDD</p>
+                <p className="text-[#AAB3CA] text-xs">$0</p>
+              </div>
+            </div>
+            {/* Pool APY */}
+            <div className="flex justify-between items-start">
+              <div className="flex flex-col justify-start gap-2 w-1/2">
+                <p className="text-[#AAB3CA] text-xs">Supply APY/LTV</p>
+                <p className="text-white text-sm">
+                  {(Number(pool.supplyApy) + Number(pool.supplyXvsApy)).toFixed(
+                    3
+                  )}
+                  %
+                </p>
+                <p className="text-[#AAB3CA] text-xs">$0</p>
+              </div>
+              <div className="flex flex-col justify-start gap-2 w-1/2">
+                <p className="text-[#AAB3CA] text-xs">Borrow APY</p>
+                <p className="text-white text-sm">
+                  {(Number(pool.borrowApy) - Number(pool.borrowXvsApy)).toFixed(
+                    3
+                  )}
+                  %
+                </p>
+              </div>
+            </div>
+            {/* Pool Liquidity */}
+            <div className="flex justify-between items-start">
+              <div className="flex flex-col justify-start gap-2 w-1/2">
+                <p className="text-[#AAB3CA] text-xs">Liquidity</p>
+                <p className="text-white text-sm">
+                  {formatNumber(
+                    (
+                      (Number(pool.liquidityCents) * 100) /
+                      Number(pool.tokenPriceCents)
+                    ).toString()
+                  )}{" "}
+                  {pool.symbol}
+                </p>
+                <p className="text-[#AAB3CA] text-xs">
+                  {formatNumber(pool.liquidityCents)}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
   );
 }
 

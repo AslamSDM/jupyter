@@ -4,6 +4,8 @@ import PoolTable from "@/components/poolTable";
 import axios from "axios";
 import { CircularProgress } from "@nextui-org/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import Logo from "../assets/logo.svg";
+import Image from "next/image";
 
 export default function Home() {
   const [pools, setPools] = useState([]);
@@ -53,18 +55,33 @@ export default function Home() {
     fetchPools();
   }, []);
   return (
-    <div className="w-full flex flex-col gap-10 px-10 py-8">
-      <div className="flex justify-between">
-        <h2 className="text-xl text-white font-bold">Dashboard</h2>
-        <ConnectButton />
-      </div>
-      {loading ? (
-        <div className="w-full flex justify-center">
-          <CircularProgress />
+    <>
+      {/* Desktop View */}
+      <div className="hidden md:flex w-full flex-col gap-10 px-10 py-8">
+        <div className="flex justify-between">
+          <h2 className="text-xl text-white font-bold">Dashboard</h2>
+          <ConnectButton />
         </div>
-      ) : (
-        <PoolTable tableData={pools} columns={columns} />
-      )}
-    </div>
+        {loading ? (
+          <div className="w-full flex justify-center">
+            <CircularProgress />
+          </div>
+        ) : (
+          <PoolTable tableData={pools} columns={columns} />
+        )}
+      </div>
+
+      {/* Mobile View */}
+
+      <div className="w-5/6 flex justify-center items-center md:hidden">
+        {loading ? (
+          <div className="w-full flex justify-center">
+            <CircularProgress />
+          </div>
+        ) : (
+          <PoolTable tableData={pools} columns={columns} />
+        )}
+      </div>
+    </>
   );
 }

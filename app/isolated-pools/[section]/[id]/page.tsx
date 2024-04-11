@@ -9,7 +9,11 @@ import { Chip, Divider, useDisclosure } from "@nextui-org/react";
 import AreaChartComponent from "@/components/charts/Areachart";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import SupplyModal from "@/components/isolatedsupplyModal";
-import { formatNumber, getExchangeRate, getRate } from "@/app/utils/formatNumber";
+import {
+  formatNumber,
+  getExchangeRate,
+  getRate,
+} from "@/app/utils/formatNumber";
 import { formatUnits } from "viem";
 import { bsc } from "viem/chains";
 import { createPublicClient, http } from "viem";
@@ -17,12 +21,12 @@ import { oracleabi } from "@/components/abi/oracleabi";
 import { vTokenabi } from "@/components/abi/vTokenabi";
 
 const bscClient = createPublicClient({
-    chain: bsc,
-    transport: http()
-  })
+  chain: bsc,
+  transport: http(),
+});
 
 const PoolComponent = () => {
-  const { section,id } = useParams();
+  const { section, id } = useParams();
   const [pool, setPool] = useState<any>([]);
   const [comptroller, setComptroller] = useState<any>([]);
   const [supplyHistory, setSupplyHistory] = useState<any>([]);
@@ -34,16 +38,14 @@ const PoolComponent = () => {
   // const { history, loading } = useHistory(id.toString());
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
- const [priceData, setPriceData] = useState({
+  const [priceData, setPriceData] = useState({
     "0x0": { price: 1, decimal: 18 },
   });
   const [totalSupply, setTotalSupply] = useState({
-    supply:0,
-    borrow:0
+    supply: 0,
+    borrow: 0,
   });
-  useEffect(() => {
-
-  }, [section]);
+  useEffect(() => {}, [section]);
   // console.log({pool});
 
   useEffect(() => {
@@ -55,40 +57,49 @@ const PoolComponent = () => {
       const pool_ = pools_json.filter((pool: any) => pool.name === section);
       const vTokens = pool_.flatMap((p: any) => p.vTokens);
       const vToken = vTokens.filter((vToken: any) => vToken.vToken == id);
-      const price =  await bscClient.readContract({
+      const price = await bscClient.readContract({
         address: pool_[0].priceOracle,
         abi: oracleabi,
         functionName: "getUnderlyingPrice",
         args: [vToken[0].vToken],
-    })
-    const VtokenContract = {
-      address:vToken[0].vToken,
-      abi:vTokenabi
-    }
-    const usymbol = await bscClient.readContract({
-      address:vToken[0].underlyingAssetAddress,
-      abi:vTokenabi,
-      functionName:"symbol"
-    })
-    // const supplyrate = await bscClient.readContract({
-    //   address:vToken[0].vToken,
-    //   abi:vTokenabi,
-    //   functionName:"supplyRatePerBlock",
-    // })
-    // const borrowrate = await bscClient.readContract({
-    //   address:vToken[0].vToken,
-    //   abi:vTokenabi,
-    //   functionName:"borrowRatePerBlock",
-    // })
-    // console.log(borrowrate);
-    // console.log(vToken[0].borrowRatePerBlock,vToken[0].underlyingDecimals);
-    vToken[0]["tokenPriceCents"] = formatUnits(price as bigint??"", vToken[0].underlyingDecimals);
-    vToken[0]["underlyingSymbol"] = usymbol;
-    vToken[0]["underlyingDecimal"] = Number(vToken[0].underlyingDecimals);
-    vToken[0]["underlyingAddress"] = vToken[0].underlyingAssetAddress;
-    vToken[0]["exchangeRateMantissa"] = vToken[0].exchangeRateCurrent;
-    vToken[0]["borrowApy"] = getRate(vToken[0].borrowRatePerBlock as string??"",Number(vToken[0].underlyingDecimals));
-    vToken[0]["supplyApy"] = getRate(vToken[0].supplyRatePerBlock as string??"",Number(vToken[0].underlyingDecimals));
+      });
+      const VtokenContract = {
+        address: vToken[0].vToken,
+        abi: vTokenabi,
+      };
+      const usymbol = await bscClient.readContract({
+        address: vToken[0].underlyingAssetAddress,
+        abi: vTokenabi,
+        functionName: "symbol",
+      });
+      // const supplyrate = await bscClient.readContract({
+      //   address:vToken[0].vToken,
+      //   abi:vTokenabi,
+      //   functionName:"supplyRatePerBlock",
+      // })
+      // const borrowrate = await bscClient.readContract({
+      //   address:vToken[0].vToken,
+      //   abi:vTokenabi,
+      //   functionName:"borrowRatePerBlock",
+      // })
+      // console.log(borrowrate);
+      // console.log(vToken[0].borrowRatePerBlock,vToken[0].underlyingDecimals);
+      vToken[0]["tokenPriceCents"] = formatUnits(
+        (price as bigint) ?? "",
+        vToken[0].underlyingDecimals
+      );
+      vToken[0]["underlyingSymbol"] = usymbol;
+      vToken[0]["underlyingDecimal"] = Number(vToken[0].underlyingDecimals);
+      vToken[0]["underlyingAddress"] = vToken[0].underlyingAssetAddress;
+      vToken[0]["exchangeRateMantissa"] = vToken[0].exchangeRateCurrent;
+      vToken[0]["borrowApy"] = getRate(
+        (vToken[0].borrowRatePerBlock as string) ?? "",
+        Number(vToken[0].underlyingDecimals)
+      );
+      vToken[0]["supplyApy"] = getRate(
+        (vToken[0].supplyRatePerBlock as string) ?? "",
+        Number(vToken[0].underlyingDecimals)
+      );
       setComptroller(pool_[0]);
       setPool(vToken[0]);
       setLoading(false);
@@ -104,7 +115,7 @@ const PoolComponent = () => {
       let borrowChartData: any = [];
       let lineChartData: any = [];
       const data_len = data.length;
-      data.forEach((item: any,index:number) => {
+      data.forEach((item: any, index: number) => {
         const date = new Date(item.blockTimestamp * 1000).toLocaleDateString(
           "en-GB"
         );
@@ -115,8 +126,7 @@ const PoolComponent = () => {
         lineChartData.push({
           supplyApy: supplyApy,
           borrowApy: borrowApy,
-          utilizationRate: (index/360)*100,
-          
+          utilizationRate: (index / 360) * 100,
         });
         supplyChartData.push({
           date: date,
@@ -137,16 +147,27 @@ const PoolComponent = () => {
     fetchhistory();
     fetchData();
     setLoading(false);
-
-  }, [id,pool,comptroller]);
+  }, [id, pool, comptroller]);
   const poolInfo = [
     { label: "Token Price", data: formatNumber(pool.tokenPriceCents) },
     // {
     //   label: "Market Liquidity",
     //   data: formatNumber(Number(totalData.totalLiquidity)?.toString()),
     // },
-    { label: "Supply APY", data: (pool.supplyApy)?.toFixed(2)<0.01?"<0.01%":(pool.supplyApy)?.toFixed(2)+ "%" },
-    { label: "Borrow APY", data: (pool.borrowApy)?.toFixed(2)<0.01?"<0.01%":(pool.borrowApy)?.toFixed(2)+ "%" },
+    {
+      label: "Supply APY",
+      data:
+        pool.supplyApy?.toFixed(2) < 0.01
+          ? "<0.01%"
+          : pool.supplyApy?.toFixed(2) + "%",
+    },
+    {
+      label: "Borrow APY",
+      data:
+        pool.borrowApy?.toFixed(2) < 0.01
+          ? "<0.01%"
+          : pool.borrowApy?.toFixed(2) + "%",
+    },
     {
       label: "Supply Cap",
       data:
@@ -223,16 +244,17 @@ const PoolComponent = () => {
   return (
     <div className="w-full py-8 px-10">
       <div className="flex justify-between mb-4">
-      <h2 className="text-xl text-gray-400 font-bold">
-          Isolated pools /{section}/ <span className="text-white">{pool. underlyingSymbol
-}</span>
+        <h2 className="text-xl text-gray-400 font-bold">
+          Isolated pools /{section}/{" "}
+          <span className="text-white">{pool.underlyingSymbol}</span>
         </h2>
-                <ConnectButton />
+        <div className="hidden md:block">
+          <ConnectButton />
+        </div>
       </div>
-      <div className="flex flex-row justify-between">
-      <div className="w-2/3 space-y-8">
-
-      <div className="w-full bg-[#1E2431] rounded-xl p-8 space-y-8">
+      <div className="flex flex-col md:flex-row justify-between gap-4 md:gap-0">
+        <div className="w-full md:w-2/3 space-y-8">
+          <div className="w-full bg-[#1E2431] rounded-xl p-8 space-y-8">
             <h2 className="text-3xl font-semibold text-white">Supply Info</h2>
             <AreaChartComponent
               data={supplyHistory}
@@ -254,8 +276,8 @@ const PoolComponent = () => {
               tooltipFieldLabel="Total Borrow"
             />
           </div>
-          </div>  
-        <div className="w-1/4 flex flex-col gap-6">
+        </div>
+        <div className="w-full md:w-1/4 flex flex-col gap-6 mb-20">
           <Card className="bg-[#1E2431] p-3">
             <CardBody className="flex flex-row justify-between text-md text-center items-center text-white">
               <button
@@ -296,9 +318,7 @@ const PoolComponent = () => {
                   <Divider />
                   <div className="py-3 flex justify-between">
                     <p className="text-gray-500">{info.label}</p>
-                    <p className="text-white">
-                      {info.data ? info.data : ""}
-                    </p>
+                    <p className="text-white">{info.data ? info.data : ""}</p>
                   </div>
                 </div>
               ))}

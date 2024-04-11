@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import {  useContractReads } from "wagmi";
+import { useContractReads } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { CircularProgress } from "@nextui-org/react";
 import IsolatedPoolsTable from "@/components/isolatedPoolsTable";
@@ -12,9 +12,9 @@ import { bsc } from "viem/chains";
 import { createPublicClient, http } from "viem";
 
 const bscClient = createPublicClient({
-    chain: bsc,
-    transport: http()
-  })
+  chain: bsc,
+  transport: http(),
+});
 
 const IsolatedPoolsPage = () => {
   const [pools, setPools] = useState([]);
@@ -54,64 +54,86 @@ const IsolatedPoolsPage = () => {
     fetchData();
   }, []);
   useEffect(() => {
-    async function fetchPrices(){
-      const f =  await bscClient.multicall({
-         contracts: pools.flatMap((p: any) =>
-         p.vTokens.map((vToken: any) => ({
-           address: p.priceOracle,
-           abi: oracleabi,
-           functionName: "getUnderlyingPrice",
-           args: [vToken.vToken],
-         }))
-       ),
-       })
-       console.log(f);
-       if(f === undefined){
+    async function fetchPrices() {
+      const f = await bscClient.multicall({
+        contracts: pools.flatMap((p: any) =>
+          p.vTokens.map((vToken: any) => ({
+            address: p.priceOracle,
+            abi: oracleabi,
+            functionName: "getUnderlyingPrice",
+            args: [vToken.vToken],
+          }))
+        ),
+      });
+      console.log(f);
+      if (f === undefined) {
+        return;
+      }
 
-         return;
-        }
-        
-      if (Array.isArray(f) && f?.length=== 0) return;
+      if (Array.isArray(f) && f?.length === 0) return;
       if (f.length === 0 || !f) return;
       let priceData_temp: any = {};
       let total: any = {};
       let vTokens = pools.flatMap((pool: any) => pool.vTokens);
-      
+
       vTokens.forEach((vToken: any, i: number) => {
-      
-        if (
-          vToken &&
-          vToken.vToken &&
-          f &&
-          i < f.length
-          && f[i]?.result
-        ) {
+        if (vToken && vToken.vToken && f && i < f.length && f[i]?.result) {
           priceData_temp[vToken.vToken] = {
-            price: formatUnits(f[i]?.result as bigint,vToken.underlyingDecimals==18?18:(vToken.underlyingDecimals==9?27:30)),
+            price: formatUnits(
+              f[i]?.result as bigint,
+              vToken.underlyingDecimals == 18
+                ? 18
+                : vToken.underlyingDecimals == 9
+                ? 27
+                : 30
+            ),
             decimal: vToken.underlyingDecimals,
-            totalSupply: Number(formatUnits(vToken.totalSupply,8)) * Number(formatUnits(f[i]?.result as bigint,vToken.underlyingDecimals==18?18:(vToken.underlyingDecimals==9?27:30))),
-            totalBorrow: Number(formatUnits(vToken.totalBorrows,18)) * Number(formatUnits(f[i]?.result as bigint,vToken.underlyingDecimals==18?18:(vToken.underlyingDecimals==9?27:30))),
+            totalSupply:
+              Number(formatUnits(vToken.totalSupply, 8)) *
+              Number(
+                formatUnits(
+                  f[i]?.result as bigint,
+                  vToken.underlyingDecimals == 18
+                    ? 18
+                    : vToken.underlyingDecimals == 9
+                    ? 27
+                    : 30
+                )
+              ),
+            totalBorrow:
+              Number(formatUnits(vToken.totalBorrows, 18)) *
+              Number(
+                formatUnits(
+                  f[i]?.result as bigint,
+                  vToken.underlyingDecimals == 18
+                    ? 18
+                    : vToken.underlyingDecimals == 9
+                    ? 27
+                    : 30
+                )
+              ),
             rawtotalBorrow: vToken.totalBorrows,
           };
           total["supply"] = total["supply"] || 0;
           total["borrow"] = total["borrow"] || 0;
           total["supply"] += priceData_temp[vToken.vToken]?.totalSupply;
-          total["borrow"] += priceData_temp[vToken.vToken]?.totalBorrow;    
+          total["borrow"] += priceData_temp[vToken.vToken]?.totalBorrow;
         } else {
           priceData_temp[vToken?.vToken] = null;
         }
         setPriceData(priceData_temp);
       });
-          pools.forEach((pool: any) => {
-            pool.vTokens.forEach((vToken: any) => {
-              total[pool.name] = total[pool.name] || { supply: 0, borrow: 0 };
-              total[pool.name]["supply"] += priceData_temp[vToken.vToken]?.totalSupply;
-              total[pool.name]["borrow"] += priceData_temp[vToken.vToken]?.totalBorrow;
-        });});
-        setTotalSupply(total);
-       return f;
-      
-
+      pools.forEach((pool: any) => {
+        pool.vTokens.forEach((vToken: any) => {
+          total[pool.name] = total[pool.name] || { supply: 0, borrow: 0 };
+          total[pool.name]["supply"] +=
+            priceData_temp[vToken.vToken]?.totalSupply;
+          total[pool.name]["borrow"] +=
+            priceData_temp[vToken.vToken]?.totalBorrow;
+        });
+      });
+      setTotalSupply(total);
+      return f;
     }
     fetchPrices();
   }, [pools]);
@@ -163,7 +185,7 @@ const IsolatedPoolsPage = () => {
   //       total["supply"] = total["supply"] || 0;
   //       total["borrow"] = total["borrow"] || 0;
   //       total["supply"] += priceData_temp[vToken.vToken]?.totalSupply;
-  //       total["borrow"] += priceData_temp[vToken.vToken]?.totalBorrow;    
+  //       total["borrow"] += priceData_temp[vToken.vToken]?.totalBorrow;
   //     } else {
   //       priceData_temp[vToken?.vToken] = null;
   //     }
@@ -202,22 +224,33 @@ const IsolatedPoolsPage = () => {
   ];
   return (
     <div className="w-full flex flex-col gap-10 px-10 py-8">
-      <div className="flex justify-between">
-        <h2 className="text-xl text-white font-bold">Isolated pools</h2>
-        <ConnectButton />
+      <div className="flex justify-between items-center">
+        <h2 className="text-3xl text-white font-bold">Isolated pools</h2>
+        <div className="hidden md:block">
+          <ConnectButton />
+        </div>
       </div>
-      <div className="w-full rounded-xl bg-[#1E2431] flex justify-start gap-10 p-6 font-semibold text-xl">
+      <div className="w-full rounded-xl bg-[#1E2431] flex justify-start gap-4 md:gap-10 p-3 md:p-6 font-semibold text-xs md:text-xl">
         <div className="flex flex-col">
           <p className="text-gray-400">Total Supply</p>
-          <p className="text-white">${formatNumber(String(totalSupply.supply *100))}</p>
+          <p className="text-white">
+            ${formatNumber(String(totalSupply.supply * 100))}
+          </p>
         </div>
         <div className="flex flex-col">
           <p className="text-gray-400">Total Borrow</p>
-          <p className="text-white">${formatNumber(String(totalSupply.borrow *100))}</p>
+          <p className="text-white">
+            ${formatNumber(String(totalSupply.borrow * 100))}
+          </p>
         </div>
         <div className="flex flex-col">
           <p className="text-gray-400">Available Liquidity</p>
-          <p className="text-white">${formatNumber(String((totalSupply.supply-totalSupply.borrow) *100))}</p>
+          <p className="text-white">
+            $
+            {formatNumber(
+              String((totalSupply.supply - totalSupply.borrow) * 100)
+            )}
+          </p>
         </div>
         <div className="flex flex-col">
           <p className="text-gray-400">Total Treasury</p>
@@ -229,7 +262,11 @@ const IsolatedPoolsPage = () => {
           <CircularProgress />
         </div>
       ) : (
-        <IsolatedPoolsTable columns={columns} pools={pools} total={totalSupply} />
+        <IsolatedPoolsTable
+          columns={columns}
+          pools={pools}
+          total={totalSupply}
+        />
       )}
     </div>
   );

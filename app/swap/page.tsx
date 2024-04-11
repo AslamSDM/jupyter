@@ -16,10 +16,12 @@ function Page() {
   return (
     <div className="w-full flex flex-col items-center gap-10 px-10 py-8">
       <div className="w-full flex justify-between">
-        <h2 className="text-2xl text-white font-bold">Swap</h2>
-        <ConnectButton />
+        <h2 className="text-3xl text-white font-bold">Swap</h2>
+        <div className="hidden md:block">
+          <ConnectButton />
+        </div>
       </div>
-      <div className="w-2/5 rounded-3xl p-10 bg-[#1E2431] flex flex-col gap-4">
+      <div className="w-full md:w-2/5 rounded-3xl p-10 bg-[#1E2431] flex flex-col gap-4">
         <p className="text-gray-400">From</p>
         <Input
           placeholder="0.00"
