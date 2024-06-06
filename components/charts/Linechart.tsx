@@ -25,6 +25,7 @@ function LineChartComponent(
     }
     return null;
   }, []);
+
   console.log(data);
   // const data = [];
 // const data = data_temp.map((item:any)=>{
@@ -38,6 +39,7 @@ function LineChartComponent(
 //     });
 //   data.sort((a, b) => a.utilizationRate - b.utilizationRate);
 
+
   const ticks = [25, 50, 75, 100];
   return (
     <ResponsiveContainer width="100%" height={250}>
@@ -46,6 +48,7 @@ function LineChartComponent(
         {ticks.map((tick, index) => (
           <ReferenceLine key={index} y={tick} stroke="#606060" />
         ))}
+        <ReferenceLine x={20} stroke="#0000DD" isFront={false} />
         <XAxis
           type="number"
           ticks={ticks}
